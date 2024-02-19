@@ -1,6 +1,6 @@
 # bounswe2024group7
 
-## About
+## 🔎 About
 
 We are the 7th group of CMPE352 for Spring '24.
 
