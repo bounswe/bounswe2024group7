@@ -13,7 +13,7 @@ We are the 7th group of CMPE352 for Spring '24.
 - [Deniz Bilge Akkoç](https://github.com/DenizBilgeAkkoc)
 - [Eren Pakelgil](https://github.com/bounswe/bounswe2024group7/wiki/Eren-Pakelgil)
 - [Hanaa Zaqout](https://github.com/hanazaq)
-- [Mert Cengiz]()
+- [Mert Cengiz](https://github.com/MertCengiz)
 - [Mustafa Ocak](https://github.com/modjak)
 - [Mustafa Oğuz Hekim](https://github.com/oguzhekim)
 
