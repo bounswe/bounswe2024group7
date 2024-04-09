@@ -1,0 +1,21 @@
+sequenceDiagram
+    actor Joseph
+    Joseph->>GuestUser: register(username, email, password)
+    activate GuestUser
+    GuestUser->>DataBase: verifyCredentials(username, email, password)
+    activate DataBase
+    DataBase-->>GuestUser: status1    
+    alt status1 IS 200
+        GuestUser->>DataBase: createUser(username, email, password)
+        DataBase-->>GuestUser: <status2, token>
+        deactivate DataBase
+        alt status2 IS 201
+            GuestUser-->>Joseph: token
+        else 
+            GuestUser-->>Joseph: <<Display Register Error>>
+        end
+    else
+        GuestUser-->>Joseph: <<Display Register Error>>
+    end    
+
+    deactivate GuestUser

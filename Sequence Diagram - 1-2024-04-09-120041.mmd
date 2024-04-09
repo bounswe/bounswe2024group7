@@ -1,0 +1,15 @@
+sequenceDiagram
+    actor Susanne
+    Susanne->>GuestUser: login(username, password)
+    activate GuestUser
+    GuestUser->>DataBase: verifyPassword(username, password)
+    activate DataBase
+    DataBase-->>GuestUser: <status, token>
+    deactivate DataBase
+    alt status IS 200
+        GuestUser-->>Susanne: token
+    else
+        GuestUser->>Susanne: <<Display Login Error>>
+    end
+    deactivate GuestUser
+    

@@ -1,0 +1,18 @@
+sequenceDiagram
+    actor Samuel Osayi
+    Samuel Osayi->>User: <<Search For a Query>>
+    activate User
+    User->>Search: search(query)
+    activate Search
+    Search->>Wikidata API: queryCall(query)
+    activate Wikidata API
+    Wikidata API -->> Search: <status, Response Object>
+    deactivate Wikidata API    
+    alt status IS 2xx
+        Search-->>User: WikidataResult 
+        User-->>Samuel Osayi: <<Display Wikidata Result>>   
+    else
+        Search-->>Samuel Osayi: <<Display Search Error>>
+        deactivate Search
+    end    
+    deactivate User
