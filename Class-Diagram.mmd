@@ -31,7 +31,6 @@ classDiagram
         +getSignUpDate(username: String) String
         +getSuspended(username: String) bool
         +setSuspended(username: String, suspended: bool)
-        +login(username: string, password: string)
         +logout()
         +classify()
         +followUser(user: RegisteredUser)
@@ -39,6 +38,7 @@ classDiagram
     }
     class GuestUser{
         +register(username: string, e-mail: string, password: string)
+        +login(username: string, password: string)
     }
     class Administrator{
         -String sign-up-date
