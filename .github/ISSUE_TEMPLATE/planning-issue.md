@@ -14,12 +14,6 @@ Briefly describe the goal or outcome you aim to achieve with this issue. This co
 ## Background/Context:
 Provide any background information that is necessary to understand the issue. This could include:
 
-## Links to relevant documentation or previous discussions
-
-## Summary of related work done by the team or in the industry
-
-## Explanation of how this issue fits into the overall project goals
-
 ## Detailed Description:
 Expand on the objective with a detailed description of what is being proposed, discussed, or clarified. Include the solutions you have considered and your questions.
 
