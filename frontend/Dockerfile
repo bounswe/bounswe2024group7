@@ -15,6 +15,7 @@ EXPOSE 3000
 
 # Define environment variable
 ENV NODE_ENV=development
+ENV VITE_GH_PAGES_PATH=/
 
 # Run the app when the container launches
 CMD ["npm", "run", "dev"]
