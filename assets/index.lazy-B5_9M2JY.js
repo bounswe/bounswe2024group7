@@ -1,0 +1,1 @@
+import{k as o,j as e}from"./index-UFpoSWqh.js";var n={};const s=n.GITHUB_PAGES?"/bounswe2024group7/":"/",a=o(s)({component:t});function t(){return e.jsx("div",{className:"p-2",children:e.jsx("h3",{children:"Welcome Home!"})})}export{a as Route};
