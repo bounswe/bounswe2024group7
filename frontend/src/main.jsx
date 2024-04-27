@@ -13,14 +13,10 @@ import { registerRoute } from './routes/register'
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
-  registerRoute
+  registerRoute,
 ])
 
 const router = createRouter({ routeTree })
-
-console.log(router)
-
-console.log(routeTree)
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ChakraProvider>

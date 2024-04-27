@@ -23,6 +23,8 @@ import {
 export default function RegisterComponent() {
     const [showPassword, setShowPassword] = useState(false)
 
+    // TODO: ADD REGISTER REQUEST
+
     return (
         <Flex
             minH={'100vh'}

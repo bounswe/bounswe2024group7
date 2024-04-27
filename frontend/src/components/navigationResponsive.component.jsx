@@ -34,8 +34,6 @@ export default function NavigationResponsive() {
     const { isOpen, onToggle } = useDisclosure()
     const { colorMode, toggleColorMode } = useColorMode()
 
-    console.log(loginPath, registerPath, indexPath)
-
     return (
         <Box>
             <Flex
