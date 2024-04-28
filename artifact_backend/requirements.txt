@@ -1,3 +1,4 @@
 Django
 python-dotenv
 mysqlclient
+sparqlwrapper
