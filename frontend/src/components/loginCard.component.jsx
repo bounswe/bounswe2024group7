@@ -13,11 +13,11 @@ import {
     useToast
 } from '@chakra-ui/react'
 import apiInstance from '../instance/apiInstance.js'
-import { registerPath } from '../constants/paths'
+import { registerPath } from '../constants/paths.js'
 import { useState } from 'react'
 import { useNavigate } from "@tanstack/react-router"
 import { useDispatch } from "react-redux";
-import { userActions } from '../context/user'
+import { userActions } from '../context/user.js'
 import Cookies from "js-cookie"
 
 export default function LoginCard() {
