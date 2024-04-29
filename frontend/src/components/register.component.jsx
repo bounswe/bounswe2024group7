@@ -13,17 +13,72 @@ import {
     Text,
     useColorModeValue,
     Link,
+    useToast
 } from '@chakra-ui/react'
-import { useState } from 'react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
     loginPath
 } from "../constants/paths"
+import apiInstance from '../instance/apiInstance.js'
+import { useState } from 'react'
+import { useNavigate } from "@tanstack/react-router"
+import { useDispatch } from "react-redux";
+import { userActions } from '../context/user'
+import Cookies from "js-cookie"
 
 export default function RegisterComponent() {
     const [showPassword, setShowPassword] = useState(false)
 
-    // TODO: ADD REGISTER REQUEST
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const navigate = useNavigate()
+    const toast = useToast()
+    const dispatch = useDispatch();
+
+    const handleUserRegister = async () => {
+        try {
+            const response = await apiInstance().post(
+                "signup",
+                {
+                    username,
+                    email,
+                    password
+                }
+            )
+
+            console.log(response)
+
+            if (response.status === 201) {
+                console.log(response.data)
+
+                dispatch(
+                    userActions.login({
+                        userName: username,
+                    })
+                )
+
+                Cookies.set("username", username)
+
+                navigate(
+                    {
+                        to: "/",
+                        state: {
+                            username
+                        }
+                    }
+                )
+            }
+        } catch (e) {
+            console.log(e)
+            toast({
+                title: "There was an error while logging in. Please try again.",
+                status: "error",
+                isClosable: true,
+                duration: 2000,
+            });
+        }
+    }
 
     return (
         <Flex
@@ -31,7 +86,14 @@ export default function RegisterComponent() {
             align={'center'}
             justify={'center'}
             bg={useColorModeValue('gray.50', 'gray.800')}>
-            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+            <Stack
+                spacing={8}
+                mx={'auto'}
+                maxW={'xl'}
+                w={"lg"}
+                py={12}
+                px={6}
+            >
                 <Stack align={'center'}>
                     <Heading fontSize={'4xl'} textAlign={'center'}>
                         Sign up
@@ -48,31 +110,35 @@ export default function RegisterComponent() {
                     boxShadow={'lg'}
                     p={8}>
                     <Stack spacing={4}>
-                        <HStack>
-                            <Box>
-                                <FormControl id="firstName" isRequired>
-                                    <FormLabel>First Name</FormLabel>
-                                    <Input type="text" focusBorderColor='purple.500'
-                                    />
-                                </FormControl>
-                            </Box>
-                            <Box>
-                                <FormControl id="lastName">
-                                    <FormLabel>Last Name</FormLabel>
-                                    <Input type="text" focusBorderColor='purple.500'
-                                    />
-                                </FormControl>
-                            </Box>
-                        </HStack>
+                        <FormControl id="username" isRequired>
+                            <FormLabel>Username</FormLabel>
+                            <Input type="text" focusBorderColor='purple.500'
+                                onChange={
+                                    (e) => {
+                                        setUsername(e.target.value)
+                                    }
+                                }
+                            />
+                        </FormControl>
                         <FormControl id="email" isRequired>
                             <FormLabel>Email address</FormLabel>
                             <Input type="email" focusBorderColor='purple.500'
+                                onChange={
+                                    (e) => {
+                                        setEmail(e.target.value)
+                                    }
+                                }
                             />
                         </FormControl>
                         <FormControl id="password" isRequired>
                             <FormLabel>Password</FormLabel>
                             <InputGroup>
                                 <Input type={showPassword ? 'text' : 'password'} focusBorderColor='purple.500'
+                                    onChange={
+                                        (e) => {
+                                            setPassword(e.target.value)
+                                        }
+                                    }
                                 />
                                 <InputRightElement h={'full'}>
                                     <Button
@@ -91,7 +157,9 @@ export default function RegisterComponent() {
                                 color={'white'}
                                 _hover={{
                                     bg: 'purple.500',
-                                }}>
+                                }}
+                                onClick={handleUserRegister}
+                            >
                                 Sign up
                             </Button>
                         </Stack>
