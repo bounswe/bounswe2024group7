@@ -52,9 +52,9 @@ def artwork_search(request):
                 'painting_results': painting_results,
                 'movement_results': movement_results,
                 'genre_results': genre_results
-            })
+            }, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'error': str(e)}, status=400)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response({'error': 'Query parameter is required'}, status=400)
+        return Response({'error': 'Query parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
 
