@@ -57,10 +57,7 @@ export default function NavigationResponsive() {
         try {
             const response = await apiInstance().post("logout")
 
-            console.log(response)
-
             if (response.status === 200) {
-                console.log(response.data)
 
                 dispatch(userActions.logout());
 
@@ -68,7 +65,7 @@ export default function NavigationResponsive() {
 
                 navigate(
                     {
-                        to: import.meta.env.VITE_BASE_PATH
+                        to: "/"
                     },
                 )
             }

@@ -47,10 +47,7 @@ export default function RegisterComponent() {
                 }
             )
 
-            console.log(response)
-
             if (response.status === 201) {
-                console.log(response.data)
 
                 dispatch(
                     userActions.login({
@@ -62,7 +59,7 @@ export default function RegisterComponent() {
 
                 navigate(
                     {
-                        to: import.meta.env.VITE_BASE_PATH
+                        to: "/"
                     }
                 )
             }

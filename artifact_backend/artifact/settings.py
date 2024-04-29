@@ -28,10 +28,16 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'bounswe2024group7-yslcfqdwna-oa.a.run.app',
+    'artifactbackend-yslcfqdwna-oa.a.run.app',
+    'localhost'
+]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://bounswe.github.io',
+    'https://frontend-yslcfqdwna-oa.a.run.app'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -85,13 +91,15 @@ WSGI_APPLICATION = 'artifact.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+ENVIRONMENT = os.getenv("ENV")
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('MYSQL_DATABASE'),
         'USER': os.getenv('MYSQL_USER'),
         'PASSWORD': os.getenv('MYSQL_PASSWORD'),
-        'HOST': os.getenv('DB_HOST', 'artifact_mysql'),   # Or an IP Address that your DB is hosted on
+        'HOST': os.getenv('DB_HOST') if ENVIRONMENT == "PRODUCTION" else "artifact_mysql",
         'PORT': os.getenv('DB_PORT', '3306'),
     }
 }
