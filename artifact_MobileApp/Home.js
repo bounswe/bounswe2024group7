@@ -3,13 +3,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
-
+// import SearchBar from './SearchBar'; 
 
 const Home = ({ navigation }) => {
   return (
     
     <View style={styles.container}>
-    <Text style={styles.title}> Welcome to Atrifact !!</Text>
+    <Text style={styles.title}> Welcome to Artifact !!</Text>
+    
        <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('Login')}>
@@ -19,6 +20,11 @@ const Home = ({ navigation }) => {
         style={styles.button}
         onPress={() => navigation.navigate('Signup')}>
         <Text style={styles.buttonText}>Go to SignUp</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('SearchBar')}>
+        <Text style={styles.buttonText}>Search</Text>
       </TouchableOpacity>
    
     </View>
@@ -31,10 +37,10 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     },
     title: {
-      fontSize: 36,
+      fontSize: 24,
       fontWeight: 'bold',
       marginBottom: 20,
-      color: '#007bff', // Blue color
+      color: '#3C3633',
       fontFamily: 'Cursive ',
     },
     input: {
@@ -46,7 +52,7 @@ const styles = StyleSheet.create({
       paddingHorizontal: 10,
     },
     button: {
-      backgroundColor: '#007bff',
+      backgroundColor: '#3C3633',
       width: '80%',
       height: 40,
       justifyContent: 'center',

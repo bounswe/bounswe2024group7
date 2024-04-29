@@ -6,10 +6,13 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-nati
 const Signup = ()=>{
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
+  const checkDatabase = (username, password) => {
+    console.log({username, password});
+    // call Database here
+  };
   return (
     <View style={styles.container}>
-      <Text style={styles.title}> SignUp to Atrifact</Text>
+      <Text style={styles.title}> SignUp to Artifact</Text>
       <TextInput
         style={styles.input}
         placeholder='Create Username'
@@ -25,7 +28,7 @@ const Signup = ()=>{
       />
       <TouchableOpacity
         style={styles.button}
-        onPress={() => console.log({ username, password })}
+        onPress={() => checkDatabase(username, password )}
       >
         <Text style={styles.buttonText}>SignUp</Text>
       </TouchableOpacity>
@@ -40,10 +43,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 36,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#007bff', // Blue color
+    color: '#3C3633',
     fontFamily: 'Cursive ',
   },
   input: {
@@ -55,7 +58,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#3C3633',
     width: '80%',
     height: 40,
     justifyContent: 'center',
