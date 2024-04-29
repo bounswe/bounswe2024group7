@@ -1,77 +1,82 @@
 from django.db import models
 from django.contrib.auth.models import User
-import json
+
 
 class Image(models.Model):
     url = models.CharField(primary_key=True, max_length=255)
 
+
 class Profile(models.Model):
-    username = models.ForeignKey(User, on_delete=models.CASCADE, to_field='username')
+    username = models.OneToOneField(User, on_delete=models.CASCADE, to_field='username', db_column='username')
     bio = models.TextField(null=True, blank=True)
-    profile_picture = models.ForeignKey(Image, on_delete=models.DO_NOTHING, to_field="url")
-    list_of_post_ids = models.TextField(default=json.dumps([]))
-    list_of_follower_usernames = models.TextField(default=json.dumps([]))
-    list_of_following_usernames = models.TextField(default=json.dumps([]))
-    list_of_blocked_user_usernames = models.TextField(default=json.dumps([]))
-    
+    profile_picture = models.ForeignKey(Image, null=True, blank=True, on_delete=models.DO_NOTHING, to_field="url",
+                                        db_column="profile_picture_url")
+    followers = models.ManyToManyField('self', symmetrical=False, related_name='following')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     def str(self):
         return self.username
 
-    
+
 class Post(models.Model):
-    post_id = models.AutoField(primary_key=True)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, editable=False)
     title = models.TextField(max_length=50)
-    is_wikidata_api = models.BooleanField(default=False)
-    textual_content = models.TextField(max_length=600, blank=True)
-    picture = models.ForeignKey(Image, on_delete= models.CASCADE, to_field="url")
-    number_of_likes = models.IntegerField()
-    username = models.ForeignKey(User, on_delete= models.CASCADE, to_field="username")
-    list_of_label_ids = models.TextField(default = json.dumps([]))
+    content = models.TextField(max_length=600)
+    image = models.ForeignKey(Image, on_delete=models.CASCADE, to_field="url")  # TODO: Is multiple image allowed?
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def str(self):
         return self.title
-    
+
+
 class Collection(models.Model):
-    collection_id = models.AutoField(primary_key=True)
-    name = models.TextField(max_length=30, blank = False)
-    username = models.ForeignKey(User, on_delete=models.CASCADE, to_field="username")
-    list_of_post_ids = models.TextField(default= json.dumps([]))
+    name = models.TextField(max_length=30)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    posts = models.ManyToManyField(Post, related_name='collection_post')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def str(self):
-        return self.collection_id
+        return self.name
+
 
 class Like(models.Model):
-    id = models.AutoField(primary_key=True)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, to_field="post_id")
-    username = models.ForeignKey(User, on_delete=models.CASCADE, to_field="username")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    def str(self):
-        return self.like_id
+    def __str__(self):
+        return f"Like by {self.profile.username} on post {self.post.id}"
+
 
 class Comment(models.Model):
-    comment_id = models.AutoField(primary_key=True)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, to_field="post_id")
-    username = models.ForeignKey(User, on_delete=models.CASCADE, to_field="username")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    content = models.TextField(max_length=300)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    def str(self):
-        return self.comment_id
-    
+    def __str__(self):
+        return f"Comment by {self.profile.username} on post {self.post.id}"
+
+
 class Label(models.Model):
-    label_id = models.AutoField(primary_key=True)
-    label_name = models.TextField()
-    label_type = models.TextField()
+    name = models.TextField()
+    type = models.TextField()
     material = models.TextField()
     genre = models.TextField()
     is_own_artwork = models.BooleanField(default=False)
-   
+
     def str(self):
-        return self.label_id
+        return f"Label {self.name} of type {self.type}"
+
 
 class Notification(models.Model):
-    notification_id = models.AutoField(primary_key=True)
     title = models.TextField(max_length=50)
-    content = models.TextField(blank = True, max_length=200)
-    list_of_usernames = models.TextField(default= json.dumps([]))
+    content = models.TextField(blank=True, max_length=200)
+    receivers = models.ManyToManyField(User, related_name='notifications')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def str(self):
-        return self.notification_id
+        return self.title
