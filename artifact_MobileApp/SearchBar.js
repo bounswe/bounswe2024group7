@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = () => {
   const [searchText, setSearchText] = useState('');
 
   const handleSearch = (val) => {
