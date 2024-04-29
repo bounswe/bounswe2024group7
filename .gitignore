@@ -25,3 +25,9 @@ dist-ssr
 
 .env
 .vite
+
+artifact_backend/.idea
+
+.env.development
+ __pycache__/
+ *.pyc
