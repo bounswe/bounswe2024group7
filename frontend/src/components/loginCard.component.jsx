@@ -10,11 +10,66 @@ import {
     Heading,
     Text,
     useColorModeValue,
+    useToast
 } from '@chakra-ui/react'
-
+import apiInstance from '../instance/apiInstance.js'
 import { registerPath } from '../constants/paths'
+import { useState } from 'react'
+import { useNavigate } from "@tanstack/react-router"
+import { useDispatch } from "react-redux";
+import { userActions } from '../context/user'
+import Cookies from "js-cookie"
 
 export default function LoginCard() {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("")
+    const navigate = useNavigate()
+    const toast = useToast()
+    const dispatch = useDispatch();
+
+    const handleUserLogin = async () => {
+        try {
+            const response = await apiInstance().post(
+                "login",
+                {
+                    username,
+                    password
+                }
+            )
+
+            console.log(response)
+
+            if (response.status === 200) {
+                console.log(response.data)
+
+                dispatch(
+                    userActions.login({
+                        userName: username,
+                    })
+                )
+
+                Cookies.set("username", username)
+
+                navigate(
+                    {
+                        to: "/",
+                        state: {
+                            username
+                        }
+                    }
+                )
+            }
+        } catch (e) {
+            console.log(e)
+            toast({
+                title: "There was an error while logging in. Please try again.",
+                status: "error",
+                isClosable: true,
+                duration: 2000,
+            });
+        }
+    }
+
     return (
         <Flex
             minH={'100vh'}
@@ -37,15 +92,25 @@ export default function LoginCard() {
                     p={8}>
                     <Stack spacing={4}>
                         <FormControl id="email">
-                            <FormLabel>Email address</FormLabel>
-                            <Input type="email"
+                            <FormLabel>Username</FormLabel>
+                            <Input type="text"
                                 focusBorderColor='purple.500'
+                                onChange={
+                                    (e) => {
+                                        setUsername(e.target.value)
+                                    }
+                                }
                             />
                         </FormControl>
                         <FormControl id="password">
                             <FormLabel>Password</FormLabel>
                             <Input type="password"
                                 focusBorderColor='purple.500'
+                                onChange={
+                                    (e) => {
+                                        setPassword(e.target.value)
+                                    }
+                                }
                             />
                         </FormControl>
                         <Stack spacing={10}>
@@ -60,7 +125,9 @@ export default function LoginCard() {
                                 color={'white'}
                                 _hover={{
                                     bg: 'purple.500',
-                                }}>
+                                }}
+                                onClick={handleUserLogin}
+                            >
                                 Sign in
                             </Button>
                         </Stack>

@@ -14,7 +14,15 @@ import {
     useBreakpointValue,
     useDisclosure,
     useColorMode,
-    Link
+    Link,
+    useToast,
+    Avatar,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    MenuDivider,
+    Center
 } from '@chakra-ui/react'
 import {
     HamburgerIcon,
@@ -29,10 +37,51 @@ import {
     registerPath,
     indexPath
 } from "../constants/paths"
+import { useDispatch, useSelector } from "react-redux";
+import { userName } from '../context/user';
+import { useEffect, useState } from 'react';
+import apiInstance from "./../instance/apiInstance.js"
+import { useNavigate } from "@tanstack/react-router"
+import { userActions } from '../context/user'
+import Cookies from "js-cookie"
 
 export default function NavigationResponsive() {
     const { isOpen, onToggle } = useDisclosure()
     const { colorMode, toggleColorMode } = useColorMode()
+    const username = useSelector(userName)
+    const navigate = useNavigate()
+    const toast = useToast()
+    const dispatch = useDispatch();
+
+    const handleLogOut = async () => {
+        try {
+            const response = await apiInstance().post("logout")
+
+            console.log(response)
+
+            if (response.status === 200) {
+                console.log(response.data)
+
+                dispatch(userActions.logout());
+
+                Cookies.set("username", "")
+
+                navigate(
+                    {
+                        to: "/"
+                    },
+                )
+            }
+        } catch (e) {
+            console.log(e)
+            toast({
+                title: "There was an error while logging out. Please try again.",
+                status: "error",
+                isClosable: true,
+                duration: 2000,
+            });
+        }
+    }
 
     return (
         <Box>
@@ -76,7 +125,6 @@ export default function NavigationResponsive() {
                         <DesktopNav />
                     </Flex>
                 </Flex>
-
                 <Stack
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
@@ -85,22 +133,59 @@ export default function NavigationResponsive() {
                     <Button onClick={toggleColorMode}>
                         {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
                     </Button>
-                    <Button as={'a'} fontSize={'sm'} fontWeight={400} variant={'link'} href={loginPath}>
-                        Sign In
-                    </Button>
-                    <Button
-                        as={'a'}
-                        display={{ base: 'none', md: 'inline-flex' }}
-                        fontSize={'sm'}
-                        fontWeight={600}
-                        color={'white'}
-                        bg={'purple.400'}
-                        href={registerPath}
-                        _hover={{
-                            bg: 'purple.300',
-                        }}>
-                        Sign Up
-                    </Button>
+                    {
+                        username ? (<Menu>
+                            <MenuButton
+                                as={Button}
+                                rounded={'full'}
+                                variant={'link'}
+                                cursor={'pointer'}
+                                minW={0}>
+                                <Avatar
+                                    size={'sm'}
+                                    name={username}
+                                />
+                            </MenuButton>
+                            <MenuList alignItems={'center'}>
+                                <br />
+                                <Center>
+                                    <Avatar
+                                        size={'2xl'}
+                                        name={username}
+                                    />
+                                </Center>
+                                <br />
+                                <Center>
+                                    <p>{username}</p>
+                                </Center>
+                                <br />
+                                <MenuDivider />
+                                {/* <MenuItem>Account Settings</MenuItem> */}
+                                <MenuItem
+                                    onClick={handleLogOut}
+                                >Logout</MenuItem>
+                            </MenuList>
+                        </Menu>) : (
+                            <>
+                                <Button as={'a'} fontSize={'sm'} fontWeight={400} variant={'link'} href={loginPath}>
+                                    Sign In
+                                </Button>
+                                <Button
+                                    as={'a'}
+                                    display={{ base: 'none', md: 'inline-flex' }}
+                                    fontSize={'sm'}
+                                    fontWeight={600}
+                                    color={'white'}
+                                    bg={'purple.400'}
+                                    href={registerPath}
+                                    _hover={{
+                                        bg: 'purple.300',
+                                    }}>
+                                    Sign Up
+                                </Button>
+                            </>
+                        )
+                    }
                 </Stack>
             </Flex>
 

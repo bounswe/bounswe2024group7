@@ -10,6 +10,8 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
+    env_file:
+      - .env
 
   backend:
     build: ./artifact_backend
