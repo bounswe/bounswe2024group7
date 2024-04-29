@@ -37,7 +37,7 @@ export default function LoginCard() {
                 }
             )
 
-            console.log(response)
+            console.log("Navigating to: " + import.meta.env.VITE_BASE_PATH)
 
             if (response.status === 200) {
                 console.log(response.data)
@@ -52,10 +52,7 @@ export default function LoginCard() {
 
                 navigate(
                     {
-                        to: "/",
-                        state: {
-                            username
-                        }
+                        to: import.meta.env.VITE_BASE_PATH
                     }
                 )
             }

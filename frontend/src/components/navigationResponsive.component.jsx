@@ -68,7 +68,7 @@ export default function NavigationResponsive() {
 
                 navigate(
                     {
-                        to: "/"
+                        to: import.meta.env.VITE_BASE_PATH
                     },
                 )
             }

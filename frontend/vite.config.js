@@ -7,11 +7,9 @@ dns.setDefaultResultOrder("verbatim")
 
 const loadEnvironmentVariables = (mode) => {
   const env = loadEnv(mode, `${process.cwd()}/..`, '')
-  console.log(env.VITE_API_URL)
-
   return {
     ghPagesPath: env.VITE_GH_PAGES_PATH || '/bounswe2024group7',
-    API_URL: env.VITE_API_URL || "http://localhost:8000"
+    API_URL: env.VITE_API_URL || "https://bounswe2024group7-yslcfqdwna-oa.a.run.app"
   }
 }
 
@@ -21,7 +19,8 @@ export default defineConfig(({ mode }) => {
   return {
     base: ghPagesPath,
     define: {
-      VITE_API_URL: JSON.stringify(API_URL)
+      VITE_API_URL: JSON.stringify(API_URL),
+      VITE_BASE_PATH: JSON.stringify(ghPagesPath)
     },
     plugins: [
       react(),

@@ -62,10 +62,7 @@ export default function RegisterComponent() {
 
                 navigate(
                     {
-                        to: "/",
-                        state: {
-                            username
-                        }
+                        to: import.meta.env.VITE_BASE_PATH
                     }
                 )
             }
