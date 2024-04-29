@@ -6,7 +6,7 @@ import { TanStackRouterVite } from '@tanstack/router-vite-plugin'
 dns.setDefaultResultOrder("verbatim")
 
 const loadEnvironmentVariables = (mode) => {
-  const env = loadEnv(mode, process.cwd(), '')
+  const env = loadEnv(mode, `${process.cwd()}/..`, '')
   return {
     ghPagesPath: env.VITE_GH_PAGES_PATH || '/bounswe2024group7',
   }
