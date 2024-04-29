@@ -5,7 +5,7 @@
   "type": "module",
   "homepage": "https://bounswe.github.io/bounswe2024group7/",
   "scripts": {
-    "deploy": "VITE_GH_PAGES_PATH=/bounswe2024group7 vite build && gh-pages -d dist",
+    "deploy": "VITE_API_URL=https://bounswe2024group7-yslcfqdwna-oa.a.run.app vite build && gh-pages -d dist",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
