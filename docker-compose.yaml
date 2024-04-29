@@ -11,7 +11,7 @@ services:
       - PYTHONUNBUFFERED=1
       - PYTHONDONTWRITEBYTECODE 1
     env_file:
-      - .env
+      - .env.development
     depends_on:
       - db
     restart: on-failure
