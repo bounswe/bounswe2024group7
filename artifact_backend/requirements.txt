@@ -1,0 +1,6 @@
+Django
+python-dotenv
+mysqlclient
+djangorestframework
+django-cors-headers
+SPARQLWrapper
