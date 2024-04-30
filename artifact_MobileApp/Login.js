@@ -1,15 +1,50 @@
 import { StatusBar } from 'expo-status-bar';
+import apiInstance from './Api'; 
 import React, { useState } from 'react';
+import Toast from 'react-native-toast-message';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
+import { useAuth } from './AuthContext';
 
 
-const Login = ()=>{
+const Login = ({ navigation })=>{
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const { login } = useAuth();
 
-  const checkDatabase = (username, password) => {
-    console.log({username, password});
-    // call Database here
+  const goHome = () => navigation.navigate('Home');
+
+  const goSignup = () => navigation.navigate('Signup');
+
+  const checkDatabase = async (username, password) => {
+    try {
+        const response = await apiInstance().post(
+            "login",
+            {
+                username,
+                password
+            }
+        )
+
+        // successful login
+        if (response.status === 200) {
+            // console.log(response.data)
+            // we should send the userdata from backend
+            login(username);
+            goHome();
+        }
+    } catch (e) {
+        console.log(e)
+        Toast.show({
+          type: 'error',
+          position: 'bottom',
+          text1: 'Login Error',
+          text2: 'There was an error while logging in. Please try again.',
+          visibilityTime: 2000,
+          autoHide: true,
+          topOffset: 30,
+          bottomOffset: 40
+        });
+    }
   };
 
   return (
@@ -33,6 +68,12 @@ const Login = ()=>{
         onPress={() => checkDatabase(username, password)} 
       >
         <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => goSignup()} 
+      >
+        <Text style={styles.buttonText}>Don't have an account?</Text>
       </TouchableOpacity>
     </View>
   );

@@ -3,17 +3,23 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
+import { useAuth } from './AuthContext';
 // import SearchBar from './SearchBar'; 
 
 const Home = ({ navigation }) => {
+  const { isLoggedIn, logout } = useAuth();
+
+
   return (
     
     <View style={styles.container}>
     <Text style={styles.title}> Welcome to Artifact !!</Text>
     
-       <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('Login')}>
+    {!isLoggedIn && (
+      <>
+      <TouchableOpacity
+      style={styles.button}
+      onPress={() => navigation.navigate('Login')}>
         <Text style={styles.buttonText}>Go to Login</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -21,11 +27,25 @@ const Home = ({ navigation }) => {
         onPress={() => navigation.navigate('Signup')}>
         <Text style={styles.buttonText}>Go to SignUp</Text>
       </TouchableOpacity>
+      </>
+    )}
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('SearchBar')}>
         <Text style={styles.buttonText}>Search</Text>
       </TouchableOpacity>
+      {isLoggedIn && (
+      <>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          logout();
+          navigation.navigate('Login')
+        }}>
+        <Text style={styles.buttonText}>Log Out</Text>
+      </TouchableOpacity>
+      </>
+    )}
    
     </View>
   );
