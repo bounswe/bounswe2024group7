@@ -43,6 +43,8 @@ VITE_API_URL="http://localhost:8080"
 ENV=DEVELOPMENT
 ```
 
+ THE `VITE_API_URL` is a must for the frontend application to run.
+
 ### Using Docker Compose (RECOMMENDED)
 
 The recommendetion of the developers is to use docker-compose to run the 
@@ -57,6 +59,9 @@ applications. This docker-compose command will build and run the backend, fronte
     ```bash
     docker-compose up
     ```
+    
+    The frontend application should now be running on `http://localhost:3000`.
+    The backend application should now be running on `http://localhost:8080`.
 
 ### Installing and Running Locally
 
