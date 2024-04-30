@@ -1,15 +1,40 @@
 // SearchBar.js
 import React, { useState } from 'react';
+import apiInstance from './Api'; 
+import Toast from 'react-native-toast-message';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const SearchBar = () => {
   const [searchText, setSearchText] = useState('');
 
-  const handleSearch = (val) => {
-    console.log({val}); 
-    //link to wikiData API here ...
-    setSearchText('');
+  const handleSearch = async (val) => {
+    try {
+        const response = await apiInstance().post("search", {
+            query: val
+        })
+
+        if (response.status === 200) {
+
+            const data = await response.data
+
+            console.log(data)
+
+            setSearchText("")
+        }
+    } catch (e) {
+        console.log(e)
+        Toast.show({
+          type: 'error',
+          position: 'bottom',
+          text1: 'Search Error',
+          text2: 'There was an error while searching. Please try again.',
+          visibilityTime: 2000,
+          autoHide: true,
+          topOffset: 30,
+          bottomOffset: 40
+        });
+    }
     
   };
 

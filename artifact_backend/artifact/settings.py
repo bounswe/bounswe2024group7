@@ -38,7 +38,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://bounswe.github.io',
     'https://frontend-yslcfqdwna-oa.a.run.app',
-    'http://192.168.1.31:8081'
+    'http://localhost:8081'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
