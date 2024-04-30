@@ -1,15 +1,54 @@
 import { StatusBar } from 'expo-status-bar';
+import apiInstance from './Api'; 
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { useAuth } from './AuthContext';
 
 
-const Signup = ()=>{
+const Signup = ({ navigation })=>{
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const checkDatabase = (username, password) => {
-    console.log({username, password});
-    // call Database here
+  const [email, setEmail] = useState('');
+  const { login } = useAuth();
+  
+  const goHome = () => navigation.navigate('Home');
+  
+  const goLogin = () => navigation.navigate('Login');
+
+  const checkDatabase = async (username, email, password) => {
+    console.log({username, email, password});
+    try {
+        const response = await apiInstance().post(
+            "signup",
+            {
+                username,
+                email,
+                password
+            }
+        )
+
+        // successful login
+        if (response.status === 201) {
+            // login(response.data)
+            login(username)
+            goHome()
+        }
+    } catch (e) {
+        console.log(e)
+        Toast.show({
+          type: 'error',
+          position: 'bottom',
+          text1: 'Login Error',
+          text2: 'There was an error while logging in. Please try again.',
+          visibilityTime: 2000,
+          autoHide: true,
+          topOffset: 30,
+          bottomOffset: 40
+        });
+    }
   };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}> SignUp to Artifact</Text>
@@ -21,6 +60,12 @@ const Signup = ()=>{
       />
       <TextInput
         style={styles.input}
+        placeholder='Enter Your Email'
+        onChangeText={(val) => setEmail(val)}
+        value={email}
+      />
+      <TextInput
+        style={styles.input}
         placeholder='Create Password'
         onChangeText={(val) => setPassword(val)}
         value={password}
@@ -28,9 +73,15 @@ const Signup = ()=>{
       />
       <TouchableOpacity
         style={styles.button}
-        onPress={() => checkDatabase(username, password )}
+        onPress={() => checkDatabase(username, email, password)}
       >
         <Text style={styles.buttonText}>SignUp</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => goLogin()} 
+      >
+        <Text style={styles.buttonText}>Already have an account?</Text>
       </TouchableOpacity>
     </View>
   );
