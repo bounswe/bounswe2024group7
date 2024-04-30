@@ -43,6 +43,21 @@ VITE_API_URL="http://localhost:8080"
 ENV=DEVELOPMENT
 ```
 
+### Using Docker Compose (RECOMMENDED)
+
+The recommendetion of the developers is to use docker-compose to run the 
+applications. This docker-compose command will build and run the backend, frontend, and MySQL database.
+
+1. **Build the Docker images:**
+    ```bash
+    docker-compose build --no-cache
+    ```
+
+2. **Run the Docker containers and connect with network:**
+    ```bash
+    docker-compose up
+    ```
+
 ### Installing and Running Locally
 
 1. **Clone the repository:**
