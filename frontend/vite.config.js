@@ -13,7 +13,7 @@ const loadEnvironmentVariables = (mode) => {
 }
 
 export default defineConfig(({ mode }) => {
-  const { ghPagesPath, API_URL } = loadEnvironmentVariables(mode);
+  const { API_URL } = loadEnvironmentVariables(mode);
 
   return {
     define: {
