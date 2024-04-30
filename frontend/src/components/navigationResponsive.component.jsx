@@ -22,7 +22,7 @@ import {
     MenuList,
     MenuItem,
     MenuDivider,
-    Center
+    Center,
 } from '@chakra-ui/react'
 import {
     HamburgerIcon,
@@ -36,14 +36,14 @@ import {
     loginPath,
     registerPath,
     indexPath
-} from "../constants/paths"
+} from "../constants/paths.js"
 import { useDispatch, useSelector } from "react-redux";
-import { userName } from '../context/user';
-import { useEffect, useState } from 'react';
-import apiInstance from "./../instance/apiInstance.js"
+import { userName } from '../context/user.js';
+import apiInstance from "../instance/apiInstance.js"
 import { useNavigate } from "@tanstack/react-router"
-import { userActions } from '../context/user'
+import { userActions } from '../context/user.js'
 import Cookies from "js-cookie"
+import SearchBar from './SearchBar.component.jsx'
 
 export default function NavigationResponsive() {
     const { isOpen, onToggle } = useDisclosure()
@@ -91,7 +91,9 @@ export default function NavigationResponsive() {
                 borderBottom={1}
                 borderStyle={'solid'}
                 borderColor={useColorModeValue('gray.200', 'gray.900')}
-                align={'center'}>
+                align={'center'}
+                justifyContent={"space-between"}
+            >
                 <Flex
                     flex={{ base: 1, md: 'auto' }}
                     ml={{ base: -2 }}
@@ -103,7 +105,7 @@ export default function NavigationResponsive() {
                         aria-label={'Toggle Navigation'}
                     />
                 </Flex>
-                <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
+                <Flex flex={{ base: 1, md: 0 }} justify={{ base: 'center', md: 'start' }}>
                     <Text
                         textAlign={useBreakpointValue({ base: 'center', md: 'left' })}
                         fontFamily={'heading'}
@@ -122,6 +124,7 @@ export default function NavigationResponsive() {
                         <DesktopNav />
                     </Flex>
                 </Flex>
+                <SearchBar screen={"desktop"} />
                 <Stack
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
@@ -278,11 +281,15 @@ const DesktopSubNav = ({ label, href, subLabel }) => {
 
 const MobileNav = () => {
     return (
-        <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
-            {NAV_ITEMS.map((navItem) => (
-                <MobileNavItem key={navItem.label} {...navItem} />
-            ))}
-        </Stack>
+        <>
+            <Stack bg={useColorModeValue('white', 'gray.800')} p={4} display={{ md: 'none' }}>
+                {NAV_ITEMS.map((navItem) => (
+                    <MobileNavItem key={navItem.label} {...navItem} />
+                ))}
+            </Stack>
+            <SearchBar screen={"mobile"} />
+        </>
+
     )
 }
 
