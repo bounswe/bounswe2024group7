@@ -5,14 +5,19 @@ sparql.setReturnFormat(JSON)
 
 def get_painting_sparql(keyword):
     sparql.setQuery(f"""
-    SELECT ?item ?itemLabel ?itemId ?image
+    SELECT ?image ?creatorLabel ?movementLabel ?genreLabel ?materialLabel
     WHERE {{
         ?item rdfs:label "{keyword}"@en.
         ?item rdfs:label ?itemLabel.
         ?item wdt:P31 wd:Q3305213.
         ?item wdt:P18 ?image.
+        ?item wdt:P135 ?movement.
+        ?item wdt:P136 ?genre.
+        ?item wdt:P170 ?creator.
+        ?item wdt:P186 ?material.
         FILTER(LANG(?itemLabel)="en").
-        BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId)
+        BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId).
+        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
     }}
     """ )
     try:
@@ -58,14 +63,16 @@ def get_genre_sparql(keyword):
 
 def find_paintings(search_type, item_id):
     sparql.setQuery(f""" 
-    SELECT ?item ?itemLabel ?itemId ?image
+    SELECT ?item ?itemLabel ?image ?creatorLabel ?itemId
     WHERE {{
         ?item rdfs:label ?itemLabel.
         ?item wdt:P{search_type} wd:{item_id}.
         ?item wdt:P31 wd:Q3305213.
         FILTER(LANG(?itemLabel)="en").
         ?item wdt:P18 ?image.
-        BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId)
+        ?item wdt:P170 ?creator.
+        BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId).
+        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
     }}""")
     try:
         return sparql.queryAndConvert()["results"]["bindings"]
