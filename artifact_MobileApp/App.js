@@ -6,7 +6,7 @@ import { AuthProvider, useAuth } from './AuthContext';
 import Home from './Home';
 import Login from './Login'; // Import LoginScreen component from log.js
 import Signup from './Signup'; 
-import SearchBar from './SearchBar'; 
+import SearchPage from './SearchPage'; 
 
 const Stack = createStackNavigator();
 
@@ -32,7 +32,7 @@ const App = () => {
             />
             <Stack.Screen name="Login" component={Login} /> 
             <Stack.Screen name="Signup" component={Signup} /> 
-            <Stack.Screen name="SearchBar" component={SearchBar} /> 
+            <Stack.Screen name="SearchPage" component={SearchPage} /> 
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>

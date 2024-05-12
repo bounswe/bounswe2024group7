@@ -1,8 +1,7 @@
-// SearchBar.js
 import React, { useState } from 'react';
 import apiInstance from './Api'; 
 import Toast from 'react-native-toast-message';
-import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const SearchBar = () => {
@@ -38,28 +37,31 @@ const SearchBar = () => {
     
   };
 
+
   return (
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Discover the world of art..."
-        onChangeText={(val) => setSearchText(val)}
-        value={searchText}
-      />
-      <TouchableOpacity style={styles.button} onPress={()=>handleSearch(searchText)}>
-        <Ionicons name="search" size={24} color="white" />
-      </TouchableOpacity>
-    </View>
+     <View style={styles.searchBarContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Discover the world of art..."
+            onChangeText={(val) => setSearchText(val)}
+            value={searchText}
+          />
+          <TouchableOpacity style={styles.button} onPress={()=>handleSearch(searchText)}>
+            <Ionicons name="search" size={24} color="white" />
+          </TouchableOpacity>
+      </View>
+
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  searchBarContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flex: 1,
     marginHorizontal: 20,
     marginTop: 20,
   },
+ 
   input: {
     flex: 1,
     height: 40,

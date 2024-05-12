@@ -31,8 +31,8 @@ const Home = ({ navigation }) => {
     )}
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('SearchBar')}>
-        <Text style={styles.buttonText}>Search</Text>
+        onPress={() => navigation.navigate('SearchPage')}>
+        <Text style={styles.buttonText}>Continue as a Guest</Text>
       </TouchableOpacity>
       {isLoggedIn && (
       <>
