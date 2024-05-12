@@ -4,7 +4,6 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
 import { useAuth } from './AuthContext';
-// import SearchBar from './SearchBar'; 
 
 const Home = ({ navigation }) => {
   const { isLoggedIn, logout } = useAuth();
