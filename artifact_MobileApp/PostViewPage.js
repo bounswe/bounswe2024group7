@@ -36,8 +36,8 @@ const PostViewPage = ({post_obj}) => {
       <Image source={{ uri: postData.imageUri }} style={styles.image} />
       
       {/* Post Title */}
-      <Text style={styles.title}>{post_obj && post_obj.title}</Text>
-            
+      {/* <Text style={styles.title}>{post_obj && post_obj.title}</Text> */}
+      <Text style={styles.title}>{postData.title}</Text>
       {/* Labels */}
       <View style={styles.labelsContainer}>
       {postData.materials.map((material, index) => (
