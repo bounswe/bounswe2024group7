@@ -41,8 +41,10 @@ function SearchBar({
         setLoading(true)
 
         try {
-            if (!searchQuery)
+            if (!searchQuery) {
+                setLoading(false)
                 return
+            }
 
             const response = await apiInstance().post("search", {
                 query: titleString(searchQuery)
@@ -114,7 +116,7 @@ function SearchBar({
                         colorScheme='purple'
                         variant={"solid"}
                         onClick={handleSearch}
-                        isDisabled={loading}
+                        isDisabled={loading || !searchQuery}
                     >
                         {loading ? (
                             <Spinner
