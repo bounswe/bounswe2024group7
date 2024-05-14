@@ -8,7 +8,8 @@ import {
     InputLeftElement,
     InputRightAddon,
     Spinner,
-    Text
+    Text,
+    useToast
 } from '@chakra-ui/react'
 import apiInstance from "../instance/apiInstance.js"
 import { useState } from 'react';
@@ -16,7 +17,7 @@ import Cookies from "js-cookie"
 import { titleString } from '../utility/string.js';
 
 function SearchBar({
-    screen
+    screen, setSearchResults, setLoading, loading
 }) {
     const flexStyleObject = screen === "mobile" ? {
         base: "flex",
@@ -33,9 +34,9 @@ function SearchBar({
         base: "2xl",
         md: "50%"
     }
+    const toast = useToast()
 
     const [searchQuery, setSearchQuery] = useState("")
-    const [loading, setLoading] = useState(false)
 
     const handleSearch = async () => {
         setLoading(true)
@@ -51,10 +52,8 @@ function SearchBar({
             if (response.status === 200) {
 
                 const data = await response.data
-
-                console.log(data)
-
-                Cookies.set("searchResults", data)
+                console.log(data.painting_results)
+                setSearchResults(data)
 
                 setSearchQuery("")
             }
