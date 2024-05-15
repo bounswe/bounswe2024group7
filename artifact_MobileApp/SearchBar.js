@@ -3,8 +3,9 @@ import apiInstance from './Api';
 import Toast from 'react-native-toast-message';
 import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+//import { AntDesign } from '@expo/vector-icons';
 
-const SearchBar = () => {
+const SearchBar = ({setResults}) => {
   const [searchText, setSearchText] = useState('');
 
   const handleSearch = async (val) => {
@@ -18,7 +19,7 @@ const SearchBar = () => {
             const data = await response.data
 
             console.log(data)
-
+            setResults(data)
             setSearchText("")
         }
     } catch (e) {
@@ -74,6 +75,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#3C3633',
     height: 40,
+    width: 40,
     paddingHorizontal: 10,
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
