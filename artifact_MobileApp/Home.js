@@ -7,6 +7,7 @@ import { useAuth } from './AuthContext';
 import Feed from './Feed';
 import SearchPage from './SearchPage';
 import ProfilePage from './ProfilePage';
+
 // import SearchBar from './SearchBar'; 
 const FeedPageContainer = () => (
   <View style={styles.page}>

@@ -41,6 +41,7 @@ const App = () => {
             <Stack.Screen name="ProfilePage" component={ProfilePage} /> 
             <Stack.Screen name="Feed" component={Feed} /> 
             <Stack.Screen name="AddPost" component={AddPost} /> 
+            <Stack.Screen name="PostViewPage" component={PostViewPage} /> 
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>

@@ -5,6 +5,37 @@ import PostCard from './PostCard';
 import { useNavigation } from '@react-navigation/native';
 const ProfilePage = () => {
   const navigation = useNavigation();
+  const paintings = [
+    {
+      title: "Mona Lisa",
+      imageURL: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
+      genre: "portrait",
+      material: "Oil",
+      creator: "Leonardo da Vinci"
+    },
+    {
+      title: "The Starry Night",
+      imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1024px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+      genre: "landscape",
+      material: "Oil",
+      creator: "Vincent van Gogh"
+    },
+    {
+      title: "The Persistence of Memory",
+      imageURL: "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/The_Persistence_of_Memory.jpg/1024px-The_Persistence_of_Memory.jpg",
+      genre: "surrealism",
+      material: "Oil",
+      creator: "Salvador Dalí"
+    },
+    {
+      title: "The Birth of Venus",
+      imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/1024px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+      genre: "mythological",
+      material: "Tempera on canvas",
+      creator: "Sandro Botticelli"
+    }
+  ];
+  
   return (
     <View style={styles.container}>
       <Image
@@ -18,59 +49,24 @@ const ProfilePage = () => {
         <Text style={styles.badge}>Followers: 500</Text>
       </View>
       <View style={styles.buttonsContainer}>
-        {/* <TouchableOpacity style={styles.iconButton}>
-          <Ionicons name="search" size={24} color="white" />
-        </TouchableOpacity> */}
+     
         <TouchableOpacity style={styles.iconButton} onPress={() => navigation.navigate('AddPost')}>
           <Text style={styles.buttonText}> Create Post</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.postCardsContainer}>
-        <View style={styles.row}>
+      {paintings.map((painting, index) => (
+        <TouchableOpacity style={styles.row} onPress={()=>navigation.navigate('PostViewPage', { imageURL: painting.imageURL,title: painting.title,material:painting.material,genre:painting.genre,creator:painting.creator})}>
           <PostCard
-            title="Mona Lisa"
-            imageURL="https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
-            genre="portrait"
-            material="Oil"
-            creator="Leonardo da Vinci"
+            title={painting.title}
+            imageURL={painting.imageURL}
+            genre={painting.genre}
+            material={painting.material}
+            creator={painting.creator}
           />
-        </View>
-        <View style={styles.row}>
-          <PostCard
-            title="Mona Lisa"
-            imageURL="https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
-            genre="portrait"
-            material="Oil"
-            creator="Leonardo da Vinci"
-          />
-        </View>
-        <View style={styles.row}>
-          <PostCard
-            title="Mona Lisa"
-            imageURL="https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
-            genre="portrait"
-            material="Oil"
-            creator="Leonardo da Vinci"
-          />
-        </View>
-        <View style={styles.row}>
-          <PostCard
-            title="Mona Lisa"
-            imageURL="https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
-            genre="portrait"
-            material="Oil"
-            creator="Leonardo da Vinci"
-          />
-        </View>
-        <View style={styles.row}>
-          <PostCard
-            title="Mona Lisa"
-            imageURL="https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg"
-            genre="portrait"
-            material="Oil"
-            creator="Leonardo da Vinci"
-          />
-        </View>
+        </TouchableOpacity>
+      ))}
+       
       </View>
     </View>
   );
