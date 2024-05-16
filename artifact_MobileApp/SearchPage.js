@@ -1,126 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import apiInstance from './Api'; 
 import Toast from 'react-native-toast-message';
-import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import PostCard from './PostCard';
 import SearchBar from './SearchBar';
+
 const SearchPage = () => {
-    const mimickedData = [
-        {
-          postId: 1,
-          created_at: "12/5/1999",
-          updated_at: "8/11/1999",
-          likes: 88,
-          bookmarked: true,
-          profile: {
-            username: "Leonardo_da_Vinci",
-            profile_picture: "https://example.com/leonardo_profile.jpg"
-          },
-          title: "Mona Lisa",
-          content: "This is a portrait painting by Leonardo da Vinci.",
-          image: {
-            url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqWRpa_xrwaPLKt_LADjacrbdsaEBIhgpi88Llcm3nyw&s'
-          },
-          comments: [
-            {
-              commentId: 1,
-              profile: {
-                username: "Art_Lover_123",
-                profile_picture: "https://example.com/profile1.jpg"
-              },
-              content: "One of the most iconic artworks of all time!"
-            },
-            {
-              commentId: 2,
-              profile: {
-                username: "Art_Critic_456",
-                profile_picture: "https://example.com/profile2.jpg"
-              },
-              content: "The enigmatic smile of Mona Lisa is mesmerizing."
-            }
-          ],
-          labels: [
-            {
-              material: ["Canvas","Oil"],
-              type: ["Frame","Wood"],
-              genre: ["Portrait"],
-              is_own_artwork: false
-            }
-          ]
-        },
-        {
-          postId: 2,
-          created_at: "3/15/2005",
-          updated_at: "7/20/2005",
-          likes: 42,
-        bookmarked:true,
-          profile: {
-            username: "Vincent_van_Gogh",
-            profile_picture: "https://example.com/van_gogh_profile.jpg"
-          },
-          title: "Starry Night",
-          content: "This is a landscape painting by Vincent van Gogh.",
-          image: {
-            url: "https://media.timeout.com/images/103166735/750/562/image.jpg"
-          },
-          comments: [
-            {
-              commentId: 3,
-              profile: {
-                username: "Art_Enthusiast_789",
-                profile_picture: "https://example.com/profile3.jpg"
-              },
-              content: "The swirling sky in Starry Night is breathtaking!"
-            }
-          ],
-          labels: [
-            {
-              material: ["Oil"],
-              type: ["Canvas"],
-              genre: ["Post-Impressionism"],
-              is_own_artwork: true
-            }
-          ]
-        }
-      ];
-      
+  const [searchResults, setSearchResults] = useState(null);
 
-      
-return (
-    <View style={styles.container}>
-     <View style={styles.searchBarContainer}>
-         <SearchBar/>
+  useEffect(() => {
+    try {
+      if (!searchResults) {
+        console.log("Search results are null");
+        return;
+      }
+
+      console.log("Search results have changed:", searchResults);
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+    }
+  }, [searchResults]); 
+
+  // Function to group search results into rows of three columns
+  const groupIntoRows = (data,rowLength) => {
+    const rows = [];
+    for (let i = 0; i < data.length; i += rowLength) {
+      const row = data.slice(i, i + rowLength);
+      rows.push(row);
+    }
+    return rows;
+  };
+
+  return (
+    <SafeAreaView style={styles.safeAreaContainer}>
+    <ScrollView style={styles.container}>
+      <View style={styles.searchBarContainer}>
+        <SearchBar setResults={setSearchResults} />
       </View>
-      {/* Ensure ScrollView has a height to allow scrolling */}
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.postCardContainer}>
-        {mimickedData.map((post, index) => (
-
-        <PostCard post_obj={post}/>
-
-            ))}
+        {/* Render PostCards in grid layout */}
+        <View style={styles.postCardsContainer}>
+          {searchResults && searchResults.painting_results && searchResults.painting_results.length > 0 ? (
+            groupIntoRows(searchResults.painting_results,3).map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.row}>
+                {row.map((result, columnIndex) => (
+                  <View key={`${rowIndex}-${columnIndex}`} style={styles.col}>
+                    <PostCard
+                      title={result["itemLabel"]["value"]}
+                      imageURL={result["image"]["value"]}
+                      genre={result["genreLabel"]["value"]}
+                      material={result["materialLabel"]["value"]}
+                      creator={result["creatorLabel"]["value"]}
+                    />
+                  </View>
+                ))}
+              </View>
+            ))
+          ) : (
+            <View />
+          )}
+          
         </View>
       </ScrollView>
-    </View>
+      </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        marginHorizontal: 20,
-        marginTop: 20,
-      },
+  row: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  col: {
+    flex: 1,
+    margin: 5,
+  },
+  safeAreaContainer:{
+    flex: 1,
+    paddingTop: StatusBar.currentHeight
+  },
+  container: {
+    flex: 1,
+    marginHorizontal: 20,
+    marginTop: 20,
+  },
   searchBarContainer: {
     flexDirection: 'row',
-    marginBottom:10,
+    marginBottom: 10,
   },
-  postCardContainer: {
+  postCardsContainer: {
     marginTop: 20,
   },
   scrollView: {
-    flex: 1, 
+    flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
