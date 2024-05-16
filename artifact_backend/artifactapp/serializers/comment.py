@@ -1,11 +1,11 @@
 from rest_framework import serializers
 
-from . import ProfileSerializer
+from . import ProfileListSerializer
 from ..models import Post, Profile, Comment
 
 
 class CommentCreateSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(read_only=True)
+    profile = ProfileListSerializer(read_only=True)
     class Meta:
         model = Comment
         fields = ['id', 'content', 'profile']
@@ -24,7 +24,7 @@ class CommentCreateSerializer(serializers.ModelSerializer):
 
 
 class CommentRetrieveSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(read_only=True)
+    profile = ProfileListSerializer(read_only=True)
     class Meta:
         model = Comment
         fields = '__all__'

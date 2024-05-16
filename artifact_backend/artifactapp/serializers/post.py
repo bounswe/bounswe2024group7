@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
 from ..models import Post, Profile
-from . import ProfileSerializer, ImageSerializer, LabelSerializer
+from . import ProfileListSerializer, ImageSerializer, LabelSerializer
 
 
 class PostListSerializer(serializers.ModelSerializer):
     labels = LabelSerializer(many=True, read_only=True)
-    profile = ProfileSerializer(read_only=True)
+    profile = ProfileListSerializer(read_only=True)
     image = ImageSerializer(read_only=True)
 
     class Meta:
