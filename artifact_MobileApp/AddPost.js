@@ -1,43 +1,22 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Picker, Image } from 'react-native';
-// import * as ImagePicker from 'react-native-image-picker';
+import { View, TextInput, Button, StyleSheet, Picker, Image, Text } from 'react-native';
+
 const AddPost = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
   const [label, setLabel] = useState('');
 
   const handlePublish = () => {
+    console.log('Post published:', { title, description, image, label, imageUrl });
     // Handle publishing logic here
-    console.log('Post published:', { title, description, image, label });
     // You can send the data to your backend or wherever needed
   };
-    // const handleChooseImage = () => {
-    //     const options = {
-    //       title: 'Select Image',
-    //       storageOptions: {
-    //         skipBackup: true,
-    //         path: 'images',
-    //       },
-    //     };
-      
-    //     ImagePicker.launchImageLibrary(options, (response) => {
-    //       if (response.didCancel) {
-    //         console.log('User cancelled image picker');
-    //       } else if (response.error) {
-    //         console.log('ImagePicker Error: ', response.error);
-    //       } else if (response.customButton) {
-    //         console.log('User tapped custom button: ', response.customButton);
-    //       } else {
-    //         const source = { uri: response.uri };
-    //         setImage(source);
-    //       }
-    //     });
-    //   };
-      
+
   return (
     <View style={styles.container}>
-    <Text style={styles.titlecreate}>Create Post:</Text>
+      <Text style={styles.titlecreate}>Create Post:</Text>
       <TextInput
         style={styles.input}
         placeholder="Title"
@@ -51,14 +30,18 @@ const AddPost = () => {
         value={description}
         onChangeText={setDescription}
       />
-       {/* <Button title="Choose Image" onPress={handleChooseImage} />
-      {image && <Image source={image} style={{ width: 200, height: 200 }} />} */}
+      <TextInput
+        style={styles.input}
+        placeholder="Image URL"
+        value={imageUrl}
+        onChangeText={setImageUrl}
+      />
       <Picker
         selectedValue={label}
         style={styles.input}
         onValueChange={(itemValue) => setLabel(itemValue)}
       >
-       <Picker.Item label="Select a label" value="" />
+        <Picker.Item label="Select a label" value="" />
         <Picker.Item label="Material: Oil" value="Material: Oil" />
         <Picker.Item label="Material: Canvas" value="Material: Canvas" />
         <Picker.Item label="Material: Wood" value="Material: Wood" />
@@ -68,7 +51,6 @@ const AddPost = () => {
         <Picker.Item label="Material: Pastel" value="Material: Pastel" />
         <Picker.Item label="Material: Charcoal" value="Material: Charcoal" />
         <Picker.Item label="Material: Clay" value="Material: Clay" />
-
       </Picker>
       <Button title="Publish" onPress={handlePublish} />
     </View>
