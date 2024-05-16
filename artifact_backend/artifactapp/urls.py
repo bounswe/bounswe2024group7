@@ -19,8 +19,9 @@ urlpatterns = [
     path('profiles/<int:profile_id>/following', FollowingListView.as_view(), name='following_list'),
 
     path('posts/<int:pk>/likes', LikeListCreate.as_view(), name='like_list'),
+    path('posts/<int:pk>/unlike', UnlikeView.as_view(), name='unlike'),
     path('posts/<int:pk>/like_count', LikeCountView.as_view(), name='like_count'),
-    path('likes/<int:pk>', LikeRetrieveDestroy.as_view(), name='like_detail'),
+    path('likes/<int:pk>', LikeRetrieve.as_view(), name='like_detail'),
     path('likes/<str:username>', UserLikesList.as_view(), name='user_likes_list'),
 
     path('posts/<int:pk>/comments', CommentListCreate.as_view(), name='comment_list'),
@@ -32,8 +33,11 @@ urlpatterns = [
 
     path('labels', LabelListCreateView.as_view(), name='label_list'),
     path('labels/<int:pk>', LabelDetailView.as_view(), name='label_detail'),
-    path('bookmarks', BookmarkListCreateView.as_view(), name='bookmark_list-create'),
+
+    path('bookmarks', BookmarkListView.as_view(), name='bookmark_list'),
     path('bookmarks/<int:pk>', BookmarkDetailView.as_view(), name='bookmark_detail'),
-    path('bookmarks/<str:username>', UserBookmarkListView.as_view(), name='user_bookmark'),
+    path('bookmarks/<str:username>', UserBookmarkListView.as_view(), name='user_bookmark_list'),
+    path('posts/<int:post_id>/bookmark', BookmarkPostView.as_view(), name='bookmark_post'),
+    path('posts/<int:post_id>/unbookmark', UnbookmarkPostView.as_view(), name='unbookmark_post'),
 
 ]

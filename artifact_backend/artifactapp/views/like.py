@@ -16,23 +16,41 @@ class LikeListCreate(generics.ListCreateAPIView):
         return Like.objects.filter(post_id=post_id)
 
     def create(self, request, *args, **kwargs):
-        # Retrieve the post instance based on the post ID in the URL
         post_id = self.kwargs.get('pk')
         post = get_object_or_404(Post, pk=post_id)
+        user_profile = request.user.profile
+
+        # Check if the user has already liked the post
+        if Like.objects.filter(profile=user_profile, post=post).exists():
+            return Response({"error": "You have already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create a like for the authenticated user on the specified post
-        like = Like.objects.create(profile=request.user.profile, post=post)
-
-        # Return a successful response with the serialized like data
+        like = Like.objects.create(profile=user_profile, post=post)
         serializer = LikeSerializer(like)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class LikeRetrieveDestroy(generics.RetrieveDestroyAPIView):
+class LikeRetrieve(generics.RetrieveAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
     lookup_field = "pk"
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly] # TODO: Reconsider IsAuthenticated
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]  # TODO: Reconsider IsAuthenticated
+
+
+class UnlikeView(generics.CreateAPIView):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def create(self, request, *args, **kwargs):
+        post_id = self.kwargs.get('pk')
+        post = get_object_or_404(Post, pk=post_id)
+        like = Like.objects.filter(profile=self.request.user.profile, post=post)
+        if like.exists():
+            like.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"error": "You have not liked this post."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLikesList(generics.ListAPIView):
