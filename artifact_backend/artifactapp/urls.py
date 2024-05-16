@@ -14,7 +14,8 @@ urlpatterns = [
 
     path('profiles', ProfileList.as_view(), name='profile_list'),
     path('profiles/<int:pk>', ProfileRetrieveUpdateDestroy.as_view(), name='profile_detail'),
-    path('follow', FollowView.as_view(), name='follow'),
+    path('profiles/<int:profile_id>/follow', FollowView.as_view(), name='follow_profile'),
+    path('profiles/<int:profile_id>/unfollow', UnfollowView.as_view(), name='unfollow_profile'),
     path('profiles/<int:profile_id>/followers', FollowersListView.as_view(), name='followers_list'),
     path('profiles/<int:profile_id>/following', FollowingListView.as_view(), name='following_list'),
 

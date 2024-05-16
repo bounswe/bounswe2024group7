@@ -5,5 +5,4 @@ from .label import *
 from .post import *
 from .like import *
 from .comment import *
-from .follow import *
 from .bookmark import *
