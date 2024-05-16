@@ -1,6 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Text } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { AuthProvider, useAuth } from './AuthContext';
 import Home from './Home';
@@ -27,7 +27,11 @@ const App = () => {
                   const { user } = useAuth();
                   if (user) {
                     return (
-                      <Text style={{ marginRight: 10 }}>{user}</Text>
+                      <TouchableOpacity
+                      style={styles.button}
+                      onPress={() => navigation.navigate("Signup")}>
+                      <Text style={styles.buttonText}>{user}</Text>
+                      </TouchableOpacity>
                     )
                   }
                 }
@@ -45,5 +49,41 @@ const App = () => {
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#3C3633', 
+    fontFamily: 'Cursive ',
+  },
+  input: {
+    width: '80%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginTop: 10,
+    paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: '#3C3633',
+    width: '50%',
+    height: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+  },
+});
 
 export default App;
