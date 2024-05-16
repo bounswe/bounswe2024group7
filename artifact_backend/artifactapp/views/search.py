@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.response import Response
-from ..search import get_painting_sparql, get_movement_sparql, get_genre_sparql, related_search
+from ..search import get_painting_sparql, get_movement_sparql, get_genre_sparql, related_search,get_creator_sparql2
 from rest_framework.decorators import api_view
 
 
@@ -13,12 +13,14 @@ def artwork_search(request):
             movement_results = get_movement_sparql(query)
             genre_results = get_genre_sparql(query)
             related_results = related_search(query)
+            creator_results = get_creator_sparql2(query)
 
             return Response({
                 'painting_results': painting_results,
                 'movement_results': movement_results,
                 'genre_results': genre_results,
-                'related_results':related_results
+                'related_results':related_results,
+                'creator_results': creator_results
             }, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

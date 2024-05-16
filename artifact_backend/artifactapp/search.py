@@ -4,6 +4,30 @@ import re
 sparql = SPARQLWrapper("https://query.wikidata.org/bigdata/namespace/wdq/sparql")
 sparql.setReturnFormat(JSON)
 
+def get_creator_sparql2(keyword):
+    possibilities=generate_combinations(keyword.split())
+    print(possibilities)
+    for i in possibilities:
+        sparql.setQuery(f"""
+        SELECT ?itemLabel ?itemId
+        WHERE {{
+            ?item rdfs:label ?itemLabel.
+            ?item rdfs:label "{i}"@en.
+            FILTER(LANG(?itemLabel)="en").
+            BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId).
+        }}
+        """ )
+        try:
+        # for r in sparql.queryAndConvert()["results"]["bindings"]:
+            #    print(r["itemLabel"]["value"])
+            results = sparql.queryAndConvert()["results"]["bindings"] 
+            if len(results) == 0:
+                continue
+            else:
+                return get_creator_sparql(results[0]["itemId"]["value"])
+        except Exception as e:
+            continue
+    return []
 def get_creator_sparql(keyword):
     sparql.setQuery(f"""
     SELECT ?itemLabel ?image ?creatorLabel ?genreLabel ?materialLabel
