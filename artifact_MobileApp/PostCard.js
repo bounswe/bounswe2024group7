@@ -50,7 +50,7 @@ const PostCard = ({imageURL,title,material,genre,creator}) => {
 
   const navigation = useNavigation();
   return (
-    <View style={styles.container} onPress={navigation.navigate('PostViewPage', { imageURL: imageURL,title: title,material:material,genre:genre,creator:creator})}>
+    <View style={styles.container} onPress={navigation.navigate('PostViewPage', { post:{imageURL: imageURL,title: title,material:material,genre:genre,creator:creator}})}>
       <Image source={{ uri: imageURL }} style={styles.image} />
       <View style={styles.textContainer}>
         <Text style={styles.titleText}>{title}</Text>
