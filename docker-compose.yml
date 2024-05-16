@@ -13,6 +13,18 @@ services:
     env_file:
       - .env
 
+  mobile:
+    build: ./artifact_MobileApp
+    volumes:
+      - ./artifact_MobileApp:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "8081:8081"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
+
   backend:
     build: ./artifact_backend
     volumes:
