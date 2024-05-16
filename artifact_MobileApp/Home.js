@@ -26,8 +26,8 @@ const ProfilePageContainer = () => (
   </View>
 );
 const Home = ({ navigation }) => {
-  //const { isLoggedIn, logout } = useAuth();
-  const isLoggedIn = true; 
+  const { isLoggedIn, logout } = useAuth();
+  // const isLoggedIn = true; 
   const [selectedTab, setSelectedTab] = useState('Feed');
 
   return (
