@@ -3,21 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import Comment from './Comment';
 import Label from './Label';
-const PostViewPage = ({post_obj}) => {
-  const postData = {
-    id: 1,
-    title: 'Beautiful Painting',
-    imageUri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqWRpa_xrwaPLKt_LADjacrbdsaEBIhgpi88Llcm3nyw&s',
-    description: 'Lorem ipsum dolor sit aa turpis.',
-    likes: 20,
-    comments: [
-      { id: 1, text: 'Nice painting!', user: 'User1', likes: 19 },
-      { id: 2, text: 'I love it!', user: 'User2', likes: 88 },
-      // Add more comments as needed
-    ],
-    materials: ['Oil', 'Canvas'],
-    genre: ['Landscape'],
-  };
+const PostViewPage = ({imageURL,title,material,genre,creator}) => {
+
 
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
@@ -33,20 +20,22 @@ const PostViewPage = ({post_obj}) => {
   return (
     <ScrollView style={styles.container}>
       {/* Post Image */}
-      <Image source={{ uri: postData.imageUri }} style={styles.image} />
+      <Image source={{ uri: imageURL }} style={styles.image} />
       
       {/* Post Title */}
       {/* <Text style={styles.title}>{post_obj && post_obj.title}</Text> */}
-      <Text style={styles.title}>{postData.title}</Text>
+      <Text style={styles.title}>{title}</Text>
+      {/* Post Description */}
+      <Text style={styles.description}>{postData.creator}</Text>
       {/* Labels */}
-      <View style={styles.labelsContainer}>
+      {/* <View style={styles.labelsContainer}>
       {postData.materials.map((material, index) => (
         <Label className="material:" value={material}/>
       ))}
-      </View>
-
-      {/* Post Description */}
-      <Text style={styles.description}>{postData.description}</Text>
+      </View> */}
+      <Label className="material:" value={material}/>
+      <Label className="genre:" value={genre}/>
+      
       
       {/* Like Button, Bookmark Button, and Comments */}
       <View style={styles.actionContainer}>
@@ -63,14 +52,14 @@ const PostViewPage = ({post_obj}) => {
         {/* <Text style={styles.commentsTitle}>Comments:</Text> */}
       </View>
       
-      {/* Comments */}
+      {/* Comments
       <View style={styles.commentsContainer}>
         {postData.comments.map(comment => (
           <View key={comment.id} style={styles.commentContainer}>
             <Comment userName={comment.user} text={comment.text} likes={comment.likes} />
           </View>
         ))}
-      </View>
+      </View> */}
     </ScrollView>
   );
 };

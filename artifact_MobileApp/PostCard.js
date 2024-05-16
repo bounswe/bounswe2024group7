@@ -2,7 +2,8 @@ import React from 'react';
 import apiInstance from './Api'; 
 import Toast from 'react-native-toast-message';
 import { View, Image, Text, StyleSheet } from 'react-native';
-
+import PostViewPage from './PostViewPage';
+import { useNavigation } from '@react-navigation/native';
 const PostCard = ({imageURL,title,material,genre,creator}) => {
   /* Actual data for the postcard
   const [imageURL, setImageURL] = useState('');
@@ -40,15 +41,16 @@ const PostCard = ({imageURL,title,material,genre,creator}) => {
   }*/
 
   // Dummy data for the postcard
-  const postCardData = {
-    imageUri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqWRpa_xrwaPLKt_LADjacrbdsaEBIhgpi88Llcm3nyw&s',
-    message: 'Hello from a dummy postcard!',
-    sender: 'John Doe',
-    receiver: 'Jane Smith'
-  };
+  // const postCardData = {
+  //   imageUri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqWRpa_xrwaPLKt_LADjacrbdsaEBIhgpi88Llcm3nyw&s',
+  //   message: 'Hello from a dummy postcard!',
+  //   sender: 'John Doe',
+  //   receiver: 'Jane Smith'
+  // };
 
+  const navigation = useNavigation();
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onPress={navigation.navigate('PostViewPage', { imageURL: imageURL,title: title,material:material,genre:genre,creator:creator})}>
       <Image source={{ uri: imageURL }} style={styles.image} />
       <View style={styles.textContainer}>
         <Text style={styles.titleText}>{title}</Text>
