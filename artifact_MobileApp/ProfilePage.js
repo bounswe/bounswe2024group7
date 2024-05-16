@@ -56,7 +56,7 @@ const ProfilePage = () => {
       </View>
       <View style={styles.postCardsContainer}>
       {paintings.map((painting, index) => (
-        <TouchableOpacity style={styles.row} onPress={()=>navigation.navigate('PostViewPage', { imageURL: painting.imageURL,title: painting.title,material:painting.material,genre:painting.genre,creator:painting.creator})}>
+        <TouchableOpacity style={styles.row} onPress={()=>navigation.navigate('PostViewPage', {post:{imageURL: painting.imageURL,title: painting.title,material:painting.material,genre:painting.genre,creator:painting.creator}})}>
           <PostCard
             title={painting.title}
             imageURL={painting.imageURL}

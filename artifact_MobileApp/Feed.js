@@ -10,6 +10,13 @@ const Feed = () => {
             "material": "Oil on poplar",
             "genre": "Portrait",
             "creator": "Leonardo da Vinci"
+        },
+        {
+            "imageURL": "https://t1.gstatic.com/licensed-image?q=tbn:ANd9GcQsu7yYuRPXNK9eHHSFD2tUYO4stQDb1Ez8vjqGERfs9xqYLLnY_y6lQkPFZa-44cqn",
+            "title": "Mona Lisa",
+            "material": "Oil on poplar",
+            "genre": "Portrait",
+            "creator": "Leonardo da Vinci"
         }
         // ,
         // {
@@ -47,11 +54,11 @@ const Feed = () => {
             {paintings.map((painting, index) => (
                 <View key={index} style={styles.postcontainer}>
                     <PostViewPage
-                        imageURL={painting.imageURL}
-                        title={painting.title}
-                        material={painting.material}
-                        genre={painting.genre}
-                        creator={painting.creator}
+                        post = {{ imageURL:painting.imageURL,
+                        title:painting.title,
+                        material:painting.material,
+                        genre:painting.genre,
+                        creator:painting.creator}}
                     />
                 </View>
             ))}

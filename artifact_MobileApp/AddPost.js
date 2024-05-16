@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Picker, Image, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const AddPost = () => {
   const [title, setTitle] = useState('');
@@ -7,9 +8,10 @@ const AddPost = () => {
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [label, setLabel] = useState('');
-
+  const navigation = useNavigation();
   const handlePublish = () => {
     console.log('Post published:', { title, description, image, label, imageUrl });
+    navigation.navigate('ProfilePage');
     // Handle publishing logic here
     // You can send the data to your backend or wherever needed
   };
