@@ -36,8 +36,8 @@ const App = () => {
             <Stack.Screen name="Login" component={Login} /> 
             <Stack.Screen name="Signup" component={Signup} /> 
             <Stack.Screen name="SearchPage" component={SearchPage} /> 
-            <Stack.Screen name="PostViewPage" component={PostViewPage} />
             <Stack.Screen name="ProfilePage" component={ProfilePage} />
+            <Stack.Screen name="PostViewPage" component={PostViewPage} />
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>
