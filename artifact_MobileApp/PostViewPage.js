@@ -26,7 +26,7 @@ const PostViewPage = ({imageURL,title,material,genre,creator}) => {
       {/* <Text style={styles.title}>{post_obj && post_obj.title}</Text> */}
       <Text style={styles.title}>{title}</Text>
       {/* Post Description */}
-      <Text style={styles.description}>{postData.creator}</Text>
+      <Text style={styles.description}>{creator}</Text>
       {/* Labels */}
       {/* <View style={styles.labelsContainer}>
       {postData.materials.map((material, index) => (
@@ -41,7 +41,7 @@ const PostViewPage = ({imageURL,title,material,genre,creator}) => {
       <View style={styles.actionContainer}>
         <TouchableOpacity style={styles.button} onPress={handleLike}>
           <Ionicons name={liked ? 'heart' : 'heart-outline'} size={24} color={liked ? '#6247aa' : 'black'} />
-          <Text style={styles.buttonText}>{postData.likes} Likes</Text>
+          {/* <Text style={styles.buttonText}>{postData.likes} Likes</Text> */}
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.button} onPress={handleBookmark}>
