@@ -12,6 +12,7 @@ To run the mobile application on your local machine, follow these steps:
 ```bash
 cd path/to/project
 npm install
+npm install expo-image-picker
 npm start 
 ```
 
