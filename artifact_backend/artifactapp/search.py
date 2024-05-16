@@ -1,219 +1,78 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
-import re
 
 sparql = SPARQLWrapper("https://query.wikidata.org/bigdata/namespace/wdq/sparql")
 sparql.setReturnFormat(JSON)
 
-def get_creator_sparql(keyword):
-    sparql.setQuery(f"""
-    SELECT ?itemLabel ?image ?creatorLabel ?genreLabel ?materialLabel
-    WHERE {{
-        ?item rdfs:label ?itemLabel.
-        ?item wdt:P170 wd:{keyword}.
-        ?item wdt:P31 wd:Q3305213.
-        ?item wdt:P18 ?image.
-        ?item wdt:P136 ?genre.
-        ?item wdt:P170 ?creator.
-        ?item wdt:P186 ?material.
-        FILTER(LANG(?itemLabel)="en").
-        BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId).
-        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-    }}
-    """ )
+def execute_sparql_query(query):
     try:
-       # for r in sparql.queryAndConvert()["results"]["bindings"]:
-        #    print(r["itemLabel"]["value"])
-        return sparql.queryAndConvert()["results"]["bindings"] 
-    except Exception as e:
-        return []
-
-def related_search(keyword):
-    creators = set()
-    result1 = get_painting_sparql(keyword)
-    for ret in result1:
-        result = ret["creator"]["value"]
-        lst = result.split("http://www.wikidata.org/entity/")
-        if len(lst)<2:
-            continue
-        creators.add(lst[1])
-    result2 = get_movement_sparql(keyword)
-    for ret in result2:
-        result = ret["creator"]["value"]
-        lst = result.split("http://www.wikidata.org/entity/")
-        if len(lst)<2:
-            continue
-        creators.add(lst[1])
-    result3 = get_genre_sparql(keyword)
-    for ret in result3:
-        result = ret["creator"]["value"]
-        lst = result.split("http://www.wikidata.org/entity/")
-        if len(lst)<2:
-            continue
-        creators.add(lst[1])
-    output = []
-    for creator in creators:
-        result = get_creator_sparql(creator)
-        output.extend(result)
-    return output
-    
-
-def get_painting_sparql(keyword):
-    #keyword = f"[^a-zA-Z]{keyword}[^a-zA-Z]|^{keyword}[^a-zA-Z]|[^a-zA-Z]{keyword}$|^{keyword}$"
-    possibilities=generate_combinations(keyword.split())
-    for i in possibilities:
-        sparql.setQuery(f"""
-        SELECT ?itemLabel ?image ?creatorLabel ?genreLabel ?materialLabel ?creator
-        WHERE {{
-            ?item rdfs:label ?itemLabel.
-            ?item rdfs:label "{i}"@en.
-            ?item wdt:P31 wd:Q3305213.
-            ?item wdt:P18 ?image.
-            ?item wdt:P136 ?genre.
-            ?item wdt:P170 ?creator.
-            ?item wdt:P186 ?material.
-            FILTER(LANG(?itemLabel)="en").
-            BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId).
-            SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-        }}
-        """ )
-        try:
-        # for r in sparql.queryAndConvert()["results"]["bindings"]:
-            #    print(r["itemLabel"]["value"])
-            results = sparql.queryAndConvert()["results"]["bindings"] 
-            if len(results) == 0:
-                continue
-            else:
-                return results
-        except Exception as e:
-            continue
-    return []
-
-def get_movement_sparql(keyword):
-    #keyword = f"[^a-zA-Z]{keyword}[^a-zA-Z]|^{keyword}[^a-zA-Z]|[^a-zA-Z]{keyword}$|^{keyword}$"
-    possibilities=generate_combinations(keyword.split())
-    for i in possibilities:
-        sparql.setQuery(f"""
-        SELECT ?item ?itemLabel ?itemId
-        WHERE {{
-            ?item rdfs:label ?itemLabel.
-            ?item rdfs:label "{i}"@en.
-            ?item wdt:P31 wd:Q968159.
-            FILTER(LANG(?itemLabel)="en").
-            BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId)
-        }}
-        """ )
-        if len(sparql.queryAndConvert()["results"]["bindings"]) != 0:
-            lst = []
-            possible_ids = sparql.queryAndConvert()["results"]["bindings"]
-            for possible_id in possible_ids:
-                item_id = possible_id["itemId"]["value"]
-                lst.extend(find_paintings(135, item_id))
-            return lst
-    return []
-
-def get_genre_sparql(keyword):
-    #keyword = f"[^a-zA-Z]{keyword}[^a-zA-Z]|^{keyword}[^a-zA-Z]|[^a-zA-Z]{keyword}$|^{keyword}$"
-    possibilities=generate_combinations(keyword.split())
-    for i in possibilities: 
-        sparql.setQuery(f"""
-        SELECT ?item ?itemLabel ?itemId
-        WHERE {{
-            ?item rdfs:label ?itemLabel.
-            ?item rdfs:label "{i}"@en.
-            ?item wdt:P31 wd:Q16743958.
-            FILTER(LANG(?itemLabel)="en").
-            BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId)
-        }}
-        """ )
-        if len(sparql.queryAndConvert()["results"]["bindings"]) != 0:
-            lst = []
-            possible_ids = sparql.queryAndConvert()["results"]["bindings"]
-            for possible_id in possible_ids:
-                item_id = possible_id["itemId"]["value"]
-                lst.extend(find_paintings(136, item_id))
-            return lst
-    return []
-
-
-def find_paintings(search_type, item_id):
-    sparql.setQuery(f""" 
-    SELECT ?itemLabel ?image ?creatorLabel ?genreLabel ?materialLabel ?creator
-    WHERE {{
-        ?item rdfs:label ?itemLabel.
-        ?item wdt:P{search_type} wd:{item_id}.
-        ?item wdt:P31 wd:Q3305213.
-        FILTER(LANG(?itemLabel)="en").
-        ?item wdt:P18 ?image.
-        ?item wdt:P136 ?genre.
-        ?item wdt:P170 ?creator.
-        ?item wdt:P186 ?material.
-        BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId)
-        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
-    }}""")
-    try:
+        sparql.setQuery(query)
         return sparql.queryAndConvert()["results"]["bindings"]
     except Exception as e:
+        print(f"Error executing SPARQL query: {e}")
         return []
-def test():
-    while True:
-        keyword = input("Search something : ")
-        if keyword=="quit":
-            break
-        else:
-            ret = related_search(keyword)
-            for r in ret:
-                print("Item Label : "+r["itemLabel"]["value"])
-                print("Creator : "+r["creatorLabel"]["value"])
-                print("Material : "+r["materialLabel"]["value"])
-                print("Genre : "+r["genreLabel"]["value"])
-            '''ret = get_painting_sparql(keyword)
-            print("Results by name : \n")
-            for r in ret:
-                print("Item Label:"+"-"+r["itemLabel"]["value"])
-                print("Creator:"+"-"+r["creatorLabel"]["value"])
-                print("Material:"+"-"+r["materialLabel"]["value"])
-                print("Genre:"+"-"+r["genreLabel"]["value"])
-                print("Creator value:"+"-"+r["creator"])
-            ret = get_movement_sparql(keyword)
-            print("Results by movement : \n")
-            for r in ret:
-                print("Item Label:"+"-"+r["itemLabel"]["value"])
-                print("Creator:"+"-"+r["creatorLabel"]["value"])
-                print("Material:"+"-"+r["materialLabel"]["value"])
-                print("Genre:"+"-"+r["genreLabel"]["value"])
-            print("Results by genre : \n")
-            ret = get_genre_sparql(keyword)
-            for r in ret:
-                print("Item Label:"+"-"+r["itemLabel"]["value"])
-                print("Creator:"+"-"+r["creatorLabel"]["value"])
-                print("Material:"+"-"+r["materialLabel"]["value"])
-                print("Genre:"+"-"+r["genreLabel"]["value"])'''
-            
 
-#Uncomment the row below to test the semantic search feature
-#test()  
+def get_painting_details(keyword):
+    query = f"""
+    SELECT ?painting ?paintingLabel ?image ?creator ?creatorLabel
+WHERE {{
+  ?painting wdt:P31 wd:Q3305213;  # specifically paintings
+            rdfs:label ?label;
+            wdt:P170 ?creator.
+  FILTER(CONTAINS(LCASE(?label), "mona lisa") && LANG(?label) = "en").
+  ?creator rdfs:label ?creatorLabel.
+  OPTIONAL {{ ?painting wdt:P18 ?image. }}
+  SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
+}}
+LIMIT 10
+    """
+    return execute_sparql_query(query)
 
+def get_other_paintings_by_creator(creator_id):
+    query = f"""
+    SELECT ?otherPainting ?otherPaintingLabel ?image WHERE {{
+      ?otherPainting wdt:P170 wd:{creator_id};
+                      wdt:P31 wd:Q3305213;
+                      rdfs:label ?otherPaintingLabel.
+      OPTIONAL {{ ?otherPainting wdt:P18 ?image. }}
+      FILTER(LANG(?otherPaintingLabel) = "en").
+    }}
+    LIMIT 10
+    """
+    return execute_sparql_query(query)
 
+def related_search(keyword):
+    # First, get the initial painting details, including creator
+    paintings = get_painting_details(keyword)
+    if not paintings:
+        return []
 
-def generate_combinations(words, index=0, current_combination=None, result=None):
-    if result is None:
-        result = []
-    if current_combination is None:
-        current_combination = []
-    
-    if index == len(words):
-        # Join the current combination into a single string and add to the result list
-        result.append(' '.join(current_combination))
-        return result
-    
-    word = words[index]
-    # Generate two versions of the current word: one with a capital first letter and one with a small first letter
-    lower_first = word[0].lower() + word[1:]
-    upper_first = word[0].upper() + word[1:]
-    
-    # Recur with the next word, adding the lower-case version of the current word
-    generate_combinations(words, index + 1, current_combination + [lower_first], result)
-    # Recur with the next word, adding the upper-case version of the current word
-    generate_combinations(words, index + 1, current_combination + [upper_first], result)
-    
-    return result
+    # Extract creator ID from the first relevant painting
+
+    creator_id = paintings[0].get('creator', {}).get('value', '').split('/')[-1]
+    print(f'creator_id: {creator_id}')
+    if not creator_id:
+        return paintings  # Return only the initial painting if no creator ID found
+
+    # Fetch other paintings by the same creator
+    other_paintings = get_other_paintings_by_creator(creator_id)
+    # Combine initial painting results with other paintings by the same creator
+    return paintings + other_paintings
+
+# Testing function - uncomment to use
+# def test():
+#     while True:
+#         keyword = input("Search something: ")
+#         if keyword.lower() == "quit":
+#             break
+#         results = related_search(keyword)
+#         if results:
+#             for result in results:
+#                 print(f"Painting: {result.get('paintingLabel', {}).get('value', 'N/A')}")
+#                 print(f"Creator: {result.get('creatorLabel', {}).get('value', 'N/A')}")
+#                 print(f"Genre: {result.get('genreLabel', {}).get('value', 'N/A')}")
+#                 print(f"Image URL: {result.get('image', {}).get('value', 'N/A')}\n")
+#         else:
+#             print("No results found.")
+
+# Uncomment below to test the functionality
+# test()
