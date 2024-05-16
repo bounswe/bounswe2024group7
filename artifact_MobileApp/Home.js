@@ -94,10 +94,11 @@ const Home = ({ navigation }) => {
       )}
       {isLoggedIn&&(
         <View style={styles.appContainer}>
+          <View style={styles.content}>
         {selectedTab === 'Feed' && <FeedPageContainer />}
         {selectedTab === 'Search' && <SearchPageContainer />}
         {selectedTab === 'Profile' && <ProfilePageContainer />}
-
+        </View>
         <TabList selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
       </View>
       )
@@ -144,6 +145,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   appContainer: {
+    flex: 1,
+  },
+  content: {
     flex: 1,
   },
   tabList: {
