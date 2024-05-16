@@ -9,6 +9,8 @@ import Signup from './Signup';
 import SearchPage from './SearchPage'; 
 import ProfilePage from './ProfilePage'; 
 import PostViewPage from './PostViewPage'; 
+import Feed from './Feed';
+import AddPost from './AddPost';
 
 
 const Stack = createStackNavigator();
@@ -35,6 +37,10 @@ const App = () => {
             />
             <Stack.Screen name="Login" component={Login} /> 
             <Stack.Screen name="Signup" component={Signup} /> 
+            <Stack.Screen name="SearchPage" component={SearchPage} /> 
+            <Stack.Screen name="ProfilePage" component={ProfilePage} /> 
+            <Stack.Screen name="Feed" component={Feed} /> 
+            <Stack.Screen name="AddPost" component={AddPost} /> 
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>
