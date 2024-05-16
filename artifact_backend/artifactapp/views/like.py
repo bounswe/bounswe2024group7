@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, status
+from rest_framework import generics, status, views
 from rest_framework.response import Response
 from ..serializers import LikeSerializer
 from ..models import Like, Post
@@ -43,3 +43,10 @@ class UserLikesList(generics.ListAPIView):
         username = self.kwargs['username']
         user_likes = Like.objects.filter(profile__username=username)
         return user_likes
+
+
+class LikeCountView(views.APIView):
+    def get(self, request, pk, *args, **kwargs):
+        post = get_object_or_404(Post, pk=pk)
+        like_count = Like.objects.filter(post=post).count()
+        return Response({'like_count': like_count}, status=status.HTTP_200_OK)

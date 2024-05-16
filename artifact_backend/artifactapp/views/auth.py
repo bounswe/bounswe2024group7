@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
 from rest_framework import status, views
 from rest_framework.response import Response
-from ..serializers import UserSerializer, LoginSerializer
+from ..serializers import UserSerializer, LoginSerializer, ProfileSerializer
+from ..models import Profile
 from .search import get_painting_sparql, get_movement_sparql, get_genre_sparql
 from rest_framework.decorators import api_view
 
@@ -22,7 +23,11 @@ class LoginView(views.APIView):
                                 password=serializer.validated_data['password'])
             if user:
                 login(request, user)
-                return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+                # Retrieve the associated profile object
+                profile = Profile.objects.get(username=user)
+                # Serialize the profile object
+                profile_serializer = ProfileSerializer(profile)
+                return Response({"message": "Login successful", "profile": profile_serializer.data}, status=status.HTTP_200_OK)
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
