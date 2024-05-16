@@ -45,8 +45,15 @@ const Home = ({ navigation }) => {
         <Text style={styles.buttonText}>Log Out</Text>
       </TouchableOpacity>
       </>
+      
     )}
-   
+    <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          navigation.navigate('ProfilePage')
+        }}>
+        <Text style={styles.buttonText}>Profile Page</Text>
+      </TouchableOpacity>
     </View>
   );
 };

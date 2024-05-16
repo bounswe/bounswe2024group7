@@ -7,7 +7,10 @@ import Home from './Home';
 import Login from './Login'; // Import LoginScreen component from log.js
 import Signup from './Signup'; 
 import SearchPage from './SearchPage'; 
-import PostViewPage from './PostViewPage';
+import ProfilePage from './ProfilePage'; 
+import PostViewPage from './PostViewPage'; 
+
+
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -33,7 +36,8 @@ const App = () => {
             <Stack.Screen name="Login" component={Login} /> 
             <Stack.Screen name="Signup" component={Signup} /> 
             <Stack.Screen name="SearchPage" component={SearchPage} /> 
-            <Stack.Screen name="PostViewPage" component={PostViewPage} /> 
+            <Stack.Screen name="PostViewPage" component={PostViewPage} />
+            <Stack.Screen name="ProfilePage" component={ProfilePage} />
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>
