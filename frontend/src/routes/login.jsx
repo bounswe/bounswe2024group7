@@ -1,5 +1,5 @@
 import { createLazyFileRoute, createRoute } from '@tanstack/react-router'
-import LoginCard from "../components/LoginCard.component"
+import LoginCard from "../components/loginCard.component"
 import { rootRoute } from "./__root"
 
 export const loginRoute = createRoute({

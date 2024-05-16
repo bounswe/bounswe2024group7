@@ -1,5 +1,6 @@
 import { createLazyFileRoute, createRoute } from '@tanstack/react-router'
 import { rootRoute } from "./__root"
+import { Component } from 'react'
 
 export const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
