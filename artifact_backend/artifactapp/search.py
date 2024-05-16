@@ -1,4 +1,5 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
+import re
 
 sparql = SPARQLWrapper("https://query.wikidata.org/bigdata/namespace/wdq/sparql")
 sparql.setReturnFormat(JSON)
@@ -7,16 +8,20 @@ def get_painting_sparql(keyword):
     sparql.setQuery(f"""
     SELECT ?item ?itemLabel ?itemId ?image
     WHERE {{
-        ?item rdfs:label "{keyword}"@en.
         ?item rdfs:label ?itemLabel.
         ?item wdt:P31 wd:Q3305213.
         ?item wdt:P18 ?image.
+        ?item wdt:P136 ?genre.
+        ?item wdt:P170 ?creator.
+        ?item wdt:P186 ?material.
         FILTER(LANG(?itemLabel)="en").
         BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId)
     }}
     """ )
     try:
-        return sparql.queryAndConvert()["results"]["bindings"]
+       # for r in sparql.queryAndConvert()["results"]["bindings"]:
+        #    print(r["itemLabel"]["value"])
+        return sparql.queryAndConvert()["results"]["bindings"] 
     except Exception as e:
         print(e)
 
@@ -56,16 +61,21 @@ def get_genre_sparql(keyword):
             return find_paintings(136, item_id)
     return []
 
+
 def find_paintings(search_type, item_id):
     sparql.setQuery(f""" 
-    SELECT ?item ?itemLabel ?itemId ?image
+    SELECT ?itemLabel ?image ?creatorLabel ?genreLabel ?materialLabel ?creator
     WHERE {{
         ?item rdfs:label ?itemLabel.
         ?item wdt:P{search_type} wd:{item_id}.
         ?item wdt:P31 wd:Q3305213.
         FILTER(LANG(?itemLabel)="en").
         ?item wdt:P18 ?image.
+        ?item wdt:P136 ?genre.
+        ?item wdt:P170 ?creator.
+        ?item wdt:P186 ?material.
         BIND(REPLACE(STR(?item), "http://www.wikidata.org/entity/", "") AS ?itemId)
+        SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }}
     }}""")
     try:
         return sparql.queryAndConvert()["results"]["bindings"]

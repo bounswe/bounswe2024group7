@@ -43,9 +43,14 @@ import apiInstance from "../instance/apiInstance.js"
 import { useNavigate } from "@tanstack/react-router"
 import { userActions } from '../context/user.js'
 import Cookies from "js-cookie"
-import SearchBar from './SearchBar.component.jsx'
+import SearchBar from './searchBar.component.jsx'
+import SearchResults from './searchResults.component.jsx'
+import { useState } from 'react'
 
 export default function NavigationResponsive() {
+    const [searchResults, setSearchResults] = useState(null);
+    const [loading, setLoading] = useState(false);
+
     const { isOpen, onToggle } = useDisclosure()
     const { colorMode, toggleColorMode } = useColorMode()
     const username = useSelector(userName)
@@ -124,7 +129,7 @@ export default function NavigationResponsive() {
                         <DesktopNav />
                     </Flex>
                 </Flex>
-                <SearchBar screen={"desktop"} />
+                <SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading = {setLoading} loading = {loading}/>
                 <Stack
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
@@ -188,7 +193,7 @@ export default function NavigationResponsive() {
                     }
                 </Stack>
             </Flex>
-
+            <SearchResults searchResults={searchResults} loading={loading} />
             <Collapse in={isOpen} animateOpacity>
                 <MobileNav />
             </Collapse>
