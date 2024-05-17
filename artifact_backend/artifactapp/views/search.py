@@ -20,7 +20,7 @@ def artwork_search(request):
                         related_search(session, query)
                     )
                     return {
-                        'painting_results': painting_results+related_results,
+                        'painting_results': painting_results+related_results+genre_results,
                         'movement_results': movement_results,
                         'genre_results': genre_results,
                         'related_results': related_results
