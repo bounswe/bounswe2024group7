@@ -129,16 +129,18 @@ export const PhaseContextProvider = ({ children }) => {
         if (bookmarkedPostsData && !bookmarkedPostsIsFetching) {
             setBookmarkedPosts(bookmarkedPostsData);
 
-            // Create a new array to avoid mutating state directly
-            const updatedPosts = posts.map(post => {
-                const isBookmarked = bookmarkedPostsData.some(bookmarkedPost => bookmarkedPost.id === post.id);
-                return {
-                    ...post,
-                    isBookmarked: isBookmarked,
-                };
-            });
+            if (bookmarkedPostsData && postsData) {
+                // Create a new array to avoid mutating state directly
+                const updatedPosts = posts.map(post => {
+                    const isBookmarked = bookmarkedPostsData.some(bookmarkedPost => bookmarkedPost.id === post.id);
+                    return {
+                        ...post,
+                        isBookmarked: isBookmarked,
+                    };
+                });
 
-            setPosts(updatedPosts);
+                setPosts(updatedPosts);
+            }
         }
     }, [bookmarkedPostsData, bookmarkedPostsIsFetching]);
 
