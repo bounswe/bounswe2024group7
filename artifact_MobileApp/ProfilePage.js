@@ -64,6 +64,7 @@ const ProfilePage = () => {
             genre={painting.genre}
             material={painting.material}
             creator={painting.creator}
+            navigation={navigation} 
           />
         {/* </TouchableOpacity> */}
         </View>
