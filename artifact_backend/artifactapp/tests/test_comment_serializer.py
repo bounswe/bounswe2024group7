@@ -20,7 +20,6 @@ class CommentSerializerTests(TestCase):
     def test_contains_expected_data(self):
         data = self.serializer.data
         excluded_fields = ['created_at', 'updated_at']
-        print(data)
         for key, value in data.items():
             if key not in excluded_fields:
                 if key == 'profile':
