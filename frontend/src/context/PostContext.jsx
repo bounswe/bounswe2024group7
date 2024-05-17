@@ -34,6 +34,20 @@ export const PhaseContextProvider = ({ children }) => {
         queryFn: async () => {
             const response = await apiInstance().get('/posts')
 
+            if (!profile || !password) {
+                const emptyLikesAndComments = await Promise.all(response.data.map(async (post) => {
+                    return {
+                        ...post,
+                        likes: [],
+                        comments: [],
+                    }
+                }
+                ))
+
+                return emptyLikesAndComments
+            }
+
+
             // Get the like_count and comments for each post
             const data = await Promise.all(response.data.map(async (post) => {
                 const likesResponse = await apiInstance(
