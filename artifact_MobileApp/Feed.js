@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { FlatList ,View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import FeedPost from './FeedPost';
 import { useAuth } from './AuthContext';
 import apiInstance from './Api';
@@ -10,45 +10,17 @@ const Feed = () => {
 
     const { user, password } = useAuth();
 
-    // const paintings = [
-    //     {
-    //         "imageURL": "https://t1.gstatic.com/licensed-image?q=tbn:ANd9GcQsu7yYuRPXNK9eHHSFD2tUYO4stQDb1Ez8vjqGERfs9xqYLLnY_y6lQkPFZa-44cqn",
-    //         "title": "Mona Lisa",
-    //         "material": "Oil on poplar",
-    //         "genre": "Portrait",
-    //         "creator": "Leonardo da Vinci"
-    //     }
+    /* const paintings = [
+         {
+             "imageURL": "https://t1.gstatic.com/licensed-image?q=tbn:ANd9GcQsu7yYuRPXNK9eHHSFD2tUYO4stQDb1Ez8vjqGERfs9xqYLLnY_y6lQkPFZa-44cqn",
+             "title": "Mona Lisa",
+            "material": "Oil on poplar",
+            "genre": "Portrait",
+            "creator": "Leonardo da Vinci"
+        }
         
-    //     // ,
-    //     // {
-    //     //     "imageURL": "https://t1.gstatic.com/licensed-image?q=tbn:ANd9GcQsu7yYuRPXNK9eHHSFD2tUYO4stQDb1Ez8vjqGERfs9xqYLLnY_y6lQkPFZa-44cqn",
-    //     //     "title": "Starry Night",
-    //     //     "material": "Oil on canvas",
-    //     //     "genre": "Post-Impressionism",
-    //     //     "creator": "Vincent van Gogh"
-    //     // },
-    //     // {
-    //     //     "imageURL": "https://t1.gstatic.com/licensed-image?q=tbn:ANd9GcQsu7yYuRPXNK9eHHSFD2tUYO4stQDb1Ez8vjqGERfs9xqYLLnY_y6lQkPFZa-44cqn",
-    //     //     "title": "The Persistence of Memory",
-    //     //     "material": "Oil on canvas",
-    //     //     "genre": "Surrealism",
-    //     //     "creator": "Salvador Dalí"
-    //     // },
-    //     // {
-    //     //     "imageURL": "https://t1.gstatic.com/licensed-image?q=tbn:ANd9GcQsu7yYuRPXNK9eHHSFD2tUYO4stQDb1Ez8vjqGERfs9xqYLLnY_y6lQkPFZa-44cqn",
-    //     //     "title": "The Scream",
-    //     //     "material": "Oil, tempera, and pastel on cardboard",
-    //     //     "genre": "Expressionism",
-    //     //     "creator": "Edvard Munch"
-    //     // },
-    //     // {
-    //     //     "imageURL": "https://t1.gstatic.com/licensed-image?q=tbn:ANd9GcQsu7yYuRPXNK9eHHSFD2tUYO4stQDb1Ez8vjqGERfs9xqYLLnY_y6lQkPFZa-44cqn",
-    //     //     "title": "Girl with a Pearl Earring",
-    //     //     "material": "Oil on canvas",
-    //     //     "genre": "Tronie",
-    //     //     "creator": "Johannes Vermeer"
-    //     // }
-    // ];
+        
+    ];*/
 
     useEffect(() => {
         const fetchPaintings = async () => {
@@ -60,7 +32,7 @@ const Feed = () => {
     
           console.log('Posts:', response.data);
     
-          setPaintings(response.data);
+         setPaintings(response.data);
     
         };
     
@@ -68,33 +40,41 @@ const Feed = () => {
       }, []);
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            {paintings.map((painting, index) => (
-                <View key={index} style={styles.postcontainer}>
-                    <FeedPost
-                        post = {{ 
-                            imageURL:painting.imageURL,
-                        title:painting.title,
-                        material:painting.material,
-                        genre:painting.genre,
-                        creator:painting.creator}}
-                    />
-                </View>
-            ))}
-        </ScrollView>
+        <FlatList
+      data={paintings}
+      keyExtractor={(item, index) => index.toString()}
+      renderItem={({ item }) => (
+        <View style={styles.postcontainer}>
+          <FeedPost
+            post={{
+              imageURL: item.image.url,
+              title: item.title,
+              material: item.material,
+              genre: item.genre,
+              creator: item.updated_at,
+            }}
+          />
+        </View>
+      )}
+      contentContainerStyle={styles.container}
+      numColumns={4} // Adjust the number of columns as needed
+    />
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
+        justifyContent: 'center',
         alignItems: 'center',
         paddingVertical: 20,
         backgroundColor: 'white',
-    },
-    postcontainer: {
-        marginBottom: 20,
-    },
+      },
+      postcontainer: {
+        flex: 1,
+        alignItems: 'center',
+        margin: 5, // Add margin between grid items
+      }
 });
 
 export default Feed;

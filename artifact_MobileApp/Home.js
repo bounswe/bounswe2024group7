@@ -95,12 +95,12 @@ const Home = ({ navigation }) => {
       )}
       {isLoggedIn&&(
         <View style={styles.appContainer}>
+        <TabList selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
           <ScrollView style={styles.content}>
         {selectedTab === 'Feed' && <FeedPageContainer />}
         {selectedTab === 'Search' && <SearchPageContainer />}
         {selectedTab === 'Profile' && <ProfilePageContainer />}
         </ScrollView>
-        <TabList selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
       </View>
       )
 
@@ -156,6 +156,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
+    justifyContent: 'flex-start'
   },
   tabItem: {
     flex: 1,

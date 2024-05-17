@@ -67,11 +67,11 @@ const ProfilePage = () => {
         source={{ uri: 'https://source.unsplash.com/random/300x300' }}
         style={styles.profileImage}
       />
-      <Text style={styles.profileName}>John Doe</Text>
-      <Text style={styles.profileUsername}>@johndoe</Text>
+      <Text style={styles.profileName}>{user}</Text>
+      <Text style={styles.profileUsername}>@{user}</Text>
       <View style={styles.badgesContainer}>
-        <Text style={styles.badge}>Posts: 100</Text>
-        <Text style={styles.badge}>Followers: 500</Text>
+        <Text style={styles.badge}>Posts: 0</Text>
+        <Text style={styles.badge}>Followers: 0</Text>
       </View>
       <View style={styles.buttonsContainer}>
      
