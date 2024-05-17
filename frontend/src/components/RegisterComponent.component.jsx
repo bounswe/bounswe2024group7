@@ -23,7 +23,7 @@ import apiInstance from '../instance/apiInstance.js'
 import { useState } from 'react'
 import { useNavigate } from "@tanstack/react-router"
 import { useDispatch } from "react-redux";
-import { userActions } from '../context/user.js'
+import { userActions, userProfile } from '../context/user.js'
 import Cookies from "js-cookie"
 
 export default function RegisterComponent() {
@@ -52,6 +52,8 @@ export default function RegisterComponent() {
                 dispatch(
                     userActions.login({
                         userName: username,
+                        password: password,
+                        profile: response.data.profile
                     })
                 )
 

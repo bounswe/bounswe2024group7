@@ -11,7 +11,19 @@ class SignupView(views.APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+            # Create a profile object for the user
+            user = serializer.instance
+            profile = Profile.objects.get(username=user)
+
+            profile_serializer = ProfileListSerializer(profile)
+
+            return Response(
+                    {
+                        "message": "User created successfully",
+                        "profile": profile_serializer.data
+                    }
+                , status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

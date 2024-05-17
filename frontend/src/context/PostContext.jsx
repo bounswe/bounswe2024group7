@@ -32,10 +32,7 @@ export const PhaseContextProvider = ({ children }) => {
     } = useQuery({
         queryKey: ['posts'],
         queryFn: async () => {
-            const response = await apiInstance(
-                profile.username,
-                password
-            ).get('/posts')
+            const response = await apiInstance().get('/posts')
 
             // Get the like_count and comments for each post
             const data = await Promise.all(response.data.map(async (post) => {
