@@ -4,49 +4,8 @@ import Toast from 'react-native-toast-message';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import PostViewPage from './PostViewPage';
 import { useNavigation } from '@react-navigation/native';
+
 const PostCard = ({imageURL,title,material,genre,creator}) => {
-  /* Actual data for the postcard
-  const [imageURL, setImageURL] = useState('');
-  const [name, setMName] = useState('');
-  const [material, setMaterial] = useState('');
-  const [genre, setGenre] = useState('');
-  const [author, setAuthor] = useState('');
-
-  const checkDatabase = async (name) => {
-    try {
-      const response = await apiInstance().post(
-        "search",
-            {
-                imageURL,
-                name,
-                material,
-                genre,
-                author
-            }
-      )
-    }
-    catch (e) {
-      console.log(e)
-      Toast.show({
-        type: 'error',
-        position: 'bottom',
-        text1: 'Search Error',
-        text2: 'This painting does not exist. Please try again.',
-        visibilityTime: 2000,
-        autoHide: true,
-        topOffset: 30,
-        bottomOffset: 40
-      });
-    }
-  }*/
-
-  // Dummy data for the postcard
-  // const postCardData = {
-  //   imageUri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqWRpa_xrwaPLKt_LADjacrbdsaEBIhgpi88Llcm3nyw&s',
-  //   message: 'Hello from a dummy postcard!',
-  //   sender: 'John Doe',
-  //   receiver: 'Jane Smith'
-  // };
 
   const navigation = useNavigation();
   return (

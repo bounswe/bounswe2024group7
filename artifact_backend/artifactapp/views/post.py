@@ -2,12 +2,12 @@ from rest_framework import generics
 from ..serializers import PostCreateSerializer, PostListSerializer
 from ..models import Post
 from ..permissions import IsOwnerOrReadOnly
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
 
 class PostListCreate(generics.ListCreateAPIView):
     queryset = Post.objects.all()
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return PostCreateSerializer

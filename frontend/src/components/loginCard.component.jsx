@@ -39,40 +39,32 @@ export default function LoginCard() {
 
             if (response.status === 200) {
 
-                // Get the labels for the artifacts
-                const labelsResponse = await apiInstance().get("labels")
 
-                if (labelsResponse.status === 200) {
+                dispatch(
+                    userActions.login({
+                        userName: username,
+                        profile: response.data.profile,
+                        password
+                    })
+                )
 
-                    console.log(labelsResponse.data)
+                Cookies.set("username", username)
 
-                    const labels = labelsResponse.data
+                navigate(
+                    {
+                        to: "/"
+                    }
+                )
 
-                    dispatch(
-                        userActions.login({
-                            userName: username,
-                            profile: response.data.profile,
-                            artifactLabels: labels
-                        })
-                    )
-
-                    Cookies.set("username", username)
-
-                    navigate(
-                        {
-                            to: "/"
-                        }
-                    )
-
-                } else {
-                    toast({
-                        title: "There was an error while logging in. Please try again.",
-                        status: "error",
-                        isClosable: true,
-                        duration: 2000,
-                    });
-                }
+            } else {
+                toast({
+                    title: "There was an error while logging in. Please try again.",
+                    status: "error",
+                    isClosable: true,
+                    duration: 2000,
+                });
             }
+
         } catch (e) {
             console.log(e)
             toast({

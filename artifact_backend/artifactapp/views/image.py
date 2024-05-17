@@ -9,7 +9,6 @@ from ..serializers import ImageSerializer
 class ImageListCreate(generics.ListCreateAPIView):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class ImageRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):

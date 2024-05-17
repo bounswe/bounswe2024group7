@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
     Modal,
     ModalOverlay,
@@ -17,33 +17,29 @@ import {
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import {
-    artifactLabels,
-    userProfile
+    userProfile,
+    userPassword
 } from '../context/user'
 import Select from 'react-select'
 import axios from 'axios'
 import apiInstance from '../instance/apiInstance'
 import { useToast } from '@chakra-ui/react'
 import { useDispatch } from 'react-redux'
-
+import { useContext } from 'react'
+import { PostContext } from '../context/PostContext'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 function CreatePostModal({
     isOpen,
     onClose
 }) {
-    const labels = useSelector(artifactLabels).map(label => ({
-        value: label.id,
-        label: label.value
-    }))
+    const { labels, isFetchingLabels } = useContext(PostContext)
     const profile = useSelector(userProfile)
+    const password = useSelector(userPassword)
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
     const [image, setImage] = useState('')
     const [selectedLabels, setSelectedLabels] = useState([])
-
-    const chooseLabel = (label) => {
-        setSelectedLabels([...selectedLabels, label])
-    }
 
     const theme = useColorModeValue('light', 'dark')
     const selectComponentStyles = {
@@ -122,6 +118,91 @@ function CreatePostModal({
         }
     }
 
+    const toast = useToast()
+    const queryClient = useQueryClient()
+
+    const createPostMutation = useMutation(
+        {
+            mutationFn: async (post) => {
+                if (selectedLabels.length === 0) {
+                    toast({
+                        title: 'No labels selected.',
+                        description: 'Please select at least one label.',
+                        status: 'error',
+                        duration: 9000,
+                        isClosable: true,
+                    })
+                    return
+                }
+
+                if (!profile) {
+                    toast({
+                        title: 'Not logged in.',
+                        description: 'Please log in to create a post.',
+                        status: 'error',
+                        duration: 9000,
+                        isClosable: true,
+                    })
+                    return
+                }
+
+                console.log(post)
+
+                // First create image model and get the image id
+                if (post.image) {
+                    const imageResponse = await apiInstance(
+                        profile.username,
+                        password
+                    ).post('/images', {
+                        url: post.image,
+                    })
+
+                    post.image = imageResponse.data.id
+
+                    console.log(post)
+                } else {
+                    delete post.image
+                }
+
+                const response = await apiInstance(
+                    profile.username,
+                    password
+                ).post('/posts', {
+                    ...post,
+                    username: profile.username,
+                })
+
+                toast({
+                    title: 'Post created.',
+                    description: 'Your post has been created successfully.',
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                })
+
+                return response.data
+            },
+            onError: (error) => {
+                toast({
+                    title: 'An error occurred.',
+                    description: error.message,
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                })
+            },
+            onSuccess: (data) => {
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['posts']
+                    }
+                )
+                onClose()
+            }
+
+        }
+    )
+
     return (
         <Modal
             isOpen={isOpen}
@@ -142,6 +223,7 @@ function CreatePostModal({
                         <FormLabel>Title</FormLabel>
                         <Input type="text"
                             focusBorderColor='purple.500'
+                            onChange={(e) => setTitle(e.target.value)}
                         />
                     </FormControl>
                     <FormControl id="content">
@@ -149,6 +231,7 @@ function CreatePostModal({
                         <Textarea
                             focusBorderColor='purple.500'
                             rows={5}
+                            onChange={(e) => setContent(e.target.value)}
                         />
                     </FormControl>
                     <FormControl id="image">
@@ -157,23 +240,43 @@ function CreatePostModal({
                         </FormLabel>
                         <Input type="text"
                             focusBorderColor='purple.500'
+                            onChange={(e) => setImage(e.target.value)}
                         />
                     </FormControl>
                     <FormControl id="labels">
                         <FormLabel>
                             Labels
                         </FormLabel>
-                        <Select
-                            styles={selectComponentStyles}
-                            isMulti
-                            options={labels}
-                            onChange={(selected) => chooseLabel(selected)}
-                        />
+                        {
+                            isFetchingLabels ?
+                                <Select
+                                    isLoading
+                                    isDisabled
+                                />
+                                :
+                                <Select
+                                    styles={selectComponentStyles}
+                                    isMulti
+                                    options={labels}
+                                    onChange={(selected) => setSelectedLabels(selected)}
+                                />
+                        }
+
                     </FormControl>
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme="purple" mr={3}>
+                    <Button colorScheme="purple" mr={3}
+                        onClick={() => {
+                            createPostMutation.mutate({
+                                title: title,
+                                content: content,
+                                image: image,
+                                labels: selectedLabels.map(label => label.value),
+                            })
+                        }}
+
+                    >
                         Save
                     </Button>
                     <Button variant="ghost"

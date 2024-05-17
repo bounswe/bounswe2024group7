@@ -26,14 +26,16 @@ class PostListSerializer(serializers.ModelSerializer):
 
 
 class PostCreateSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(write_only=True)
+
     class Meta:
         model = Post
         fields = '__all__'
 
     def create(self, validated_data):
-        # Retrieve the Profile instance based on the username of the logged-in user
-        user = self.context['request'].user
-        profile = Profile.objects.get(username=user.username)
+        # Retrieve the Profile instance based on the username from the body of the request
+        username = validated_data.pop('username')
+        profile = Profile.objects.get(username=username)
 
         # Add the profile to the validated data before saving
         validated_data['profile'] = profile

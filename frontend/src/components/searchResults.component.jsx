@@ -40,7 +40,6 @@ function SearchResults({
     useEffect(() => {
         try {
             if (!searchResults) {
-                console.log("This is null");
                 return;
             }
 

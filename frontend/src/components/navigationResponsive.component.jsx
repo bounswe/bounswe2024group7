@@ -63,8 +63,6 @@ export default function NavigationResponsive() {
     const toast = useToast()
     const dispatch = useDispatch();
 
-    console.log(profile)
-
     const {
         isOpen: isSearchResultsOpen,
         onClose: onSearchResultsClose,
@@ -249,7 +247,21 @@ export default function NavigationResponsive() {
                 bottom={4}
                 right={4}
                 colorScheme='purple'
-                onClick={onCreatePostModalOpen}
+                onClick={() => {
+                    if (username) {
+                        onCreatePostModalOpen()
+                    } else {
+                        toast({
+                            title: "You need to be logged in to create a new artifact.",
+                            status: "error",
+                            isClosable: true,
+                            duration: 2000,
+                        })
+                        navigate({
+                            to: loginPath
+                        })
+                    }
+                }}
                 gap={2}
                 w={"auto"}
             >
