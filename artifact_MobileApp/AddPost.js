@@ -11,7 +11,7 @@ const AddPost = () => {
   const navigation = useNavigation();
   const handlePublish = () => {
     console.log('Post published:', { title, description, image, label, imageUrl });
-    navigation.navigate('ProfilePage');
+    navigation.navigate('Home');
     // Handle publishing logic here
     // You can send the data to your backend or wherever needed
   };
