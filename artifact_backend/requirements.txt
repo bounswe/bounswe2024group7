@@ -6,3 +6,4 @@ django-cors-headers
 SPARQLWrapper
 django-rest-swagger
 drf-yasg
+aiohttp
