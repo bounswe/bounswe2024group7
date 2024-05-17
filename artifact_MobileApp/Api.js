@@ -5,7 +5,7 @@ import { useState } from "react";
 // todo: would be the best case scenario but we are in a hurry
 
 // const baseURL = "http://10.0.2.2:8081"
-const baseURL = "http://localhost:8080"
+const baseURL = "https://artifactbackend-yslcfqdwna-oa.a.run.app"
 
 function apiInstance() {
   return axios.create({
