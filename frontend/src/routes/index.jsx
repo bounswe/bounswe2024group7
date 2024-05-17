@@ -1,6 +1,8 @@
 import { createLazyFileRoute, createRoute } from '@tanstack/react-router'
 import { rootRoute } from "./__root"
 import { Component } from 'react'
+import { PhaseContextProvider } from '../context/PostContext'
+import PostFeed from '../components/PostFeed,component'
 
 export const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -10,8 +12,8 @@ export const indexRoute = createRoute({
 
 function Index() {
     return (
-        <div className="p-2">
-            <h3>Welcome Home!</h3>
-        </div>
+        <PhaseContextProvider>
+            <PostFeed />
+        </PhaseContextProvider>
     )
 }

@@ -27,8 +27,6 @@ const Login = ({ navigation })=>{
 
         // successful login
         if (response.status === 200) {
-            // console.log(response.data)
-            // we should send the userdata from backend
             login(username);
             goHome();
         }

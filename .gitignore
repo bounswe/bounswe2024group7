@@ -31,6 +31,7 @@ artifact_backend/.idea
 .env.development
  __pycache__/
  *.pyc
+**/__pycache__/
 
 venv
 staticfiles

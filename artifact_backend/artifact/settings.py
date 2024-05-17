@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'artifactapp.apps.ArtifactappConfig',
     'rest_framework',
     'corsheaders',
+    'rest_framework_swagger',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [

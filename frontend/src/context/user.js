@@ -2,9 +2,10 @@ import { loadState, saveState } from "./local";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialUser = {
-  // id: loadState("id"),
-  // token: loadState("token"),
   userName: loadState("userName"),
+  password: loadState("password"),
+  searchResults: loadState("searchResults"),
+  profile: loadState("profile"),
 };
 
 const userSlice = createSlice({
@@ -12,27 +13,33 @@ const userSlice = createSlice({
   initialState: initialUser,
   reducers: {
     login(state, actions) {
-      // state.id = actions.payload.id;
-      // state.token = actions.payload.token;
       state.userName = actions.payload.userName;
-      // saveState("id", actions.payload.id);
-      // saveState("token", actions.payload.token);
+      state.profile = actions.payload.profile;
+      state.password = actions.payload.password;
       saveState("userName", actions.payload.userName);
+      saveState("profile", actions.payload.profile);
+      saveState("password", actions.payload.password);
     },
     logout(state) {
-      // state.id = null;
-      // state.token = null;
       state.userName = "";
-      // saveState("id", null);
-      // saveState("token", null);
+      state.profile = null;
+      state.password = "";
       saveState("userName", "");
+      saveState("profile", null);
+      saveState("password", "");
+    },
+    updateSearchResults(state, actions) {
+      state.searchResults = actions.payload;
+      saveState("searchResults", actions.payload);
     },
   }
 });
 
-// export const userId = (state) => state.user.id;
-// export const accessToken = (state) => state.user.token;
+
 export const userName = (state) => state.user.userName;
+export const searchResults = (state) => state.user.searchResults;
+export const userProfile = (state) => state.user.profile;
+export const userPassword = (state) => state.user.password;
 
 export const userActions = userSlice.actions;
 

@@ -39,9 +39,12 @@ export default function LoginCard() {
 
             if (response.status === 200) {
 
+
                 dispatch(
                     userActions.login({
                         userName: username,
+                        profile: response.data.profile,
+                        password
                     })
                 )
 
@@ -52,7 +55,16 @@ export default function LoginCard() {
                         to: "/"
                     }
                 )
+
+            } else {
+                toast({
+                    title: "There was an error while logging in. Please try again.",
+                    status: "error",
+                    isClosable: true,
+                    duration: 2000,
+                });
             }
+
         } catch (e) {
             console.log(e)
             toast({
