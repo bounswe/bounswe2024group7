@@ -5,11 +5,7 @@ import Comment from './Comment';
 import Label from './Label';
 import { useRoute } from '@react-navigation/native';
 
-const PostViewPage = () => {
-  const route = useRoute(); // Get the route object
-
-  const { post } = route.params || { post: { imageURL: '', title: '', creator: '', material: '', genre: '' } }; // Default value for post parameter; // Extract the post object from route params
-
+const FeedPost = ({post}) => {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
 
@@ -141,4 +137,4 @@ const styles = StyleSheet.create({
   
 
 
-export default PostViewPage;
+export default FeedPost;

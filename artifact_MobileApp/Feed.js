@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
-import PostViewPage from './PostViewPage';
+import FeedPost from './FeedPost';
 
 const Feed = () => {
     const paintings = [
@@ -47,7 +47,7 @@ const Feed = () => {
         <ScrollView contentContainerStyle={styles.container}>
             {paintings.map((painting, index) => (
                 <View key={index} style={styles.postcontainer}>
-                    <PostViewPage
+                    <FeedPost
                         post = {{ imageURL:painting.imageURL,
                         title:painting.title,
                         material:painting.material,

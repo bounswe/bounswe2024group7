@@ -54,6 +54,7 @@ const ProfilePage = () => {
           <Text style={styles.buttonText}> Create Post</Text>
         </TouchableOpacity>
       </View>
+      <Text style={styles.mypost}>my posts:</Text>
       <View style={styles.postCardsContainer}>
       {paintings.map((painting, index) => (
         <View style={styles.row}>
@@ -101,6 +102,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'gray',
     marginBottom: 16,
+  },
+  mypost: {
+    fontSize: 16,
+    color: 'gray',
   },
   badgesContainer: {
     flexDirection: 'row',
