@@ -1,127 +1,234 @@
 import React, { useState, useEffect } from 'react';
-import { Flex, Text, Spinner, Grid, GridItem } from '@chakra-ui/react';
+import {
+    Flex,
+    Text,
+    Spinner,
+    Grid,
+    GridItem,
+    SimpleGrid,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
+    Button,
+    ButtonGroup,
+    useColorModeValue,
+    Box,
+    VStack
+} from '@chakra-ui/react';
 import Cookies from 'js-cookie';
 import SearchResult from './searchResult.component';
 import PostView from './postView.component';
 
-function SearchResults({searchResults,loading}) {
-    //Cookies.set('searchResults','{}');
+function SearchResults({
+    searchResults,
+    loading,
+    isOpen,
+    onClose,
+}) {
     const [paintingResults, setPaintingResults] = useState([]);
     const [materialResults, setMaterialResults] = useState([]);
     const [genreResults, setGenreResults] = useState([]);
-   // const [relatedResults, setRelatedResults] = useState([]);
+    const [relatedResults, setRelatedResults] = useState([]);
 
+    const headerBackground = useColorModeValue("gray.100", "gray.700");
 
 
     useEffect(() => {
-            try {
-               // console.log(searchResults);
-                if (!searchResults) {
-                    //setLoading(false);
-                    console.log("This is null");
-                    return;
-                }
-                setPaintingResults(searchResults.painting_results);
-                setMaterialResults(searchResults.material_results);
-                setGenreResults(searchResults.genre_results);
-               // setRelatedResults(searchResults.related_results);
-               // setLoading(false);
-            } catch (error) {
-                console.error('Error fetching search results:', error);
-               // setLoading(false);
+        try {
+            if (!searchResults) {
+                console.log("This is null");
+                return;
             }
-        
-    },[searchResults]); 
 
-    /*var result = {
-        image: "https://upload.wikimedia.org/wikipedia/commons/6/6a/Mona_Lisa.jpg",
-        title: "Mona Lisa",
-        creator: "Leonardo Da Vinci",
-        genre: "portrait",
-        material: "oil"
-};*/
+            const filterResults = (results) => {
+                if (!results) {
+                    return [];
+                }
+
+                return results.filter((result, index, self) =>
+                    index === self.findIndex((t) => (
+                        t["itemLabel"]["value"] === result["itemLabel"]["value"]
+                    ))
+                );
+            };
+
+            const paintingResultsFiltered = filterResults(searchResults.painting_results);
+            const materialResultsFiltered = filterResults(searchResults.material_results);
+            const genreResultsFiltered = filterResults(searchResults.genre_results);
+            const relatedResultsFiltered = filterResults(searchResults.related_results);
+
+            setPaintingResults(paintingResultsFiltered);
+            setMaterialResults(materialResultsFiltered);
+            setGenreResults(genreResultsFiltered);
+            setRelatedResults(relatedResultsFiltered);
+
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+        }
+    }, [searchResults]);
+
+
     return (
-       /* <Flex direction="column" alignItems="center" mt={8}>
-            {loading ? (
-                <Spinner
-                    thickness="3px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color="purple.600"
-                    size="md"
-                />
-            ) : (
-                (paintingResults && paintingResults.length > 0 ) ? (
-                    paintingResults.map((result, index) => (
-                        <Flex
-                            key={index}
-                            border="1px solid"
-                            borderRadius="md"
-                            borderColor="gray.300"
-                            p={4}
-                            mt={4}
-                            width={{ base: '100%', md: '80%' }}
-                            justifyContent="space-between"
-                            alignItems="center"
-                        >
-                            <SearchResult title={result["itemLabel"]["value"]} image={result["image"]["value"]}
-                            genre={result["genreLabel"]["value"]} material={result["materialLabel"]["value"]}/>
-                        </Flex>
-                    ))
-                    
-                ) : (
-                    <Text>No results found by painting name.</Text>
-                )
-                
-            )}
-        </Flex> */
-       /* <Grid templateColumns='repeat(3, 1fr)' gap={6} mt={8}> 
-            <GridItem colStart={2} colEnd = {3}>
-            <PostView title={"Mona Lisa"} description = {"Certain description"} likes = {"8"} imageUri = {"https://upload.wikimedia.org/wikipedia/commons/6/6a/Mona_Lisa.jpg"} />
+        <Modal
+            isOpen={isOpen}
+            onClose={
+                onClose
+            }
+            size={'6xl'}
+        >
+            <ModalOverlay />
+            <ModalContent
+                p={4}
+                m={4}
+                borderRadius={4}
+                overflowY="auto"
+                maxH="90vh"
+            >
+                <ModalHeader
+                    position="sticky"
+                    top={0}
+                    py={4}
+                    px={4}
+                    borderBottomWidth="1px"
+                    borderBottomColor="gray.200"
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    zIndex={1}
+                    bg={headerBackground}
+                >
+                    Search Results
+                    <ModalCloseButton />
+                </ModalHeader>
+                <ModalBody>
+                    <Flex
+                        gap={6}
+                        mt={8}
+                        p={4}
+                        w="100%"
+                        flexWrap="wrap"
+                        justifyContent="center"
+                        flexDirection={{ base: "column", md: "row" }}
+                    >
+                        {loading ? (
+                            <Spinner
+                                thickness="3px"
+                                speed="0.65s"
+                                emptyColor="gray.200"
+                                color="purple.600"
+                                size="md"
+                            />
+                        ) : (
+                            <VStack
+                                spacing={8}
+                                align="start"
+                                w="100%"
+                            >
+                                <Flex
+                                    w="100%"
+                                    justifyContent="center"
+                                    flexDirection="column"
+                                    gap={8}>
+                                    <Text fontSize="xl" fontWeight="bold" mb={4}>
+                                        Paintings
+                                    </Text>
+                                    {
+                                        (paintingResults && paintingResults.length > 0) ? (
+                                            paintingResults.map((result, index) => (
+                                                <SearchResult
+                                                    key={index}
+                                                    title={result["itemLabel"]["value"]}
+                                                    image={result["image"]["value"]}
+                                                    genre={result["genreLabel"]["value"]}
+                                                    material={result["materialLabel"]["value"]}
+                                                    creator={result["creatorLabel"]["value"]} />
+                                            ))
+                                        ) :
+                                            <Text>No paintings found</Text>
+                                    }
+                                </Flex>
+                                <Flex
+                                    w="100%"
+                                    justifyContent="center"
+                                    flexDirection="column"
+                                    gap={8}>
+                                    <Text fontSize="xl" fontWeight="bold" mb={4}>
+                                        Materials
+                                    </Text>
+                                    {
+                                        (materialResults && materialResults.length > 0) ? (
+                                            materialResults.map((result, index) => (
+                                                <SearchResult
+                                                    key={index}
+                                                    title={result["itemLabel"]["value"]}
+                                                    image={result["image"]["value"]}
+                                                    genre={result["genreLabel"]["value"]}
+                                                    material={result["materialLabel"]["value"]}
+                                                    creator={result["creatorLabel"]["value"]} />
+                                            ))
+                                        ) :
+                                            <Text>No materials found</Text>
+                                    }
+                                </Flex>
+                                <Flex
+                                    w="100%"
+                                    justifyContent="center"
+                                    flexDirection="column"
+                                    gap={8}>
+                                    <Text fontSize="xl" fontWeight="bold" mb={4}>
+                                        Genres
+                                    </Text>
+                                    {
+                                        (genreResults && genreResults.length > 0) ? (
+                                            genreResults.map((result, index) => (
+                                                <SearchResult
+                                                    key={index}
+                                                    title={result["itemLabel"]["value"]}
+                                                    image={result["image"]["value"]}
+                                                    genre={result["genreLabel"]["value"]}
+                                                    material={result["materialLabel"]["value"]}
+                                                    creator={result["creatorLabel"]["value"]} />
+                                            ))
+                                        ) :
+                                            <Text>No genres found</Text>
+                                    }
+                                </Flex>
+                                <Flex
+                                    w="100%"
+                                    justifyContent="center"
+                                    flexDirection="column"
+                                    gap={8}
+                                >
+                                    <Text fontSize="xl" fontWeight="bold" mb={4}>
+                                        Related Items
+                                    </Text>
+                                    {
+                                        (relatedResults && relatedResults.length > 0) ? (
+                                            relatedResults.map((result, index) => (
+                                                <SearchResult
+                                                    key={index}
+                                                    title={result["itemLabel"]["value"]}
+                                                    image={result["image"]["value"]}
+                                                    genre={result["genreLabel"]["value"]}
+                                                    material={result["materialLabel"]["value"]}
+                                                    creator={result["creatorLabel"]["value"]} />
+                                            ))
+                                        ) :
+                                            <Text>No related items found</Text>
+                                    }
+                                </Flex>
+                            </VStack>
 
-            </GridItem>
-            <GridItem colStart={3} colEnd = {4}>
-            <PostView title={"Mona Lisa"} description = {"Certain description"} likes = {"8"} imageUri = {"https://upload.wikimedia.org/wikipedia/commons/6/6a/Mona_Lisa.jpg"} />
+                        )}
 
-            </GridItem>
-            <GridItem colStart={2} colEnd = {3}>
-            <SearchResult
-                result={result}
-/>
-            </GridItem>
-            <GridItem colStart={3} colEnd = {4}>
-            <SearchResult
-                result={result}
-/>
-            </GridItem> 
-
-        </Grid> */
-        <Grid templateColumns='repeat(3, 1fr)' gap={6} mt={8}> 
-            {loading ? (
-                <Spinner
-                    thickness="3px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color="purple.600"
-                    size="md"
-                />
-            ) : (
-                (paintingResults && paintingResults.length > 0 ) ? (
-                    paintingResults.map((result, index) => (
-                        <GridItem>
-                            <SearchResult title={result["itemLabel"]["value"]} image={result["image"]["value"]}
-                            genre={result["genreLabel"]["value"]} material={result["materialLabel"]["value"]} creator = {result["creatorLabel"]["value"]}/>
-                        </GridItem>
-                    ))
-                    
-                ) : (
-                    <Text>No results found by painting name.</Text>
-                )
-                
-            )}
-
-        </Grid>
-        
+                    </Flex>
+                </ModalBody>
+            </ModalContent>
+        </Modal>
     );
 }
 

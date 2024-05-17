@@ -39,19 +39,39 @@ export default function LoginCard() {
 
             if (response.status === 200) {
 
-                dispatch(
-                    userActions.login({
-                        userName: username,
-                    })
-                )
+                // Get the labels for the artifacts
+                const labelsResponse = await apiInstance().get("labels")
 
-                Cookies.set("username", username)
+                if (labelsResponse.status === 200) {
 
-                navigate(
-                    {
-                        to: "/"
-                    }
-                )
+                    console.log(labelsResponse.data)
+
+                    const labels = labelsResponse.data
+
+                    dispatch(
+                        userActions.login({
+                            userName: username,
+                            profile: response.data.profile,
+                            artifactLabels: labels
+                        })
+                    )
+
+                    Cookies.set("username", username)
+
+                    navigate(
+                        {
+                            to: "/"
+                        }
+                    )
+
+                } else {
+                    toast({
+                        title: "There was an error while logging in. Please try again.",
+                        status: "error",
+                        isClosable: true,
+                        duration: 2000,
+                    });
+                }
             }
         } catch (e) {
             console.log(e)

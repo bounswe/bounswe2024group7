@@ -38,25 +38,50 @@ import {
     indexPath
 } from "../constants/paths.js"
 import { useDispatch, useSelector } from "react-redux";
-import { userName } from '../context/user.js';
+import { userName, userProfile } from '../context/user.js';
 import apiInstance from "../instance/apiInstance.js"
 import { useNavigate } from "@tanstack/react-router"
 import { userActions } from '../context/user.js'
 import Cookies from "js-cookie"
 import SearchBar from './searchBar.component.jsx'
 import SearchResults from './searchResults.component.jsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import PlusIcon from '../icons/PlusIcon.jsx';
+import CreatePostModal from './CreatePostModal.component.jsx';
 
 export default function NavigationResponsive() {
-    const [searchResults, setSearchResults] = useState(null);
+    const [searchResults, setSearchResults] = useState(
+        null
+    );
     const [loading, setLoading] = useState(false);
 
     const { isOpen, onToggle } = useDisclosure()
     const { colorMode, toggleColorMode } = useColorMode()
     const username = useSelector(userName)
+    const profile = useSelector(userProfile)
     const navigate = useNavigate()
     const toast = useToast()
     const dispatch = useDispatch();
+
+    console.log(profile)
+
+    const {
+        isOpen: isSearchResultsOpen,
+        onClose: onSearchResultsClose,
+        onOpen: onSearchResultsOpen
+    } = useDisclosure()
+
+    const {
+        isOpen: isCreatePostModalOpen,
+        onClose: onCreatePostModalClose,
+        onOpen: onCreatePostModalOpen
+    } = useDisclosure()
+
+    useEffect(() => {
+        if (searchResults) {
+            onSearchResultsOpen()
+        }
+    }, [searchResults])
 
     const handleLogOut = async () => {
         try {
@@ -87,6 +112,7 @@ export default function NavigationResponsive() {
 
     return (
         <Box>
+            <CreatePostModal isOpen={isCreatePostModalOpen} onClose={onCreatePostModalClose} />
             <Flex
                 bg={useColorModeValue('white', 'gray.800')}
                 color={useColorModeValue('gray.600', 'white')}
@@ -129,7 +155,7 @@ export default function NavigationResponsive() {
                         <DesktopNav />
                     </Flex>
                 </Flex>
-                <SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading = {setLoading} loading = {loading}/>
+                <SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading={setLoading} loading={loading} />
                 <Stack
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
@@ -146,18 +172,34 @@ export default function NavigationResponsive() {
                                 variant={'link'}
                                 cursor={'pointer'}
                                 minW={0}>
-                                <Avatar
-                                    size={'sm'}
-                                    name={username}
-                                />
+                                {
+                                    profile && profile.profile_picture ? (
+                                        <Avatar
+                                            size={'sm'}
+                                            src={profile.profile_picture.url}
+                                        />
+                                    ) : (
+                                        <Avatar
+                                            size={'sm'}
+                                            name={username}
+                                        />
+                                    )
+                                }
                             </MenuButton>
                             <MenuList alignItems={'center'}>
                                 <br />
                                 <Center>
-                                    <Avatar
-                                        size={'2xl'}
-                                        name={username}
-                                    />
+                                    {
+                                        profile && profile.profile_picture ? (
+                                            <Avatar
+                                                size={'2xl'}
+                                                src={profile.profile_picture.url}
+                                            />
+                                        ) : <Avatar
+                                            size={'2xl'}
+                                            name={username}
+                                        />
+                                    }
                                 </Center>
                                 <br />
                                 <Center>
@@ -193,7 +235,40 @@ export default function NavigationResponsive() {
                     }
                 </Stack>
             </Flex>
-            <SearchResults searchResults={searchResults} loading={loading} />
+            <SearchResults
+                isOpen={isSearchResultsOpen}
+                onClose={onSearchResultsClose}
+                searchResults={searchResults}
+                loading={loading}
+            />
+            {/* 
+                Button to create a new artifact
+            */}
+            <Button
+                position={"fixed"}
+                bottom={4}
+                right={4}
+                colorScheme='purple'
+                onClick={onCreatePostModalOpen}
+                gap={2}
+                w={"auto"}
+            >
+                <PlusIcon />
+                Create New Artifact
+            </Button>
+            {
+                searchResults && !isSearchResultsOpen && (
+                    <Button
+                        onClick={onSearchResultsOpen}
+                        position={"fixed"}
+                        bottom={4}
+                        left={4}
+                        colorScheme='gray'
+                    >
+                        Show Search Results
+                    </Button>
+                )
+            }
             <Collapse in={isOpen} animateOpacity>
                 <MobileNav />
             </Collapse>

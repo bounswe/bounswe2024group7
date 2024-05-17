@@ -1,12 +1,14 @@
 from django.urls import path
 from .views import *
+from .views.swagger import schema_view
 
 urlpatterns = [
     path('signup', SignupView.as_view(), name='signup'),
     path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view(), name='logout'),
-    path("", HealthView.as_view(), name="health"),
     path('search', artwork_search, name='artwork_search'),
+    path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path("", HealthView.as_view(), name="health"),
 
     path('posts', PostListCreate.as_view(), name='post_list'),
     path('posts/<int:pk>', PostRetrieveUpdateDestroy.as_view(), name='post_detail'),

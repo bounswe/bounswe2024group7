@@ -15,10 +15,14 @@ import apiInstance from "../instance/apiInstance.js"
 import { useState } from 'react';
 import Cookies from "js-cookie"
 import { titleString } from '../utility/string.js';
+import { useDispatch } from "react-redux";
+import { userActions } from '../context/user.js'
 
 function SearchBar({
     screen, setSearchResults, setLoading, loading
 }) {
+    const dispatch = useDispatch()
+
     const flexStyleObject = screen === "mobile" ? {
         base: "flex",
         md: "none"
@@ -54,8 +58,16 @@ function SearchBar({
             if (response.status === 200) {
 
                 const data = await response.data
-                console.log(data.painting_results)
+
                 setSearchResults(data)
+
+                dispatch(
+                    userActions.updateSearchResults({
+                        searchResults: data
+                    })
+                )
+
+                Cookies.set("searchResults", JSON.stringify(data))
 
                 setSearchQuery("")
             }

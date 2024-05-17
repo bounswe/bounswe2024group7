@@ -29,6 +29,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = [
+    'bounswe2024group7-yslcfqdwna-oa.a.run.app',
+    'artifactbackend-yslcfqdwna-oa.a.run.app',
+    'localhost'
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -52,6 +55,8 @@ INSTALLED_APPS = [
     'artifactapp.apps.ArtifactappConfig',
     'rest_framework',
     'corsheaders',
+    'rest_framework_swagger',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -97,7 +102,7 @@ DATABASES = {
         'NAME': os.getenv('MYSQL_DATABASE'),
         'USER': os.getenv('MYSQL_USER'),
         'PASSWORD': os.getenv('MYSQL_PASSWORD'),
-        'HOST': os.getenv('DB_HOST') if ENVIRONMENT == "PRODUCTION" else "127.0.0.1",
+        'HOST': os.getenv('DB_HOST') if ENVIRONMENT == "PRODUCTION" else "artifact_mysql",
         'PORT': os.getenv('DB_PORT', '3306'),
     }
 }

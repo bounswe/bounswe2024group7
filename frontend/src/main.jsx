@@ -6,10 +6,12 @@ import { Provider as ContextProvider } from 'react-redux'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { ChakraProvider } from '@chakra-ui/react'
 import { rootRoute } from "./routes/__root"
+import { indexRoute } from './routes/index'
 import { loginRoute } from './routes/login'
 import { registerRoute } from './routes/register'
 
 const routeTree = rootRoute.addChildren([
+  indexRoute,
   loginRoute,
   registerRoute,
 ])
