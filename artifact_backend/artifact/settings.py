@@ -104,6 +104,9 @@ DATABASES = {
         'PASSWORD': os.getenv('MYSQL_PASSWORD'),
         'HOST': os.getenv('DB_HOST') if ENVIRONMENT == "PRODUCTION" else "artifact_mysql",
         'PORT': os.getenv('DB_PORT', '3306'),
+    },
+    'test': {
+        'NAME': f"test_{os.getenv('MYSQL_DATABASE')}",
     }
 }
 
