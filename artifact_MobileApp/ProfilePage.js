@@ -1,40 +1,65 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import PostCard from './PostCard';
 import { useNavigation } from '@react-navigation/native';
+import apiInstance from './Api';
+import { useAuth } from './AuthContext';
+
 const ProfilePage = () => {
   const navigation = useNavigation();
-  const paintings = [
-    {
-      title: "Mona Lisa",
-      imageURL: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
-      genre: "portrait",
-      material: "Oil",
-      creator: "Leonardo da Vinci"
-    },
-    // {
-    //   title: "The Starry Night",
-    //   imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1024px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
-    //   genre: "landscape",
-    //   material: "Oil",
-    //   creator: "Vincent van Gogh"
-    // },
-    // {
-    //   title: "The Persistence of Memory",
-    //   imageURL: "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/The_Persistence_of_Memory.jpg/1024px-The_Persistence_of_Memory.jpg",
-    //   genre: "surrealism",
-    //   material: "Oil",
-    //   creator: "Salvador Dalí"
-    // },
-    // {
-    //   title: "The Birth of Venus",
-    //   imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/1024px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
-    //   genre: "mythological",
-    //   material: "Tempera on canvas",
-    //   creator: "Sandro Botticelli"
-    // }
-  ];
+  const { user, password } = useAuth();
+  const [paintings, setPaintings] = useState([]);
+
+  // const paintings = [
+  //   {
+  //     title: "Mona Lisa",
+  //     imageURL: "https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg",
+  //     genre: "portrait",
+  //     material: "Oil",
+  //     creator: "Leonardo da Vinci"
+  //   },
+  //   // {
+  //   //   title: "The Starry Night",
+  //   //   imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1024px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+  //   //   genre: "landscape",
+  //   //   material: "Oil",
+  //   //   creator: "Vincent van Gogh"
+  //   // },
+  //   // {
+  //   //   title: "The Persistence of Memory",
+  //   //   imageURL: "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/The_Persistence_of_Memory.jpg/1024px-The_Persistence_of_Memory.jpg",
+  //   //   genre: "surrealism",
+  //   //   material: "Oil",
+  //   //   creator: "Salvador Dalí"
+  //   // },
+  //   // {
+  //   //   title: "The Birth of Venus",
+  //   //   imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/1024px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
+  //   //   genre: "mythological",
+  //   //   material: "Tempera on canvas",
+  //   //   creator: "Sandro Botticelli"
+  //   // }
+  // ];
+
+  useEffect(() => {
+    const fetchPaintings = async () => {
+      const response = await apiInstance().get(`/posts/${user}`, {
+        headers: {
+          Authorization: `Basic ${btoa(`${user}:${password}`)}`
+        },
+      });
+
+      console.log('Posts:', response.data);
+
+      setPaintings(response.data);
+
+    };
+
+    fetchPaintings();
+  }, []);
+
+
   
   return (
     <View style={styles.container}>

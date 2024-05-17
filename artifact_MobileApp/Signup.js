@@ -31,7 +31,10 @@ const Signup = ({ navigation })=>{
         // successful login
         if (response.status === 201) {
             // login(response.data)
-            login(username)
+            login({
+              username,
+              password
+            })
             goHome()
         }
     } catch (e) {

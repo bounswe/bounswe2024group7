@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Picker, Image, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import apiInstance from './Api';
+import { useAuth } from './AuthContext';
 
 const AddPost = () => {
   const [title, setTitle] = useState('');
@@ -9,11 +11,39 @@ const AddPost = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [label, setLabel] = useState('');
   const navigation = useNavigation();
-  const handlePublish = () => {
+  const { user, password } = useAuth();
+
+  const handlePublish = async () => {
     console.log('Post published:', { title, description, image, label, imageUrl });
-    navigation.navigate('Home');
-    // Handle publishing logic here
-    // You can send the data to your backend or wherever needed
+
+
+    // First, save the image to the server
+    const imageResponse = await apiInstance().post('/images', {
+      url: imageUrl,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${btoa(`${user}:${password}`)}`
+      },
+    });
+
+    // Then, save the post to the server
+    const postResponse = await apiInstance().post('/posts', {
+      title,
+      content: description,
+      image: imageResponse.data.id,
+      label,
+      username: user,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${btoa(`${user}:${password}`)}`
+      },
+    });
+
+    console.log('Post created:', postResponse.data);
+
+    navigation.navigate('Home', { post: postResponse.data });
   };
 
   return (

@@ -27,7 +27,10 @@ const Login = ({ navigation })=>{
 
         // successful login
         if (response.status === 200) {
-            login(username);
+            login({
+              username,
+              password
+            });
             goHome();
         }
     } catch (e) {
