@@ -109,8 +109,13 @@ function SearchResults({searchResults,loading}) {
                 (paintingResults && paintingResults.length > 0 ) ? (
                     paintingResults.map((result, index) => (
                         <GridItem>
-                            <SearchResult title={result["itemLabel"]["value"]} image={result["image"]["value"]}
-                            genre={result["genreLabel"]["value"]} material={result["materialLabel"]["value"]} creator = {result["creatorLabel"]["value"]}/>
+                            <SearchResult 
+                                                
+                            title={result["itemLabel"]["value"]} 
+                            image={result["image"] ? result["image"]["value"] : 'defaultImage'}
+                            genre={result["genreLabel"] ? result["genreLabel"]["value"] : 'Unknown Genre'}
+                            material={result["materialLabel"] ? result["materialLabel"]["value"] : 'Unknown Material'}
+                            creator={result["creatorLabel"] ? result["creatorLabel"]["value"] : 'Unknown Creator'}/>
                         </GridItem>
                     ))
                     

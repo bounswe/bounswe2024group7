@@ -4,3 +4,4 @@ mysqlclient
 djangorestframework
 django-cors-headers
 SPARQLWrapper
+aiohttp
