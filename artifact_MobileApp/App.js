@@ -8,6 +8,8 @@ import Login from './Login'; // Import LoginScreen component from log.js
 import Signup from './Signup'; 
 import SearchPage from './SearchPage'; 
 import ProfilePage from './ProfilePage'; 
+import Feed from './Feed';
+import AddPost from './AddPost';
 import PostViewPage from './PostViewPage'; 
 
 
@@ -35,6 +37,11 @@ const App = () => {
             />
             <Stack.Screen name="Login" component={Login} /> 
             <Stack.Screen name="Signup" component={Signup} /> 
+            <Stack.Screen name="SearchPage" component={SearchPage} /> 
+            <Stack.Screen name="ProfilePage" component={ProfilePage} /> 
+            <Stack.Screen name="Feed" component={Feed} /> 
+            <Stack.Screen name="PostViewPage" component={PostViewPage} /> 
+            <Stack.Screen name="AddPost" component={AddPost} /> 
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>

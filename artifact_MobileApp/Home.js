@@ -2,11 +2,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView  } from 'react-native';
 import { useAuth } from './AuthContext';
 import Feed from './Feed';
 import SearchPage from './SearchPage';
 import ProfilePage from './ProfilePage';
+
 // import SearchBar from './SearchBar'; 
 const FeedPageContainer = () => (
   <View style={styles.page}>
@@ -26,8 +27,8 @@ const ProfilePageContainer = () => (
   </View>
 );
 const Home = ({ navigation }) => {
-  //const { isLoggedIn, logout } = useAuth();
-  const isLoggedIn = true; 
+  const { isLoggedIn, logout } = useAuth();
+  // const isLoggedIn = true; 
   const [selectedTab, setSelectedTab] = useState('Feed');
 
   return (
@@ -94,11 +95,11 @@ const Home = ({ navigation }) => {
       )}
       {isLoggedIn&&(
         <View style={styles.appContainer}>
-          <View style={styles.content}>
+          <ScrollView style={styles.content}>
         {selectedTab === 'Feed' && <FeedPageContainer />}
         {selectedTab === 'Search' && <SearchPageContainer />}
         {selectedTab === 'Profile' && <ProfilePageContainer />}
-        </View>
+        </ScrollView>
         <TabList selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
       </View>
       )
