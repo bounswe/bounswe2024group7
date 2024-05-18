@@ -1,0 +1,1595 @@
+openapi: 3.0.3
+info:
+  title: Artifact API
+  version: 1.0.0
+  description: Social platform that supports semantic search about paintings
+paths:
+  /bookmarks:
+    get:
+      operationId: bookmarks_list
+      tags:
+      - bookmarks
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bookmark'
+          description: ''
+  /bookmarks/{id}:
+    get:
+      operationId: bookmarks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - bookmarks
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookmark'
+          description: ''
+  /bookmarks/{username}:
+    get:
+      operationId: bookmarks_retrieve_2
+      parameters:
+      - in: path
+        name: username
+        schema:
+          type: string
+        required: true
+      tags:
+      - bookmarks
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookmark'
+          description: ''
+  /comments/{id}:
+    get:
+      operationId: comments_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - comments
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentRetrieve'
+          description: ''
+    put:
+      operationId: comments_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - comments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentCreate'
+          description: ''
+    patch:
+      operationId: comments_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - comments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentRetrieve'
+          description: ''
+    delete:
+      operationId: comments_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - comments
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /comments/{username}:
+    get:
+      operationId: comments_list
+      parameters:
+      - in: path
+        name: username
+        schema:
+          type: string
+        required: true
+      tags:
+      - comments
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentRetrieve'
+          description: ''
+  /images:
+    get:
+      operationId: images_list
+      tags:
+      - images
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Image'
+          description: ''
+    post:
+      operationId: images_create
+      tags:
+      - images
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Image'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Image'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Image'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+          description: ''
+  /images/{id}:
+    get:
+      operationId: images_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - images
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+          description: ''
+    put:
+      operationId: images_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - images
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Image'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Image'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Image'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+          description: ''
+    patch:
+      operationId: images_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - images
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedImage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedImage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedImage'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+          description: ''
+    delete:
+      operationId: images_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - images
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /labels:
+    get:
+      operationId: labels_list
+      tags:
+      - labels
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Label'
+          description: ''
+    post:
+      operationId: labels_create
+      tags:
+      - labels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Label'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Label'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Label'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Label'
+          description: ''
+  /labels/{id}:
+    get:
+      operationId: labels_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - labels
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Label'
+          description: ''
+    put:
+      operationId: labels_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - labels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Label'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Label'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Label'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Label'
+          description: ''
+    patch:
+      operationId: labels_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - labels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLabel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLabel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLabel'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Label'
+          description: ''
+    delete:
+      operationId: labels_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - labels
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /login:
+    post:
+      operationId: login_create
+      tags:
+      - login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserLoginRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserLoginRegister'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+          description: ''
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+  /logout:
+    post:
+      operationId: logout_create
+      tags:
+      - logout
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /likes/{id}:
+    get:
+      operationId: likes_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - likes
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+          description: ''
+  /likes/{username}:
+    get:
+      operationId: likes_list
+      parameters:
+      - in: path
+        name: username
+        schema:
+          type: string
+        required: true
+      tags:
+      - likes
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Like'
+          description: ''
+  /posts:
+    get:
+      operationId: posts_list
+      tags:
+      - posts
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostList'
+          description: ''
+    post:
+      operationId: posts_create
+      tags:
+      - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostCreate'
+          description: ''
+  /posts/{id}:
+    get:
+      operationId: posts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostList'
+          description: ''
+    put:
+      operationId: posts_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostCreate'
+          description: ''
+    patch:
+      operationId: posts_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPostCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPostCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPostCreate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostCreate'
+          description: ''
+    delete:
+      operationId: posts_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /posts/{id}/comments:
+    get:
+      operationId: posts_comments_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentRetrieve'
+          description: ''
+    post:
+      operationId: posts_comments_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommentCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentCreate'
+          description: ''
+  /posts/{id}/like_count:
+    get:
+      operationId: posts_like_count_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /posts/{id}/likes:
+    get:
+      operationId: posts_likes_list
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Like'
+          description: ''
+    post:
+      description: "Like a post"
+      operationId: posts_likes_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Like'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Like'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Like'
+        required: false
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+          description: ''
+  /posts/{id}/unlike:
+    post:
+      operationId: posts_unlike_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Like'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Like'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Like'
+        required: false
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Like'
+          description: ''
+  /posts/{post_id}/bookmark:
+    post:
+      operationId: posts_bookmark_create
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bookmark'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Bookmark'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Bookmark'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookmark'
+          description: ''
+  /posts/{post_id}/unbookmark:
+    post:
+      operationId: posts_unbookmark_create
+      parameters:
+      - in: path
+        name: post_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - posts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Bookmark'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Bookmark'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Bookmark'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookmark'
+          description: ''
+  /posts/{username}:
+    get:
+      operationId: posts_list_2
+      parameters:
+      - in: path
+        name: username
+        schema:
+          type: string
+        required: true
+      tags:
+      - posts
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostList'
+          description: ''
+  /profiles:
+    get:
+      operationId: profiles_list
+      tags:
+      - profiles
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileList'
+          description: ''
+  /profiles/{id}:
+    get:
+      operationId: profiles_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - profiles
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileList'
+          description: ''
+    put:
+      operationId: profiles_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProfileCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProfileCreate'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileCreate'
+          description: ''
+    patch:
+      operationId: profiles_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProfileCreate'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileCreate'
+          description: ''
+    delete:
+      operationId: profiles_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - profiles
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /profiles/{profile_id}/follow:
+    post:
+      operationId: profiles_follow_create
+      parameters:
+      - in: path
+        name: profile_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - profiles
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          description: No response body
+  /profiles/{profile_id}/followers:
+    get:
+      operationId: profiles_followers_list
+      parameters:
+      - in: path
+        name: profile_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - profiles
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileList'
+          description: ''
+  /profiles/{profile_id}/following:
+    get:
+      operationId: profiles_following_list
+      parameters:
+      - in: path
+        name: profile_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - profiles
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfileList'
+          description: ''
+  /profiles/{profile_id}/unfollow:
+    post:
+      operationId: profiles_unfollow_create
+      parameters:
+      - in: path
+        name: profile_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - profiles
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          description: No response body
+  /signup:
+    post:
+      operationId: signup_create
+      tags:
+      - signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserLoginRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserLoginRegister'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    Bookmark:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        profile:
+          type: integer
+          readOnly: true
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostList'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - posts
+      - profile
+    CommentCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        content:
+          type: string
+          maxLength: 300
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/ProfileList'
+          readOnly: true
+      required:
+      - content
+      - id
+      - profile
+    CommentRetrieve:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/ProfileList'
+          readOnly: true
+        content:
+          type: string
+          maxLength: 300
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        post:
+          type: integer
+      required:
+      - content
+      - created_at
+      - id
+      - post
+      - profile
+      - updated_at
+    Image:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        url:
+          type: string
+          maxLength: 255
+      required:
+      - id
+      - url
+    Label:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+        value:
+          type: string
+      required:
+      - id
+      - type
+      - value
+    Like:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        post:
+          type: integer
+        profile:
+          type: integer
+      required:
+      - created_at
+      - id
+      - post
+      - profile
+    PatchedBookmark:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        profile:
+          type: integer
+          readOnly: true
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostList'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCommentRetrieve:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/ProfileList'
+          readOnly: true
+        content:
+          type: string
+          maxLength: 300
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        post:
+          type: integer
+    PatchedImage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        url:
+          type: string
+          maxLength: 255
+    PatchedLabel:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          type: string
+        value:
+          type: string
+    PatchedPostCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 50
+        content:
+          type: string
+          maxLength: 600
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        profile:
+          type: integer
+          readOnly: true
+        image:
+          type: integer
+        labels:
+          type: array
+          items:
+            type: integer
+    PatchedProfileCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        bio:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        profile_picture:
+          type: integer
+          nullable: true
+        followers:
+          type: array
+          items:
+            type: integer
+    PostCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+        title:
+          type: string
+          maxLength: 50
+        content:
+          type: string
+          maxLength: 600
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        profile:
+          type: integer
+          readOnly: true
+        image:
+          type: integer
+        labels:
+          type: array
+          items:
+            type: integer
+      required:
+      - content
+      - created_at
+      - id
+      - image
+      - profile
+      - title
+      - updated_at
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        profile:
+          $ref: '#/components/schemas/ProfileList'
+      required:
+        - message
+        - profile
+    PostList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Label'
+          readOnly: true
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/ProfileList'
+          readOnly: true
+        image:
+          allOf:
+          - $ref: '#/components/schemas/Image'
+          readOnly: true
+        title:
+          type: string
+          maxLength: 50
+        content:
+          type: string
+          maxLength: 600
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - content
+      - created_at
+      - id
+      - image
+      - labels
+      - profile
+      - title
+      - updated_at
+    ProfileCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        bio:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        profile_picture:
+          type: integer
+          nullable: true
+        followers:
+          type: array
+          items:
+            type: integer
+      required:
+      - created_at
+      - id
+      - updated_at
+      - username
+    UserLoginRegister:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 150
+        password:
+          type: string
+          maxLength: 150
+      required:
+      - username
+      - password
+    ProfileList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        profile_picture:
+          $ref: '#/components/schemas/Image'
+        bio:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        followers:
+          type: array
+          items:
+            type: integer
+      required:
+      - created_at
+      - id
+      - profile_picture
+      - updated_at
+      - username
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
