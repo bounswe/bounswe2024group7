@@ -17,7 +17,7 @@ cd <your-repository-directory>
 
 ### 2. Configure Environment Variables
 
-Create a `.env` file in the root directory and add:
+Create a `.env` file in the root directory(demo-group7) and add:
 
 ```
 POSTGRES_DB=group7test
