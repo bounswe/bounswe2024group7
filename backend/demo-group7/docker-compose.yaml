@@ -1,5 +1,17 @@
 version: '3.8'
 services:
+  mobile: # TODO: Check whether "build" is under the correct directory. 
+    build: ./mobile
+    volumes:
+      - ./mobile:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "8081:8081"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env
+
   postgres:
     image: postgres
     container_name: postgres-db
