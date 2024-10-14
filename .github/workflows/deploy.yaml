@@ -1,0 +1,43 @@
+name: Deploy to DigitalOcean Droplet
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Log in to DigitalOcean Registry
+        run: echo "dop_v1_32046525c349ded0c2e69fabe229d4d9f803765110080040e7177d59732bd9dd" | docker login registry.digitalocean.com -u samet@leext.com --password-stdin
+
+      # Step 3: Build and push frontend Docker image
+      - name: Build frontend Docker image
+        run: docker build -t registry.digitalocean.com/group7-droplet/frontend ./frontend
+
+      - name: Push frontend Docker image
+        run: docker push registry.digitalocean.com/group7-droplet/frontend
+
+      # Step 4: Build and push backend Docker image
+      - name: Build backend Docker image
+        run: docker build -t registry.digitalocean.com/group7-droplet/backend ./backend/demo-group7
+
+      - name: Push backend Docker image
+        run: docker push registry.digitalocean.com/group7-droplet/backend
+
+      # Step 5: Deploy to Droplet
+      - name: Deploy to DigitalOcean Droplet
+        uses: appleboy/ssh-action@master
+        with:
+          host: 64.226.89.57
+          username: root
+          password: dop_v1_32046525c349ded0c2e69fabe229d4d9f803765110080040e7177d59732bd9dd
+          script: |
+            docker pull registry.digitalocean.com/group7-droplet/frontend
+            docker pull registry.digitalocean.com/group7-droplet/backend
+            docker-compose -f . up -d --build

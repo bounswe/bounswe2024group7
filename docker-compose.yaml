@@ -19,7 +19,7 @@ services:
       retries: 10
 
   springboot-app:
-    image: sametalan/springboot
+    image: springboot
     build: ./backend/demo-group7
     container_name: springboot-app
     ports:
@@ -36,7 +36,7 @@ services:
 
   frontend:
     build: ./frontend
-    image: sametalan/frontend
+    image: frontend
     container_name: frontend
     ports:
       - "${VITE_PORT}:${VITE_PORT}"
