@@ -1,6 +1,7 @@
 package com.group7.demo.controllers;
 
 import com.group7.demo.dtos.LoginRequest;
+import com.group7.demo.dtos.LoginResponse;
 import com.group7.demo.dtos.RegisterRequest;
 import com.group7.demo.models.User;
 import com.group7.demo.services.AuthenticationService;
@@ -27,10 +28,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         try {
-            String sessionToken = authenticationService.login(request);
-            return ResponseEntity.ok(sessionToken);
+            LoginResponse response = authenticationService.login(request);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }

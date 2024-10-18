@@ -1,6 +1,7 @@
 package com.group7.demo.services;
 
 import com.group7.demo.dtos.LoginRequest;
+import com.group7.demo.dtos.LoginResponse;
 import com.group7.demo.dtos.RegisterRequest;
 import com.group7.demo.models.User;
 import com.group7.demo.repository.UserRepository;
@@ -36,20 +37,24 @@ public class AuthenticationService {
         return userRepository.save(newUser);
     }
 
-    public String login(LoginRequest request) throws Exception {
+    public LoginResponse login(LoginRequest request) throws Exception {
         Optional<User> user = userRepository.findByUsername(request.getUsername());
         if (user.isPresent()) {
             User foundUser = user.get();
             if (passwordEncoder.matches(request.getPassword(), foundUser.getPassword())) {
-                // Check if the user is already logged in with an active session
-                if (foundUser.getSessionToken() != null) {
-                    return foundUser.getSessionToken();
-                }
+                String sessionToken = foundUser.getSessionToken();
                 // Generate a new session token if not already logged in
-                String sessionToken = UUID.randomUUID().toString();
-                foundUser.setSessionToken(sessionToken);
-                userRepository.save(foundUser);
-                return sessionToken;
+                if (sessionToken == null) {
+                    sessionToken = UUID.randomUUID().toString();
+                    foundUser.setSessionToken(sessionToken);
+                    userRepository.save(foundUser);
+                }
+                return LoginResponse.builder()
+                        .sessionToken(sessionToken)
+                        .username(foundUser.getUsername())
+                        .email(foundUser.getEmail())
+                        .role(foundUser.getRole())
+                        .build();
             } else {
                 throw new Exception("Invalid credentials");
             }
