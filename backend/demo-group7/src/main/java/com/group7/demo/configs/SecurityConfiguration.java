@@ -28,6 +28,7 @@ public class SecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/auth/register", "/auth/login").permitAll() // Allow registration and login without authentication
+                    .requestMatchers("GET", "/api/user/{username}", "/api/user/{username}/followers", "/api/user/{username}/following").permitAll()
                     .anyRequest().authenticated() // All other requests require authentication
             )
             .sessionManagement(session -> session
