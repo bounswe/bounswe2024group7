@@ -5,6 +5,7 @@ import com.group7.demo.dtos.LoginResponse;
 import com.group7.demo.dtos.RegisterRequest;
 import com.group7.demo.models.User;
 import com.group7.demo.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,23 @@ public class AuthenticationService {
         } else {
             throw new Exception("User not found");
         }
+    }
+
+    public LoginResponse getAuthenticatedUser(HttpServletRequest request) {
+        String sessionToken = request.getHeader("Token");
+        if (sessionToken != null) {
+            Optional<User> user = userRepository.findBySessionToken(sessionToken);
+            if (user.isPresent()) {
+                User foundUser = user.get();
+                return LoginResponse.builder()
+                        .sessionToken(sessionToken)
+                        .username(foundUser.getUsername())
+                        .email(foundUser.getEmail())
+                        .role(foundUser.getRole())
+                        .build();
+            }
+        }
+        return null;
     }
 
     public void logout(String sessionToken) {
