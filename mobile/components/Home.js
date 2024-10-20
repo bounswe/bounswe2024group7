@@ -1,34 +1,32 @@
-
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView  } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import { useAuth } from '../AuthContext';
 import ProfilePage from './ProfilePage';
 import Feed from './Feed';
 
-// import SearchBar from './SearchBar'; 
-
 const ProfilePageContainer = () => (
   <View style={styles.page}>
-    <ProfilePage/>
+    <ProfilePage />
   </View>
 );
 
 const FeedPageContainer = () => (
   <View style={styles.page}>
-    <Feed/>
+    <Feed />
   </View>
 );
+
 const Home = ({ navigation }) => {
-  //const { isLoggedIn, logout } = useAuth();   // TODO: Uncomment this line after connecting with the DB
-  const isLoggedIn = true;  // // TODO: Comment this line after connecting with the DB
+  // const { isLoggedIn, logout } = useAuth();   // TODO: Uncomment this line after connecting with the DB
+  const isLoggedIn = false;  // TODO: Comment this line after connecting with the DB
   const [selectedTab, setSelectedTab] = useState('Feed');
 
   return (
-    <div>
+    <View style={styles.appContainer}>
       {!isLoggedIn && (
         <View style={styles.container}>
-        <Text style={styles.title}> Welcome to Fitness Fact !!</Text>
-        <>
+          <Text style={styles.title}>Welcome to Fitness Fact !!</Text>
+          {/* Removed fragment <>...</> */}
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate('Login')}>
@@ -39,20 +37,18 @@ const Home = ({ navigation }) => {
             onPress={() => navigation.navigate('Register')}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
-        </>
         </View>
       )}
-      {isLoggedIn&&(
+      {isLoggedIn && (
         <View style={styles.appContainer}>
-        <TabList selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+          <TabList selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
           <ScrollView style={styles.content}>
-        {selectedTab === 'Profile' && <ProfilePageContainer />}
-        {selectedTab === 'Feed' && <FeedPageContainer />}
-        </ScrollView>
-      </View>
-      )
-
-      }</div>
+            {selectedTab === 'Profile' && <ProfilePageContainer />}
+            {selectedTab === 'Feed' && <FeedPageContainer />}
+          </ScrollView>
+        </View>
+      )}
+    </View>
   );
 };
 
@@ -99,7 +95,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
   },
   tabItem: {
     flex: 1,
@@ -115,40 +111,31 @@ const styles = StyleSheet.create({
   selectedTabItemText: {
     color: '#fff',
   },
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      marginBottom: 20,
-      color: '#3C3633',
-      fontFamily: 'Cursive ',
-    },
-    input: {
-      width: '80%',
-      height: 40,
-      borderColor: 'gray',
-      borderWidth: 1,
-      marginTop: 10,
-      paddingHorizontal: 10,
-    },
-    button: {
-      backgroundColor: '#3C3633',
-      width: '80%',
-      height: 40,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginTop: 20,
-      borderRadius: 5,
-    },
-    buttonText: {
-      color: '#fff',
-      fontSize: 18,
-    },
-  });
-  
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#3C3633',
+    fontFamily: 'Cursive ',
+  },
+  button: {
+    backgroundColor: '#3C3633',
+    width: '80%',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+  },
+});
 
 export default Home;
