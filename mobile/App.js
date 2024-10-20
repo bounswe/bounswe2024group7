@@ -1,3 +1,4 @@
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Text } from 'react-native';
@@ -8,8 +9,9 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Feed from './components/Feed';
 import ProfilePage from './components/ProfilePage';
+import { enableScreens } from 'react-native-screens';
 
-
+enableScreens();
 
 const Stack = createStackNavigator();
 
@@ -19,8 +21,8 @@ const App = () => {
       <AuthProvider>
         <NavigationContainer>
           <Stack.Navigator>
-            <Stack.Screen 
-              name="Home" 
+            <Stack.Screen
+              name="Home"
               component={Home}
               options={{
                 headerRight: () => {
@@ -33,14 +35,15 @@ const App = () => {
                 }
               }}
             />
-            <Stack.Screen name="Login" component={Login} /> 
+            <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />
-            <Stack.Screen name="ProfilePage" component={ProfilePage} /> 
-            <Stack.Screen name="Feed" component={Feed} />  
+            <Stack.Screen name="ProfilePage" component={ProfilePage} />
+            <Stack.Screen name="Feed" component={Feed} />
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      {/* Toast component should be rendered directly */}
+      <Toast />
     </>
   );
 };
