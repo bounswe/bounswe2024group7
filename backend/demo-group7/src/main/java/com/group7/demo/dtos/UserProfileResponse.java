@@ -18,4 +18,5 @@ public class UserProfileResponse {
     private Set<String> followers;
     private Set<String> following;
     private List<PostResponse> posts;
+    private List<TrainingProgramResponse> trainingPrograms;
 }

@@ -54,4 +54,10 @@ public class TrainingProgramController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
+
+    @GetMapping("/trainer/{username}")
+    public ResponseEntity<List<TrainingProgramResponse>> getTrainingProgramsByTrainer(@PathVariable String username) {
+        List<TrainingProgramResponse> trainingPrograms = trainingProgramService.getTrainingProgramByTrainer(username);
+        return ResponseEntity.ok(trainingPrograms);
+    }
 }
