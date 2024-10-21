@@ -39,6 +39,16 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/user/{username}")
+    public ResponseEntity<List<PostResponse>> getPostsByUser(@PathVariable String username) {
+        try {
+            List<PostResponse> posts = postService.getPostsByUser(username);
+            return ResponseEntity.ok(posts);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     @DeleteMapping("/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Long postId, HttpServletRequest request) throws IllegalAccessException {
         try {

@@ -65,6 +65,17 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    public List<PostResponse> getPostsByUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+
+        List<Post> posts = postRepository.findByUser(user);
+
+        return posts.stream()
+                .map(this::mapToPostResponse)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void deletePost(Long postId, HttpServletRequest request) throws IllegalAccessException {
         User authenticatedUser = authenticationService.getAuthenticatedUserInternal(request);
