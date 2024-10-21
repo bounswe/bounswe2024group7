@@ -13,7 +13,7 @@ export const UserContext = createContext({
 })
 
 export const UserContextProvider = ({ children }) => {
-    const user = useSelector(userProfile)
+    const [user, setUser] = useState({})
     const [followers, setFollowers] = useState([])
     const [following, setFollowing] = useState([])
     const [posts, setPosts] = useState([])
@@ -21,6 +21,20 @@ export const UserContextProvider = ({ children }) => {
 
     const sessionToken = useSelector(userSessionToken)
     const username = useSelector(userName)
+
+    const {
+        data: profileData,
+        isFetching: profileIsFetching,
+        isLoading: profileIsLoading,
+    } = useQuery({
+        queryKey: ['user'],
+        queryFn: async () => {
+            const response = await apiInstance(sessionToken).get(`api/user/${username}`);
+
+            return response.data;
+        },
+        refetchOnWindowFocus: false,
+    });
 
     const {
         data: followersData,
@@ -119,6 +133,12 @@ export const UserContextProvider = ({ children }) => {
             setPrograms(programsData)
         }
     }, [programsData, programsIsFetching])
+
+    useEffect(() => {
+        if (profileData && !profileIsFetching) {
+            setUser(profileData)
+        }
+    }, [profileData, profileIsFetching])
 
     return (
         <UserContext.Provider value={{

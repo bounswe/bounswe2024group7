@@ -32,7 +32,7 @@ public class SecurityConfiguration {
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS configuration
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/auth/register", "/auth/login").permitAll() // Allow registration and login without authentication
-                    .requestMatchers("GET", "/api/user/{username}", "/api/user/{username}/followers", "/api/user/{username}/following", "/api/posts/random").permitAll()
+                    .requestMatchers("GET", "/api/user/{username}", "/api/user/{username}/followers", "/api/user/{username}/following", "/api/posts/random", "api/training-programs").permitAll()
                     .anyRequest().authenticated() // All other requests require authentication
             )
             .sessionManagement(session -> session

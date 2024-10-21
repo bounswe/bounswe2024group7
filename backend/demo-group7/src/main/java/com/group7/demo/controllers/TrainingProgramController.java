@@ -57,8 +57,8 @@ public class TrainingProgramController {
 
 
     @PostMapping("/{programId}/join")
-    public ResponseEntity<String> joinTrainingProgram(@RequestParam Long userId, @PathVariable Long programId , HttpServletRequest request) {
-        trainingProgramService.joinTrainingProgram(userId, programId ,request);
+    public ResponseEntity<String> joinTrainingProgram(@PathVariable Long programId , HttpServletRequest request) {
+        trainingProgramService.joinTrainingProgram(programId ,request);
         return ResponseEntity.ok("User has successfully joined the training program.");
     }
 

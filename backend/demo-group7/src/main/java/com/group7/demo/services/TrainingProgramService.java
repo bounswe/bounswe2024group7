@@ -29,7 +29,8 @@ public class TrainingProgramService {
     private final UserTrainingProgramRepository userTrainingProgramRepository;
 
     private final UserRepository userRepository;
-  
+    private final UserService userService;
+
     @Transactional
     public TrainingProgramResponse createTrainingProgram(TrainingProgramRequest trainingProgramRequest, HttpServletRequest request) throws IllegalAccessException {
         User user = authenticationService.getAuthenticatedUserInternal(request);
@@ -148,7 +149,7 @@ public class TrainingProgramService {
     }
 
     @Transactional
-    public void joinTrainingProgram(Long userId, Long trainingProgramId , HttpServletRequest request) {
+    public void joinTrainingProgram(Long trainingProgramId , HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
         TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
@@ -195,6 +196,21 @@ public class TrainingProgramService {
         // Fetch the list of participants' usernames
         return trainingProgram.getParticipants().stream()
                 .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
+                .collect(Collectors.toList());
+    }
+
+    // Return the list of joined training programs for the authenticated user
+    public List<TrainingProgramResponse> getJoinedTrainingPrograms(String username) throws Exception {
+        // Fetch the authenticated user
+        User user = userService.getUserByUsername(username);
+
+        // Fetch the list of training programs the user has joined
+        List<UserTrainingProgram> userTrainingPrograms = userTrainingProgramRepository.findByUser(user);
+
+        // Map the list of UserTrainingProgram entities to TrainingProgramResponse DTOs
+        return userTrainingPrograms.stream()
+                .map(UserTrainingProgram::getTrainingProgram)
+                .map(this::mapToTrainingProgramResponse)
                 .collect(Collectors.toList());
     }
 

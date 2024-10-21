@@ -43,9 +43,9 @@ export const PhaseContextProvider = ({ children }) => {
         isFetching: programsIsFetching,
         isLoading: programsIsLoading,
     } = useQuery({
-        queryKey: ['programs'],
+        queryKey: ['training-programs'],
         queryFn: async () => {
-            const response = await apiInstance(sessionToken).get('/api/training-programs')
+            const response = await apiInstance().get('/api/training-programs')
 
             return response.data
         },

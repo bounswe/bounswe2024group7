@@ -19,4 +19,5 @@ public class UserProfileResponse {
     private Set<String> following;
     private List<PostResponse> posts;
     private List<TrainingProgramResponse> trainingPrograms;
+    private List<TrainingProgramResponse> joinedPrograms;
 }

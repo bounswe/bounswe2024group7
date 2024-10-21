@@ -36,8 +36,6 @@ export default function LoginCard() {
     } = useQuery({
         queryKey: ['profile', sessionToken],
         queryFn: async () => {
-            console.log("Fetching profile data with token:", sessionToken);
-
             const response = await apiInstance(sessionToken).get(`api/user/${username}`);
 
             return response.data;
@@ -76,8 +74,6 @@ export default function LoginCard() {
             if (response.status === 200) {
 
                 const token = response.data.sessionToken;
-
-                console.log("Session Token:", token);
 
                 setSessionToken(token);
 

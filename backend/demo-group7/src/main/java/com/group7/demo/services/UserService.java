@@ -7,6 +7,7 @@ import com.group7.demo.models.User;
 import com.group7.demo.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,12 +15,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
     private final PostService postService;
     private final TrainingProgramService trainingProgramService;
+
+    public UserService(UserRepository userRepository,
+                       @Lazy AuthenticationService authenticationService,
+                       @Lazy PostService postService,
+                       @Lazy TrainingProgramService trainingProgramService) {
+        this.userRepository = userRepository;
+        this.authenticationService = authenticationService;
+        this.postService = postService;
+        this.trainingProgramService = trainingProgramService;
+    }
 
     public UserProfileResponse getUserProfile(String username) throws Exception {
         User user = userRepository.findByUsername(username)
@@ -37,6 +47,7 @@ public class UserService {
 
         List<PostResponse> posts = postService.getPostsByUser(user.getUsername());
         List<TrainingProgramResponse> trainingPrograms = trainingProgramService.getTrainingProgramByTrainer(user.getUsername());
+        List<TrainingProgramResponse> joinedPrograms = trainingProgramService.getJoinedTrainingPrograms(user.getUsername());
 
         return UserProfileResponse.builder()
                 .username(user.getUsername())
@@ -46,6 +57,7 @@ public class UserService {
                 .following(following)
                 .posts(posts)
                 .trainingPrograms(trainingPrograms)
+                .joinedPrograms(joinedPrograms)
                 .build();
     }
 
@@ -93,6 +105,11 @@ public class UserService {
         return user.getFollowing().stream()
                 .map(User::getUsername)
                 .collect(Collectors.toSet());
+    }
+
+    public User getUserByUsername(String username) throws Exception {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new Exception("User not found"));
     }
 
 }

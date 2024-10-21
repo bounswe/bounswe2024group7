@@ -3,6 +3,7 @@ import { rootRoute } from './__root'
 import { Component } from 'react'
 import { PhaseContextProvider } from '../context/PostContext'
 import PostFeed from '../components/PostFeed.component'
+import { UserContextProvider } from '../context/UserContext'
 
 export const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -12,8 +13,10 @@ export const indexRoute = createRoute({
 
 function Index() {
   return (
-    <PhaseContextProvider>
-      <PostFeed />
-    </PhaseContextProvider>
+    <UserContextProvider>
+      <PhaseContextProvider>
+        <PostFeed />
+      </PhaseContextProvider>
+    </UserContextProvider>
   )
 }

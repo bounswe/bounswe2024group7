@@ -12,8 +12,6 @@ import Label from './label.component';
 import LazyLoad from 'react-lazy-load';
 
 const SearchResult = ({ title, image, creator, genre, material, }) => {
-  console.log(title, image, creator, genre, material);
-
   return (
     <Card
       overflow="hidden"

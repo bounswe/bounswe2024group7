@@ -30,26 +30,7 @@ import { useDispatch } from 'react-redux'
 import { useContext } from 'react'
 import { PostContext } from '../context/PostContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-
-const programTypes = [
-    { value: 'GROUP', label: 'Group' },
-    { value: 'INDIVIDUAL', label: 'Individual' },
-]
-
-const muscleGroups = [
-    { value: 'CHEST', label: 'Chest' },
-    { value: 'BACK', label: 'Back' },
-    { value: 'SHOULDERS', label: 'Shoulders' },
-    { value: 'LEGS', label: 'Legs' },
-    { value: 'ARMS', label: 'Arms' },
-    { value: 'CORE', label: 'Core' },
-]
-
-const locationType = [
-    { value: 'HOME', label: 'Home' },
-    { value: 'GYM', label: 'Gym' },
-    { value: 'OUTDOOR', label: 'Outdoors' },
-]
+import { muscleGroups, locationType, programTypes } from '../constants/program'
 
 function CreateProgramModal({
     isOpen,
@@ -211,7 +192,17 @@ function CreateProgramModal({
             onSuccess: (data) => {
                 queryClient.invalidateQueries(
                     {
-                        queryKey: ['posts', 'training-programs', 'profile']
+                        queryKey: ['posts']
+                    }
+                )
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['training-programs']
+                    }
+                )
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['user']
                     }
                 )
                 onClose()

@@ -46,10 +46,11 @@ import { userActions } from '../context/user.js'
 import Cookies from "js-cookie"
 import SearchBar from './searchBar.component.jsx'
 import SearchResults from './searchResults.component.jsx'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import PlusIcon from '../icons/PlusIcon.jsx';
 import CreatePostModal from './CreatePostModal.component.jsx';
 import CreateProgramModal from './CreateProgramModal.component.jsx';
+import { UserContext } from '../context/UserContext.jsx';
 
 export default function NavigationResponsive() {
     const [searchResults, setSearchResults] = useState(
@@ -66,8 +67,7 @@ export default function NavigationResponsive() {
     const toast = useToast()
     const dispatch = useDispatch();
 
-    // Log the user profile
-    console.log(profile)
+    const { user } = useContext(UserContext)
 
     const {
         isOpen: isSearchResultsOpen,
@@ -294,11 +294,11 @@ export default function NavigationResponsive() {
             </Button>
             {
                 // If user role is trainer, show create program button
-                profile && profile.role === "TRAINER" && (
+                user && user.role === "TRAINER" && (
                     <Button
                         position={"fixed"}
-                        bottom={4}
-                        left={4}
+                        bottom={20}
+                        right={4}
                         colorScheme='blue'
                         onClick={() => {
                             if (username) {
