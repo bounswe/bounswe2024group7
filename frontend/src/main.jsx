@@ -7,6 +7,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { rootRoute } from "./routes/__root"
 import { indexRoute } from './routes/index'
 import { loginRoute } from './routes/login'
+import { profileRoute } from './routes/profile'
 import React from 'react'
 import { registerRoute } from './routes/register'
 import {
@@ -20,6 +21,7 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   registerRoute,
+  profileRoute
 ])
 
 const router = createRouter({ routeTree })

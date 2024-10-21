@@ -35,7 +35,8 @@ import {
 import {
     loginPath,
     registerPath,
-    indexPath
+    indexPath,
+    profilePath
 } from "../constants/paths.js"
 import { useDispatch, useSelector } from "react-redux";
 import { userName, userProfile, userSessionToken } from '../context/user.js';
@@ -48,6 +49,8 @@ import SearchResults from './searchResults.component.jsx'
 import { useEffect, useState } from 'react'
 import PlusIcon from '../icons/PlusIcon.jsx';
 import CreatePostModal from './CreatePostModal.component.jsx';
+
+
 
 export default function NavigationResponsive() {
     const [searchResults, setSearchResults] = useState(
@@ -202,7 +205,12 @@ export default function NavigationResponsive() {
                                 </Center>
                                 <br />
                                 <Center>
+                                <   Link
+                                        href={profilePath}
+                                        textDecoration={"none"}
+                                    >
                                     <p>{username}</p>
+                                    </Link>
                                 </Center>
                                 <br />
                                 <MenuDivider />
