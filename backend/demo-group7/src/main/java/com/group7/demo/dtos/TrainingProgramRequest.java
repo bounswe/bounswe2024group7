@@ -20,5 +20,4 @@ public class TrainingProgramRequest {
     private LocationType locationType;
     private List<ExerciseRequest> exercises;
     private String description;
-    private Long trainerId;  // The ID of the trainer creating the program
 }
