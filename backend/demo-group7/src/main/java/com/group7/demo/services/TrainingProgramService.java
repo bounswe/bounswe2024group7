@@ -4,17 +4,16 @@ import com.group7.demo.dtos.ExerciseDetailResponse;
 import com.group7.demo.dtos.ExerciseResponse;
 import com.group7.demo.dtos.TrainingProgramRequest;
 import com.group7.demo.dtos.TrainingProgramResponse;
-import com.group7.demo.models.Exercise;
-import com.group7.demo.models.ExerciseDetail;
-import com.group7.demo.models.TrainingProgram;
-import com.group7.demo.models.User;
+import com.group7.demo.models.*;
 import com.group7.demo.repository.TrainingProgramRepository;
+import com.group7.demo.repository.UserTrainingProgramRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +24,9 @@ public class TrainingProgramService {
     private final TrainingProgramRepository trainingProgramRepository;
 
     private final AuthenticationService authenticationService;
+
+    private final UserTrainingProgramRepository userTrainingProgramRepository;
+
     @Transactional
     public TrainingProgramResponse createTrainingProgram(TrainingProgramRequest trainingProgramRequest, HttpServletRequest request) throws IllegalAccessException {
         User user = authenticationService.getAuthenticatedUserInternal(request);
@@ -130,6 +132,57 @@ public class TrainingProgramService {
 
         // Delete the training program
         trainingProgramRepository.delete(trainingProgram);
+    }
+
+    @Transactional
+    public void joinTrainingProgram(Long userId, Long trainingProgramId , HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
+                .orElseThrow(() -> new EntityNotFoundException("Training Program not found with id: " + trainingProgramId));
+
+        boolean alreadyJoined = userTrainingProgramRepository.existsByUserAndTrainingProgram(user, trainingProgram);
+        if (alreadyJoined) {
+            throw new IllegalStateException("User has already joined the training program.");
+        }
+
+        // Create a new UserTrainingProgram entity
+        UserTrainingProgram userTrainingProgram = UserTrainingProgram.builder()
+                .user(user)
+                .trainingProgram(trainingProgram)
+                .joinedAt(LocalDateTime.now())
+                .build();
+
+        // Save the UserTrainingProgram entity
+        userTrainingProgramRepository.save(userTrainingProgram);
+    }
+
+    @Transactional
+    public void leaveTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
+        // Fetch the authenticated user from the request
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        // Fetch the training program by its ID
+        TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
+                .orElseThrow(() -> new EntityNotFoundException("Training program not found with id: " + trainingProgramId));
+
+        // Check if the user is participating in the program
+        UserTrainingProgram userTrainingProgram = userTrainingProgramRepository.findByUserIdAndTrainingProgramId(user.getId(), trainingProgram.getId())
+                .orElseThrow(() -> new IllegalStateException("User is not participating in this program."));
+
+        // Remove the user from the program
+        userTrainingProgramRepository.delete(userTrainingProgram);
+    }
+
+    public List<String> getRegisteredUsernames(Long trainingProgramId) {
+        // Fetch the training program by its ID
+        TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
+                .orElseThrow(() -> new EntityNotFoundException("Training program not found with id: " + trainingProgramId));
+
+        // Fetch the list of participants' usernames
+        return trainingProgram.getParticipants().stream()
+                .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
+                .collect(Collectors.toList());
     }
 
 

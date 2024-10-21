@@ -1,20 +1,21 @@
 package com.group7.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.group7.demo.models.enums.LocationType;
 import com.group7.demo.models.enums.ProgramType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EqualsAndHashCode( exclude = {"trainer", "exercises", "participants"})
 public class TrainingProgram {
 
     @Id
@@ -38,7 +39,13 @@ public class TrainingProgram {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties("trainingPrograms")
     private User trainer;
 
-    private String description;  // Optional description of the program
+    private String description;
+
+    @OneToMany(mappedBy = "trainingProgram", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("trainingProgram")
+    private Set<UserTrainingProgram> participants = new HashSet<>();
+
 }
