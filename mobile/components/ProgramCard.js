@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const ProgramCard = ({ owner, title, description, followCount, location, muscle_list, navigation }) => {
+const ProgramCard = ({ owner, title, description, followCount, location, muscle_list, weeklySchedule, navigation }) => {
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('ProgramDetail', { title, description, owner, followCount, location, muscle_list })}
+      onPress={() => navigation.navigate('ProgramDetail', { title, description, owner, followCount, location, muscle_list, weeklySchedule })}
     >
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>

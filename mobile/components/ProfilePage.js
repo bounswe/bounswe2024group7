@@ -16,8 +16,24 @@ const ProfilePage = () => {
   ];
 
   const programs = [
-    { id: 1, title: 'Powerlifting Program', description: 'A 12-week strength program for powerlifting.', owner: 'john_doe', followCount: 100, location: 'outdoor', muscle_list: ['chest','shoulder'] },
-    { id: 2, title: 'Hypertrophy Program', description: 'Gain muscle with this 6-week hypertrophy program.', owner: 'john_doe', followCount: 85, location: 'gym',muscle_list: ['leg'] },
+    { id: 1, title: 'Powerlifting Program', description: 'A 12-week strength program for powerlifting.', owner: 'john_doe', followCount: 100, location: 'outdoor', muscle_list: ['chest','shoulder'], weeklySchedule: {
+                                                                                                                                                                                                                          Monday: ['Push-ups', 'Squats', 'Plank'],
+                                                                                                                                                                                                                          Tuesday: ['Pull-ups', 'Leg Press', 'Deadlift'],
+                                                                                                                                                                                                                          Wednesday: ['Rest Day'],
+                                                                                                                                                                                                                          Thursday: ['Bench Press', 'Rows', 'Bicep Curls'],
+                                                                                                                                                                                                                          Friday: ['Overhead Press', 'Lunges', 'Lat Pulldown'],
+                                                                                                                                                                                                                          Saturday: ['Cardio', 'Abs Workout'],
+                                                                                                                                                                                                                          Sunday: ['Rest Day']
+                                                                                                                                                                                                                        } },
+    { id: 2, title: 'Hypertrophy Program', description: 'Gain muscle with this 6-week hypertrophy program.', owner: 'john_doe', followCount: 85, location: 'gym',muscle_list: ['leg'], weeklySchedule: {
+                                                                                                                                                                                                                                                                                                                                                                                                               Monday: ['Push-ups', 'Squats', 'Plank'],
+                                                                                                                                                                                                                                                                                                                                                                                                               Tuesday: ['Pull-ups', 'Lunges', 'Deadlift'],
+                                                                                                                                                                                                                                                                                                                                                                                                               Wednesday: ['Rest Day'],
+                                                                                                                                                                                                                                                                                                                                                                                                               Thursday: ['Bench Press', 'Rows', 'Bicep Curls'],
+                                                                                                                                                                                                                                                                                                                                                                                                               Friday: ['Overhead Press', 'Leg Press', 'Lat Pulldown'],
+                                                                                                                                                                                                                                                                                                                                                                                                               Saturday: ['Cardio', 'Abs Workout'],
+                                                                                                                                                                                                                                                                                                                                                                                                               Sunday: ['Rest Day']
+                                                                                                                                                                                                                                                                                                                                                                                                             } },
   ];
 
   const [isFollowing, setIsFollowing] = useState(false);
@@ -60,6 +76,7 @@ const ProfilePage = () => {
               followCount={item.followCount}
               location={item.location}
               muscle_list={item.muscle_list}
+              weeklySchedule = {item.weeklySchedule}
               navigation={navigation}
             />
           )}
