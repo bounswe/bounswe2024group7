@@ -1,91 +1,127 @@
 import React, { useState } from 'react';
-import { FlatList ,View, Text, Image, StyleSheet, ScrollView } from 'react-native';
-import { useAuth } from '../AuthContext';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import PostCard from './PostCard';
-import apiInstance from '../Api';
-import { useEffect } from 'react';
+import ProgramCard from './ProgramCard';
+import { useNavigation } from '@react-navigation/native';
 
-const Feed = () => {
-    
-    const { user, password } = useAuth();
+const FeedPage = () => {
+  const navigation = useNavigation();
 
-    const mock_posts = [
-        {
-            "urilist": ["https://upload.wikimedia.org/wikipedia/commons/2/29/US_Navy_070504-N-0995C-072_Chief_Mineman_Kevin_Sperling_appears_as_the_guest_body_builder_at_an_Armed_Forces_body_building_competition_held_at_Sharkey%27s_Theatre_at_Naval_Station_Pearl_Harbor.jpg"],
-            "title": "Look At What I Have Become",
-            "description": "I just encountered a program, and within a few weeks, I feel much strong. This forum is awesome",
-            "likeCount": "10769",
-            "owner": "John",
-            "labels": ["Powerlifting", "Cardio", "Upper Body Muscles"],
-            "CommentContainer": ""
-        },
-        {
-            "urilist": ["https://images.pexels.com/photos/1978505/pexels-photo-1978505.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"],
-            "title": "UNBELIEVABLE PROGRESS With Me",
-            "description": "Look at Matt! It is so suprizing how he built his muscles that fast. FASCINATING",
-            "likeCount": "8792",
-            "owner": "Sarah",
-            "labels": ["Body Building", "Powerlifting"],
-            "CommentContainer": ""
-        },
-        {
-           "urilist": ["https://images.pexels.com/photos/6388391/pexels-photo-6388391.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"],
-            "title": "Strength Training Advice",
-            "description": "My leg strength is lagging behind my upper body, so I want to strength it. Where can I start, guys???",
-            "likeCount": "256",
-            "owner": "Oliver",
-            "labels": ["Strength Training", "Leg Muscles"],
-            "CommentContainer": ""
-        },
-        {
-            "urilist": ["https://images.pexels.com/photos/68468/pexels-photo-68468.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"],
-            "title": "My Monday Morning Yoga Exercise",
-            "description": "I have just finished my yoga exercise and feel sooooo good! Next? Of course coffee :))",
-            "likeCount": "5",
-            "owner": "Emma",
-            "labels": ["Yoga", "Relaxing Exercises"],
-            "CommentContainer": ""
-        }
-    ];
-    return (
+  // Mock data for forum posts and programs
+  const forumPosts = [
+    { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', labels: ['forum', 'discussion'], likeCount: 20 },
+    { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: 'jane_doe', labels: ['forum', 'diet'], likeCount: 15 },
+  ];
+
+  const programs = [
+    { id: 1, title: 'Powerlifting Program', description: 'A 12-week strength program for powerlifting.', owner: 'trainer_john', followCount: 100, location: 'Gym A', muscle_list: ['Legs', 'Back'] },
+    { id: 2, title: 'Hypertrophy Program', description: 'Gain muscle with this 6-week hypertrophy program.', owner: 'trainer_jane', followCount: 85, location: 'Gym B', muscle_list: ['Arms', 'Chest'] },
+  ];
+
+  const [selectedTab, setSelectedTab] = useState('forum'); // To track the selected tab
+
+  // Function to render posts or programs based on the selected tab
+  const renderContent = () => {
+    if (selectedTab === 'forum') {
+      return (
         <FlatList
-        data={mock_posts}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-        <View style={styles.postcontainer}>
-          <PostCard
-            post={{
-              urilist: item.urilist,
-              title: item.title,
-              description: item.description,
-              likeCount: item.likeCount,
-              owner: item.owner,
-              labels: item.labels,
-              CommentContainer: item.CommentContainer,
-            }}
-          />
-        </View>
-        )}
-        contentContainerStyle={styles.container}
-        numColumns={4} // Adjust the number of columns as needed
+          data={forumPosts}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <PostCard
+              title={item.title}
+              owner={item.owner}
+              description={item.description}
+              labels={item.labels}
+              likeCount={item.likeCount}
+              navigation={navigation}
+            />
+          )}
+          showsVerticalScrollIndicator={false}
         />
-    );
-
-    
-}
-
-const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 20,
-        backgroundColor: 'white',
-    },
-    postcontainer: {
-        flex: 1,
-        alignItems: 'center',
-        margin: 5, // Add margin between grid items
+      );
+    } else if (selectedTab === 'programs') {
+      return (
+        <FlatList
+          data={programs}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <ProgramCard
+              title={item.title}
+              description={item.description}
+              owner={item.owner}
+              followCount={item.followCount}
+              location={item.location}
+              muscle_list={item.muscle_list}
+              navigation={navigation}
+            />
+          )}
+          showsVerticalScrollIndicator={false}
+        />
+      );
     }
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Tabs for Forum Posts and Programs */}
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={[styles.tabItem, selectedTab === 'forum' && styles.activeTab]}
+          onPress={() => setSelectedTab('forum')}
+        >
+          <Text style={[styles.tabText, selectedTab === 'forum' && styles.activeTabText]}>Forum Posts</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabItem, selectedTab === 'programs' && styles.activeTab]}
+          onPress={() => setSelectedTab('programs')}
+        >
+          <Text style={[styles.tabText, selectedTab === 'programs' && styles.activeTabText]}>Programs</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Display content based on selected tab */}
+      <View style={styles.contentContainer}>
+        {renderContent()}
+      </View>
+    </View>
+  );
+};
+
+// Define styles for the feed page
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: 'white',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  tabItem: {
+    paddingVertical: 10,
+    flex: 1,
+    alignItems: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#007bff',
+  },
+  tabText: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  activeTabText: {
+    color: '#007bff',
+    fontWeight: 'bold',
+  },
+  contentContainer: {
+    flex: 1,
+  },
 });
-export default Feed;
+
+export default FeedPage;

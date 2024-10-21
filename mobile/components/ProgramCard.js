@@ -1,16 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const PostCard = ({ owner, title, description, labels, likeCount, navigation }) => {
+const ProgramCard = ({ owner, title, description, followCount, location, muscle_list, navigation }) => {
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('PostDetail', { title, description, owner, labels, likeCount })}
+      onPress={() => navigation.navigate('ProgramDetail', { title, description, owner, followCount, location, muscle_list })}
     >
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
-      <Text style={styles.owner}>Posted by: {owner}</Text>
-      <Text style={styles.likeCount}>Likes: {likeCount}</Text>
+      <Text style={styles.location}>Location: {location}</Text>
+      <Text style={styles.muscleType}>Targeted muscles: {muscle_list.join(', ')}</Text>
+      <Text style={styles.follow}>Followers: {followCount}</Text>
     </TouchableOpacity>
   );
 };
@@ -33,14 +34,20 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 8,
   },
-  owner: {
+  location: {
     fontSize: 12,
     color: '#555',
+    marginBottom: 4,
   },
-  likeCount: {
+  muscleType: {
+    fontSize: 12,
+    color: '#555',
+    marginBottom: 4,
+  },
+  follow: {
     fontSize: 12,
     color: '#888',
   },
 });
 
-export default PostCard;
+export default ProgramCard;
