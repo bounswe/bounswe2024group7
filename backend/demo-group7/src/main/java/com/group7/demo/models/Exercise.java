@@ -26,7 +26,7 @@ public class Exercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column
     private String name;  // Name of the exercise
 
     @Enumerated(EnumType.STRING)
