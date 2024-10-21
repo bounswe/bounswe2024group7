@@ -31,4 +31,9 @@ public class Post {
             inverseJoinColumns = @JoinColumn(name = "tag_name"))
 //    @JsonIgnoreProperties("posts")  // Prevents infinite recursion with Tag entity
     private Set<Tag> tags = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 }

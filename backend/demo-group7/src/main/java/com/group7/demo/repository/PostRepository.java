@@ -12,7 +12,7 @@ import java.util.Set;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByTags_Name(String tagName);
 
-    @Query("SELECT p.id, p.content, p.createdAt, t.name FROM Post p LEFT JOIN p.tags t")
+    @Query("SELECT p.id, p.content, p.createdAt, t.name, p.user.id FROM Post p LEFT JOIN p.tags t")
     List<Object[]> findAllPostDataWithTags();
 
     @Query("SELECT DISTINCT p FROM Post p LEFT JOIN FETCH p.tags")
