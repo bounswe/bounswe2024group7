@@ -1,17 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const PostCard = ({ owner, title, description, labels, likeCount, navigation }) => {
+const PostCard = ({ title, owner, description, labels, likeCount, navigation }) => {
   return (
-    <TouchableOpacity
-      style={styles.card}
-      onPress={() => navigation.navigate('PostDetail', { title, description, owner, labels, likeCount })}
-    >
+    <View style={styles.card}>
+      <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { username: owner })}>
+        <Text style={styles.owner}>{owner}</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
-      <Text style={styles.owner}>Posted by: {owner}</Text>
+      <Text style={styles.labels}>{labels.join(', ')}</Text>
       <Text style={styles.likeCount}>Likes: {likeCount}</Text>
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -23,6 +23,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 3, // Adds shadow on Android
   },
+  owner: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#007bff', // Link color
+  },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -33,9 +39,10 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 8,
   },
-  owner: {
+  labels: {
     fontSize: 12,
     color: '#555',
+    marginBottom: 4,
   },
   likeCount: {
     fontSize: 12,
