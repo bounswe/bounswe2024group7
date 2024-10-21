@@ -107,11 +107,11 @@ const ProfilePage = () => {
             <Text style={styles.statLabel}>Following</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.followButton} onPress={handleFollowToggle}>
+        {/*<TouchableOpacity style={styles.followButton} onPress={handleFollowToggle}>
           <Text style={styles.followButtonText}>
             {isFollowing ? 'Following' : 'Follow'}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity>*/}
       </View>
 
       {/* Tabs for Forum Posts and Programs */}
