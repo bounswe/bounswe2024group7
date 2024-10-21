@@ -58,32 +58,11 @@ public class PostService {
 
 
     public List<PostResponse> getAllPosts() {
-        List<Object[]> results = postRepository.findAllPostDataWithTags();
+        List<Post> posts = postRepository.findAll();
 
-        Map<Long, PostResponse> postResponseMap = new HashMap<>();
-
-        for (Object[] result : results) {
-            Long postId = (Long) result[0];
-            String content = (String) result[1];
-            LocalDateTime createdAt = (LocalDateTime) result[2];
-            String tagName = (String) result[3];
-            Long userId = (Long) result[4];
-
-            // Check if the PostResponse already exists for this post
-            PostResponse postResponse = postResponseMap.get(postId);
-
-            if (postResponse == null) {
-                // Create a new PostResponse if it doesn't exist
-                postResponse = new PostResponse(postId, content, new HashSet<>(), createdAt, userId);
-                postResponseMap.put(postId, postResponse);
-            }
-
-            // Add the tag name to the PostResponse
-            postResponse.getTags().add(tagName);
-        }
-
-        // Return the list of PostResponse
-        return new ArrayList<>(postResponseMap.values());
+        return posts.stream()
+                .map(this::mapToPostResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -140,7 +119,7 @@ public class PostService {
                 post.getContent(),
                 post.getTags().stream().map(Tag::getName).collect(Collectors.toSet()),  // Only tag names
                 post.getCreatedAt(),
-                post.getUser().getId()
+                post.getUser().getUsername()
         );
     }
 

@@ -16,5 +16,5 @@ public class PostResponse {
     private String content;
     private Set<String> tags;
     private LocalDateTime createdAt;
-    private Long userId;
+    private String username;
 }
