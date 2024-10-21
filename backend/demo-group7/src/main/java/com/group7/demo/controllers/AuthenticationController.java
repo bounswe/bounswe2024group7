@@ -5,6 +5,7 @@ import com.group7.demo.dtos.LoginResponse;
 import com.group7.demo.dtos.RegisterRequest;
 import com.group7.demo.models.User;
 import com.group7.demo.services.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,6 @@ public class AuthenticationController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
@@ -36,6 +36,16 @@ public class AuthenticationController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<LoginResponse> getAuthenticatedUser(HttpServletRequest request) {
+        LoginResponse loginResponse = authenticationService.getAuthenticatedUser(request);
+        if (loginResponse != null) {
+            return ResponseEntity.ok(loginResponse);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
