@@ -55,9 +55,30 @@ public class TrainingProgramController {
         }
     }
 
+
+    @PostMapping("/{programId}/join")
+    public ResponseEntity<String> joinTrainingProgram(@RequestParam Long userId, @PathVariable Long programId , HttpServletRequest request) {
+        trainingProgramService.joinTrainingProgram(userId, programId ,request);
+        return ResponseEntity.ok("User has successfully joined the training program.");
+    }
+
+    @DeleteMapping("/leave")
+    public ResponseEntity<String> leaveProgram(@RequestParam Long programId, HttpServletRequest request) {
+        trainingProgramService.leaveTrainingProgram(programId, request);
+        return ResponseEntity.ok("Successfully left the training program.");
+    }
+
+    @GetMapping("/{programId}/participants")
+    public ResponseEntity<List<String>> getRegisteredUsernames(@PathVariable Long programId) {
+        List<String> usernames = trainingProgramService.getRegisteredUsernames(programId);
+        return ResponseEntity.ok(usernames);
+    }
+
+
     @GetMapping("/trainer/{username}")
     public ResponseEntity<List<TrainingProgramResponse>> getTrainingProgramsByTrainer(@PathVariable String username) {
         List<TrainingProgramResponse> trainingPrograms = trainingProgramService.getTrainingProgramByTrainer(username);
         return ResponseEntity.ok(trainingPrograms);
     }
+
 }

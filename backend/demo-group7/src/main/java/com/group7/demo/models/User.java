@@ -1,5 +1,6 @@
 package com.group7.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -63,6 +64,11 @@ public class User {
     private Set<Post> posts = new HashSet<>();
 
     @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("trainer")
     private List<TrainingProgram> trainingPrograms;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("user")
+    private Set<UserTrainingProgram> joinedPrograms = new HashSet<>();
 
 }
