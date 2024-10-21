@@ -43,13 +43,14 @@ function PostFeed() {
                         <Text>Loading posts...</Text>
                     </Flex>
                 )}
-
-                {posts.map(post => (
+                {posts.length > 0 ? posts.map(post => (
                     <PostFeedCard
                         key={post.id}
                         post={post}
                     />
-                ))}
+                )) : (
+                    <Text>No posts found.</Text>
+                )}
             </Stack>
         </Box>
     )

@@ -144,6 +144,7 @@ export default function NavigationResponsive() {
                         fontFamily={'heading'}
                         color={useColorModeValue('gray.800', 'white')}
                         fontWeight={"700"}
+                        width={"200px"}
                     >
                         <Link
                             href={indexPath}
@@ -157,7 +158,7 @@ export default function NavigationResponsive() {
                         <DesktopNav />
                     </Flex>
                 </Flex>
-                <SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading={setLoading} loading={loading} />
+                {/* <SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading={setLoading} loading={loading} /> */}
                 <Stack
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
@@ -205,19 +206,24 @@ export default function NavigationResponsive() {
                                 </Center>
                                 <br />
                                 <Center>
-                                <   Link
-                                        href={profilePath}
-                                        textDecoration={"none"}
-                                    >
                                     <p>{username}</p>
-                                    </Link>
                                 </Center>
                                 <br />
                                 <MenuDivider />
-                                {/* <MenuItem>Account Settings</MenuItem> */}
+                                <Link
+                                    href={profilePath}
+                                    textDecoration={"none"}
+                                >
+                                    <MenuItem>
+                                        Profile
+                                    </MenuItem>
+                                </Link>
+                                <MenuDivider />
                                 <MenuItem
                                     onClick={handleLogOut}
-                                >Log out</MenuItem>
+                                >
+                                    Log out
+                                </MenuItem>
                             </MenuList>
                         </Menu>) : (
                             <>
@@ -388,7 +394,7 @@ const MobileNav = () => {
                     <MobileNavItem key={navItem.label} {...navItem} />
                 ))}
             </Stack>
-            <SearchBar screen={"mobile"} />
+            {/* <SearchBar screen={"mobile"} /> */}
         </>
 
     )
@@ -443,8 +449,4 @@ const MobileNavItem = ({ label, children, href }) => {
 }
 
 const NAV_ITEMS = [
-    {
-        label: 'Home',
-        href: indexPath
-    },
 ]

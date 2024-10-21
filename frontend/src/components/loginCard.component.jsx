@@ -39,12 +39,20 @@ export default function LoginCard() {
 
             if (response.status === 200) {
 
+                const sessionToken = response.data.sessionToken
+
+                const profileResponse = await apiInstance(sessionToken).get(
+                    `api/user/${username}`
+                )
+
+                const profileData = profileResponse.data
 
                 dispatch(
                     userActions.login({
                         userName: username,
                         password,
-                        sessionToken: response.data.sessionToken
+                        sessionToken,
+                        profile: profileData,
                     })
                 )
 
