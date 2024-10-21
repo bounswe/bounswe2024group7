@@ -7,10 +7,15 @@ const PostDetail = ({ route }) => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.owner}>Posted by: {owner}</Text>
+
+      {/* Owner and Like Count in a horizontal layout */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.owner}>Posted by: {owner}</Text>
+        <Text style={styles.likeCount}>Likes: {likeCount}</Text>
+      </View>
+
       <Text style={styles.description}>{description}</Text>
       <Text style={styles.labels}>Tags: {labels.join(', ')}</Text>
-      <Text style={styles.likeCount}>Likes: {likeCount}</Text>
     </ScrollView>
   );
 };
@@ -26,10 +31,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   owner: {
     fontSize: 16,
     color: '#555',
-    marginBottom: 10,
+  },
+  likeCount: {
+    fontSize: 16,
+    color: '#888',
   },
   description: {
     fontSize: 16,
@@ -40,10 +54,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#888',
     marginBottom: 10,
-  },
-  likeCount: {
-    fontSize: 14,
-    color: '#888',
   },
 });
 

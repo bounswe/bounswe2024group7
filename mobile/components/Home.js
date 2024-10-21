@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-nati
 import { useAuth } from '../AuthContext';
 import ProfilePage from './ProfilePage';
 import Feed from './Feed';
-
+import CreatePost from './CreatePost';
 const ProfilePageContainer = () => (
   <View style={styles.page}>
     <ProfilePage />
@@ -40,32 +40,38 @@ const Home = ({ navigation }) => {
         </View>
       )}
       {isLoggedIn && (
-        <View style={styles.appContainer}>
-          <TabList selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-          <View style={styles.content}>
-            {selectedTab === 'Profile' && <ProfilePageContainer />}
-            {selectedTab === 'Feed' && <FeedPageContainer />}
-          </View>
-        </View>
-      )}
+           <View style={styles.appContainer}>
+             <TabList selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+             <View style={styles.content}>
+               {selectedTab === 'Profile' && <ProfilePageContainer />}
+               {selectedTab === 'Feed' && <FeedPageContainer />}
+               {selectedTab === 'CreatePost' && <CreatePost />}
+             </View>
+           </View>
+         )}
     </View>
   );
 };
 
 const TabList = ({ selectedTab, setSelectedTab }) => (
-  <View style={styles.tabList}>
-    <TabItem
-      label="Feed"
-      isSelected={selectedTab === 'Feed'}
-      onPress={() => setSelectedTab('Feed')}
-    />
-    <TabItem
-      label="Profile"
-      isSelected={selectedTab === 'Profile'}
-      onPress={() => setSelectedTab('Profile')}
-    />
-  </View>
-);
+     <View style={styles.tabList}>
+       <TabItem
+         label="Feed"
+         isSelected={selectedTab === 'Feed'}
+         onPress={() => setSelectedTab('Feed')}
+       />
+       <TabItem
+         label="CreatePost" // Add CreatePost tab
+         isSelected={selectedTab === 'CreatePost'}
+         onPress={() => setSelectedTab('CreatePost')}
+       />
+       <TabItem
+         label="Profile"
+         isSelected={selectedTab === 'Profile'}
+         onPress={() => setSelectedTab('Profile')}
+       />
+     </View>
+   );
 
 const TabItem = ({ label, isSelected, onPress }) => (
   <TouchableOpacity
