@@ -46,9 +46,5 @@ public class PostController {
         return ResponseEntity.ok("Post deleted successfully.");
     }
 
-//    @GetMapping("/by-tags")
-//    public ResponseEntity<List<PostResponse>> getPostsByTags(@RequestParam ) {
-//
-//    }
 }
 

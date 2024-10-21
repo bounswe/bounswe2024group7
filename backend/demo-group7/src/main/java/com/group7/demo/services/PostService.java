@@ -4,8 +4,10 @@ import com.group7.demo.dtos.PostRequest;
 import com.group7.demo.dtos.PostResponse;
 import com.group7.demo.models.Post;
 import com.group7.demo.models.Tag;
+import com.group7.demo.models.User;
 import com.group7.demo.repository.PostRepository;
 import com.group7.demo.repository.TagRepository;
+import com.group7.demo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class PostService {
 
     private TagRepository tagRepository;
 
+    private UserRepository userRepository;
     public PostResponse createPost(PostRequest postRequest) {
         Set<Tag> tags = new HashSet<>();
 
@@ -35,10 +38,15 @@ public class PostService {
             tags.add(tag);
         }
 
+        User user = userRepository.findById(postRequest.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + postRequest.getUserId()));
+
+
         Post post = Post.builder()
                 .content(postRequest.getContent())
                 .createdAt(LocalDateTime.now())
                 .tags(tags)
+                .user(user)  // Associate the post with the user
                 .build();
 
         Post savedPost = postRepository.save(post);
@@ -57,13 +65,14 @@ public class PostService {
             String content = (String) result[1];
             LocalDateTime createdAt = (LocalDateTime) result[2];
             String tagName = (String) result[3];
+            Long userId = (Long) result[4];
 
             // Check if the PostResponse already exists for this post
             PostResponse postResponse = postResponseMap.get(postId);
 
             if (postResponse == null) {
                 // Create a new PostResponse if it doesn't exist
-                postResponse = new PostResponse(postId, content, new HashSet<>(), createdAt);
+                postResponse = new PostResponse(postId, content, new HashSet<>(), createdAt, userId);
                 postResponseMap.put(postId, postResponse);
             }
 
@@ -101,7 +110,8 @@ public class PostService {
                 post.getId(),
                 post.getContent(),
                 post.getTags().stream().map(Tag::getName).collect(Collectors.toSet()),  // Only tag names
-                post.getCreatedAt()
+                post.getCreatedAt(),
+                post.getUser().getId()
         );
     }
 
