@@ -10,6 +10,7 @@ import com.group7.demo.repository.TagRepository;
 import com.group7.demo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,10 @@ public class PostService {
     private TagRepository tagRepository;
 
     private UserRepository userRepository;
-    public PostResponse createPost(PostRequest postRequest) {
+
+    private AuthenticationService authenticationService;
+
+    public PostResponse createPost(PostRequest postRequest, HttpServletRequest request) {
         Set<Tag> tags = new HashSet<>();
 
         for (String tagName : postRequest.getTags()) {
@@ -38,10 +42,7 @@ public class PostService {
                     });
             tags.add(tag);
         }
-
-        User user = userRepository.findById(postRequest.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + postRequest.getUserId()));
-
+        User user = authenticationService.getAuthenticatedUserInternal(request);
 
         Post post = Post.builder()
                 .content(postRequest.getContent())
@@ -86,10 +87,17 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long postId) {
+    public void deletePost(Long postId, HttpServletRequest request) throws IllegalAccessException {
+        User authenticatedUser = authenticationService.getAuthenticatedUserInternal(request);
+
         // Check if the post exists
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
+
+        // Check if the authenticated user is the owner of the post
+        if (!post.getUser().equals(authenticatedUser)) {
+            throw new IllegalAccessException("Unauthorized: You are not allowed to delete this post");
+        }
 
         // Remove the post from the user's post collection
         User user = post.getUser();
@@ -113,6 +121,15 @@ public class PostService {
         return posts.stream()
                 .filter(post -> post.getTags().stream()
                         .anyMatch(tag -> tagNames.contains(tag.getName())))
+                .map(this::mapToPostResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<PostResponse> getRandomPosts(int count) {
+        List<Post> allPosts = postRepository.findAll();
+        Collections.shuffle(allPosts);
+        return allPosts.stream()
+                .limit(count)
                 .map(this::mapToPostResponse)
                 .collect(Collectors.toList());
     }
