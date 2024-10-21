@@ -9,6 +9,7 @@ import com.group7.demo.repository.PostRepository;
 import com.group7.demo.repository.TagRepository;
 import com.group7.demo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -84,12 +85,23 @@ public class PostService {
         return new ArrayList<>(postResponseMap.values());
     }
 
+    @Transactional
     public void deletePost(Long postId) {
         // Check if the post exists
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
 
-        // Delete the post
+        // Remove the post from the user's post collection
+        User user = post.getUser();
+        if (user != null) {
+            user.getPosts().remove(post);
+        }
+
+        // Remove all associations between the post and tags
+        post.getTags().forEach(tag -> tag.getPosts().remove(post));
+        post.getTags().clear();  // Clear the post's tags to ensure the association is removed
+
+        // Finally, delete the post
         postRepository.delete(post);
     }
 
