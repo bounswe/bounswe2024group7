@@ -9,6 +9,8 @@ import com.group7.demo.repository.PostRepository;
 import com.group7.demo.repository.TagRepository;
 import com.group7.demo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,10 @@ public class PostService {
     private TagRepository tagRepository;
 
     private UserRepository userRepository;
-    public PostResponse createPost(PostRequest postRequest) {
+
+    private AuthenticationService authenticationService;
+
+    public PostResponse createPost(PostRequest postRequest, HttpServletRequest request) {
         Set<Tag> tags = new HashSet<>();
 
         for (String tagName : postRequest.getTags()) {
@@ -37,10 +42,7 @@ public class PostService {
                     });
             tags.add(tag);
         }
-
-        User user = userRepository.findById(postRequest.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + postRequest.getUserId()));
-
+        User user = authenticationService.getAuthenticatedUserInternal(request);
 
         Post post = Post.builder()
                 .content(postRequest.getContent())
@@ -56,51 +58,52 @@ public class PostService {
 
 
     public List<PostResponse> getAllPosts() {
-        List<Object[]> results = postRepository.findAllPostDataWithTags();
+        List<Post> posts = postRepository.findAll();
 
-        Map<Long, PostResponse> postResponseMap = new HashMap<>();
-
-        for (Object[] result : results) {
-            Long postId = (Long) result[0];
-            String content = (String) result[1];
-            LocalDateTime createdAt = (LocalDateTime) result[2];
-            String tagName = (String) result[3];
-            Long userId = (Long) result[4];
-
-            // Check if the PostResponse already exists for this post
-            PostResponse postResponse = postResponseMap.get(postId);
-
-            if (postResponse == null) {
-                // Create a new PostResponse if it doesn't exist
-                postResponse = new PostResponse(postId, content, new HashSet<>(), createdAt, userId);
-                postResponseMap.put(postId, postResponse);
-            }
-
-            // Add the tag name to the PostResponse
-            postResponse.getTags().add(tagName);
-        }
-
-        // Return the list of PostResponse
-        return new ArrayList<>(postResponseMap.values());
+        return posts.stream()
+                .map(this::mapToPostResponse)
+                .collect(Collectors.toList());
     }
 
-    public void deletePost(Long postId) {
+    @Transactional
+    public void deletePost(Long postId, HttpServletRequest request) throws IllegalAccessException {
+        User authenticatedUser = authenticationService.getAuthenticatedUserInternal(request);
+
         // Check if the post exists
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
 
-        // Delete the post
+        // Check if the authenticated user is the owner of the post
+        if (!post.getUser().equals(authenticatedUser)) {
+            throw new IllegalAccessException("Unauthorized: You are not allowed to delete this post");
+        }
+
+        // Remove the post from the user's post collection
+        User user = post.getUser();
+        if (user != null) {
+            user.getPosts().remove(post);
+        }
+
+        // Remove all associations between the post and tags
+        post.getTags().forEach(tag -> tag.getPosts().remove(post));
+        post.getTags().clear();  // Clear the post's tags to ensure the association is removed
+
+        // Finally, delete the post
         postRepository.delete(post);
     }
 
     public List<PostResponse> getPostsByTags(Set<String> tagNames) {
-        // Fetch all posts with tags
-        List<Post> posts = postRepository.findAllPostsWithTags();
-
-        // Filter posts that have at least one of the requested tags
+        List<Post> posts = postRepository.findPostsByTags(tagNames);
         return posts.stream()
-                .filter(post -> post.getTags().stream()
-                        .anyMatch(tag -> tagNames.contains(tag.getName())))
+                .map(this::mapToPostResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<PostResponse> getRandomPosts(int count) {
+        List<Post> allPosts = postRepository.findAll();
+        Collections.shuffle(allPosts);
+        return allPosts.stream()
+                .limit(count)
                 .map(this::mapToPostResponse)
                 .collect(Collectors.toList());
     }
@@ -111,7 +114,7 @@ public class PostService {
                 post.getContent(),
                 post.getTags().stream().map(Tag::getName).collect(Collectors.toSet()),  // Only tag names
                 post.getCreatedAt(),
-                post.getUser().getId()
+                post.getUser().getUsername()
         );
     }
 

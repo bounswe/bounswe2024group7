@@ -25,7 +25,7 @@ services:
       - ./backend/demo-group7:/app
     container_name: springboot-app
     ports:
-      - "8080:8080"
+      - "${SPRING_PORT}:${SPRING_PORT}"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
