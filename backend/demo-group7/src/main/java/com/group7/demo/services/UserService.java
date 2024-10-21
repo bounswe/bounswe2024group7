@@ -1,5 +1,6 @@
 package com.group7.demo.services;
 
+import com.group7.demo.dtos.PostResponse;
 import com.group7.demo.dtos.UserProfileResponse;
 import com.group7.demo.models.User;
 import com.group7.demo.repository.UserRepository;
@@ -7,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
+    private final PostService postService;
 
     public UserProfileResponse getUserProfile(String username) throws Exception {
         User user = userRepository.findByUsername(username)
@@ -30,12 +33,15 @@ public class UserService {
                 .map(User::getUsername)
                 .collect(Collectors.toSet());
 
+        List<PostResponse> posts = postService.getPostsByUser(user.getUsername());
+
         return UserProfileResponse.builder()
                 .username(user.getUsername())
                 .fullName(user.getFullName())
                 .role(user.getRole())
                 .followers(followers)
                 .following(following)
+                .posts(posts)
                 .build();
     }
 
