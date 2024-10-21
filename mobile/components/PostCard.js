@@ -3,7 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 const PostCard = ({ title, owner, description, labels, likeCount, navigation }) => {
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+          style={styles.card}
+          onPress={() => navigation.navigate('PostDetail', { title, description, owner, labels, likeCount })}
+        >
       <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { username: owner })}>
         <Text style={styles.owner}>{owner}</Text>
       </TouchableOpacity>
@@ -11,7 +14,7 @@ const PostCard = ({ title, owner, description, labels, likeCount, navigation }) 
       <Text style={styles.description}>{description}</Text>
       <Text style={styles.labels}>{labels.join(', ')}</Text>
       <Text style={styles.likeCount}>Likes: {likeCount}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
