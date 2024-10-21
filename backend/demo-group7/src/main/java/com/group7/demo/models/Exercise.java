@@ -12,6 +12,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,6 +26,7 @@ public class Exercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String name;  // Name of the exercise
 
     @Enumerated(EnumType.STRING)
@@ -31,7 +35,6 @@ public class Exercise {
     @OneToOne(mappedBy = "exercise", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private ExerciseDetail exerciseDetail;  // Link to the sets and repetitions
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "training_program_id")
-    private TrainingProgram trainingProgram;
+    @ManyToMany(mappedBy = "exercises", fetch = FetchType.LAZY)
+    private List<TrainingProgram> trainingPrograms = new ArrayList<>();
 }

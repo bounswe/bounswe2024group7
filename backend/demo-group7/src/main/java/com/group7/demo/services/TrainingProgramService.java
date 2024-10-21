@@ -8,6 +8,7 @@ import com.group7.demo.models.Exercise;
 import com.group7.demo.models.ExerciseDetail;
 import com.group7.demo.models.TrainingProgram;
 import com.group7.demo.models.User;
+import com.group7.demo.repository.ExerciseRepository;
 import com.group7.demo.repository.TrainingProgramRepository;
 import com.group7.demo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,6 +17,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +28,7 @@ public class TrainingProgramService {
 
     private final UserRepository userRepository;
 
+    private final ExerciseRepository exerciseRepository;
     @Transactional
     public TrainingProgramResponse createTrainingProgram(TrainingProgramRequest request) {
         // Find the trainer by ID (you should have a Trainer/User repository)
@@ -44,20 +47,22 @@ public class TrainingProgramService {
         // Map exercises from request to entity
         List<Exercise> exercises = request.getExercises().stream()
                 .map(exerciseRequest -> {
+                    // Create exercise
                     Exercise exercise = Exercise.builder()
                             .name(exerciseRequest.getName())
                             .muscleGroup(exerciseRequest.getMuscleGroup())
-                            .trainingProgram(trainingProgram)
                             .build();
 
-                    // Create exercise detail
+                    // Create exercise detail (assuming `ExerciseRequest` has `getSets()` and `getRepetitions()` methods)
                     ExerciseDetail exerciseDetail = ExerciseDetail.builder()
-                            .sets(exerciseRequest.getSets())
-                            .repetitions(exerciseRequest.getRepetitions())
+                            .sets(exerciseRequest.getSets())  // Make sure this retrieves the sets from the request
+                            .repetitions(exerciseRequest.getRepetitions())  // Retrieves repetitions from the request
                             .exercise(exercise)
                             .build();
 
+                    // Link the exercise with its exercise detail
                     exercise.setExerciseDetail(exerciseDetail);
+
                     return exercise;
                 })
                 .collect(Collectors.toList());
