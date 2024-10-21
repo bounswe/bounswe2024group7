@@ -2,7 +2,10 @@ package com.group7.demo.services;
 
 import com.group7.demo.dtos.LoginRequest;
 import com.group7.demo.dtos.LoginResponse;
+import com.group7.demo.dtos.PostResponse;
 import com.group7.demo.dtos.RegisterRequest;
+import com.group7.demo.models.Post;
+import com.group7.demo.models.Tag;
 import com.group7.demo.models.User;
 import com.group7.demo.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,8 +69,19 @@ public class AuthenticationService {
         }
     }
 
+    public User getAuthenticatedUserInternal(HttpServletRequest request) {
+        String sessionToken = request.getHeader("x-session-token");
+        if (sessionToken != null) {
+            Optional<User> user = userRepository.findBySessionToken(sessionToken);
+            if (user.isPresent()) {
+                return user.get();
+            }
+        }
+        return null;
+    }
+
     public LoginResponse getAuthenticatedUser(HttpServletRequest request) {
-        String sessionToken = request.getHeader("Token");
+        String sessionToken = request.getHeader("x-session-token");
         if (sessionToken != null) {
             Optional<User> user = userRepository.findBySessionToken(sessionToken);
             if (user.isPresent()) {
@@ -88,5 +103,14 @@ public class AuthenticationService {
             foundUser.setSessionToken(null);  // Invalidate the token
             userRepository.save(foundUser);
         });
+    }
+
+    private LoginResponse mapToLoginResponse(User user) {
+        return LoginResponse.builder()
+                .username(user.getUsername())
+                .sessionToken(user.getSessionToken())
+                .role(user.getRole())
+                .email(user.getEmail())
+                .build();
     }
 }

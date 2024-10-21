@@ -40,13 +40,11 @@ public class UserService {
     }
 
     public void followUser(String usernameToFollow, HttpServletRequest request) throws Exception {
-        String authenticatedUsername = authenticationService.getAuthenticatedUser(request).getUsername();
-        User authenticatedUser = userRepository.findByUsername(authenticatedUsername)
-                .orElseThrow(() -> new Exception("Entity not found"));
+        User authenticatedUser = authenticationService.getAuthenticatedUserInternal(request);
         User userToFollow = userRepository.findByUsername(usernameToFollow)
                 .orElseThrow(() -> new Exception("Entity not found"));
 
-        if (!authenticatedUsername.equals(usernameToFollow) && !authenticatedUser.getFollowing().contains(userToFollow)) {
+        if (!authenticatedUser.getUsername().equals(usernameToFollow) && !authenticatedUser.getFollowing().contains(userToFollow)) {
             authenticatedUser.getFollowing().add(userToFollow);
             userToFollow.getFollowers().add(authenticatedUser);
             userRepository.save(authenticatedUser);
@@ -57,9 +55,7 @@ public class UserService {
     }
 
     public void unfollowUser(String usernameToUnfollow, HttpServletRequest request) throws Exception {
-        String authenticatedUsername = authenticationService.getAuthenticatedUser(request).getUsername();
-        User authenticatedUser = userRepository.findByUsername(authenticatedUsername)
-                .orElseThrow(() -> new Exception("Entity not found"));
+        User authenticatedUser = authenticationService.getAuthenticatedUserInternal(request);
         User userToUnfollow = userRepository.findByUsername(usernameToUnfollow)
                 .orElseThrow(() -> new Exception("Entity not found"));
 
