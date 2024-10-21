@@ -49,8 +49,7 @@ import SearchResults from './searchResults.component.jsx'
 import { useEffect, useState } from 'react'
 import PlusIcon from '../icons/PlusIcon.jsx';
 import CreatePostModal from './CreatePostModal.component.jsx';
-
-
+import CreateProgramModal from './CreateProgramModal.component.jsx';
 
 export default function NavigationResponsive() {
     const [searchResults, setSearchResults] = useState(
@@ -67,6 +66,9 @@ export default function NavigationResponsive() {
     const toast = useToast()
     const dispatch = useDispatch();
 
+    // Log the user profile
+    console.log(profile)
+
     const {
         isOpen: isSearchResultsOpen,
         onClose: onSearchResultsClose,
@@ -77,6 +79,12 @@ export default function NavigationResponsive() {
         isOpen: isCreatePostModalOpen,
         onClose: onCreatePostModalClose,
         onOpen: onCreatePostModalOpen
+    } = useDisclosure()
+
+    const {
+        isOpen: isCreateProgramModalOpen,
+        onClose: onCreateProgramModalClose,
+        onOpen: onCreateProgramModalOpen
     } = useDisclosure()
 
     useEffect(() => {
@@ -115,6 +123,7 @@ export default function NavigationResponsive() {
     return (
         <Box>
             <CreatePostModal isOpen={isCreatePostModalOpen} onClose={onCreatePostModalClose} />
+            <CreateProgramModal isOpen={isCreateProgramModalOpen} onClose={onCreateProgramModalClose} />
             <Flex
                 bg={useColorModeValue('white', 'gray.800')}
                 color={useColorModeValue('gray.600', 'white')}
@@ -267,7 +276,7 @@ export default function NavigationResponsive() {
                         onCreatePostModalOpen()
                     } else {
                         toast({
-                            title: "You need to be logged in to create a new program.",
+                            title: "You need to be logged in to create a new post.",
                             status: "error",
                             isClosable: true,
                             duration: 2000,
@@ -281,8 +290,39 @@ export default function NavigationResponsive() {
                 w={"auto"}
             >
                 <PlusIcon />
-                Create New Program
+                Create New Post
             </Button>
+            {
+                // If user role is trainer, show create program button
+                profile && profile.role === "TRAINER" && (
+                    <Button
+                        position={"fixed"}
+                        bottom={4}
+                        left={4}
+                        colorScheme='blue'
+                        onClick={() => {
+                            if (username) {
+                                onCreateProgramModalOpen()
+                            } else {
+                                toast({
+                                    title: "You need to be logged in to create a new program.",
+                                    status: "error",
+                                    isClosable: true,
+                                    duration: 2000,
+                                })
+                                navigate({
+                                    to: loginPath
+                                })
+                            }
+                        }}
+                        gap={2}
+                        w={"auto"}
+                    >
+                        <PlusIcon />
+                        Create New Program
+                    </Button>
+                )
+            }
             {
                 searchResults && !isSearchResultsOpen && (
                     <Button

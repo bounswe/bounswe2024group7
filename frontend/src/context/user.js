@@ -15,11 +15,9 @@ const userSlice = createSlice({
   reducers: {
     login(state, actions) {
       state.userName = actions.payload.userName;
-      state.profile = actions.payload.profile;
       state.password = actions.payload.password;
       state.sessionToken = actions.payload.sessionToken;
       saveState("userName", actions.payload.userName);
-      saveState("profile", actions.payload.profile);
       saveState("password", actions.payload.password);
       saveState("sessionToken", actions.payload.sessionToken);
     },
@@ -37,6 +35,10 @@ const userSlice = createSlice({
       state.searchResults = actions.payload;
       saveState("searchResults", actions.payload);
     },
+    saveProfile(state, actions) {
+      state.profile = actions.payload.profile;
+      saveState("profile", actions.payload);
+    }
   }
 });
 

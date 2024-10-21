@@ -10,21 +10,24 @@ import {
     Stack,
     Divider
 } from '@chakra-ui/react'
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 export default function ProfilePage() {
 
     const username = useSelector(userName);
     const profile = useSelector(userProfile);
     const { colorMode, toggleColorMode } = useColorMode();
+    const { user, followers, following, posts, programs } = useContext(UserContext);
 
     return (
         <Box p={4}>
             <Flex direction="column" align="center" justify="center">
-                <Avatar 
-                    size="xl" 
-                    name={username} 
+                <Avatar
+                    size="xl"
+                    name={username}
                     src={profile?.avatarUrl || ""} // Will fallback to initials if no avatarUrl
-                    mb={4} 
+                    mb={4}
                 />
                 <Text fontSize="2xl" fontWeight="bold">
                     {username}
@@ -33,13 +36,13 @@ export default function ProfilePage() {
                     <Stack align="center" mx={4}>
                         <Text fontSize="md" fontWeight="medium">Followers</Text>
                         <Text color="gray.500">
-                            {profile?.followers || 0} {/* Assuming profile contains followers count */}
+                            {followers.length || 0} {/* Assuming profile contains followers count */}
                         </Text>
                     </Stack>
                     <Stack align="center" mx={4}>
                         <Text fontSize="md" fontWeight="medium">Following</Text>
                         <Text color="gray.500">
-                            {profile?.following || 0} {/* Assuming profile contains following count */}
+                            {following.length || 0} {/* Assuming profile contains following count */}
                         </Text>
                     </Stack>
                 </Flex>
@@ -53,15 +56,7 @@ export default function ProfilePage() {
                         Posts
                     </Text>
                     <Text color="gray.500">
-                        {profile?.posts || 0} {/* Assuming profile contains posts count */}
-                    </Text>
-                </Stack>
-                <Stack align="center" w="100%">
-                    <Text fontSize="lg" fontWeight="medium">
-                        Liked
-                    </Text>
-                    <Text color="gray.500">
-                        {profile?.liked || 0} {/* Assuming profile contains liked count */}
+                        {posts.length || 0} {/* Assuming profile contains posts count */}
                     </Text>
                 </Stack>
                 <Stack align="center" w="100%">
@@ -69,12 +64,12 @@ export default function ProfilePage() {
                         Programs
                     </Text>
                     <Text color="gray.500">
-                        {profile?.programs || 0} {/* Assuming profile contains programs count */}
+                        {programs.length || 0} {/* Assuming profile contains programs count */}
                     </Text>
                 </Stack>
             </Flex>
             <Divider mt={8} borderColor="gray.600" />
         </Box>
-        
+
     );
 }

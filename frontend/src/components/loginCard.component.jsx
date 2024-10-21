@@ -14,11 +14,12 @@ import {
 } from '@chakra-ui/react'
 import apiInstance from '../instance/apiInstance.js'
 import { registerPath } from '../constants/paths.js'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from "@tanstack/react-router"
 import { useDispatch } from "react-redux";
 import { userActions } from '../context/user.js'
 import Cookies from "js-cookie"
+import { useQuery } from "@tanstack/react-query"
 
 export default function LoginCard() {
     const [username, setUsername] = useState("");
@@ -26,6 +27,41 @@ export default function LoginCard() {
     const navigate = useNavigate()
     const toast = useToast()
     const dispatch = useDispatch();
+    const [sessionToken, setSessionToken] = useState(null);
+
+    const {
+        data: profileData,
+        isFetching: profileIsFetching,
+        isLoading: profileIsLoading,
+    } = useQuery({
+        queryKey: ['profile', sessionToken],
+        queryFn: async () => {
+            console.log("Fetching profile data with token:", sessionToken);
+
+            const response = await apiInstance(sessionToken).get(`api/user/${username}`);
+
+            return response.data;
+        },
+        refetchOnWindowFocus: false,
+        enabled: !!sessionToken,
+    });
+
+
+    useEffect(() => {
+        if (profileData && !profileIsFetching) {
+            dispatch(
+                userActions.saveProfile({
+                    profile: profileData
+                })
+            );
+
+            navigate(
+                {
+                    to: "/"
+                }
+            )
+        }
+    }, [profileData, profileIsFetching, dispatch]);
 
     const handleUserLogin = async () => {
         try {
@@ -39,31 +75,21 @@ export default function LoginCard() {
 
             if (response.status === 200) {
 
-                const sessionToken = response.data.sessionToken
+                const token = response.data.sessionToken;
 
-                const profileResponse = await apiInstance(sessionToken).get(
-                    `api/user/${username}`
-                )
+                console.log("Session Token:", token);
 
-                const profileData = profileResponse.data
+                setSessionToken(token);
 
                 dispatch(
                     userActions.login({
                         userName: username,
                         password,
-                        sessionToken,
-                        profile: profileData,
+                        sessionToken: token,
                     })
-                )
+                );
 
                 Cookies.set("username", username)
-
-                navigate(
-                    {
-                        to: "/"
-                    }
-                )
-
             } else {
                 toast({
                     title: "There was an error while logging in. Please try again.",

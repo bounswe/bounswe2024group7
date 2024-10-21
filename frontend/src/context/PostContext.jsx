@@ -7,21 +7,19 @@ import { userProfile, userPassword, userSessionToken } from "../context/user";
 export const PostContext = createContext(
     {
         posts: [],
-        labels: [],
-        bookmarkedPosts: [],
         isLoadingPosts: false,
         isFetchingPosts: false,
-        isLoadingLabels: false,
-        isFetchingLabels: false,
-        isLoadingBookmarkedPosts: false,
-        isFetchingBookmarkedPosts: false,
+        programs: [],
+        isLoadingPrograms: false,
+        isFetchingPrograms: false,
     }
 )
 
 export const PhaseContextProvider = ({ children }) => {
     const [posts, setPosts] = useState([])
-    const [labels, setLabels] = useState([])
-    const [bookmarkedPosts, setBookmarkedPosts] = useState([])
+    const [programs, setPrograms] = useState([])
+
+
     const profile = useSelector(userProfile)
     const password = useSelector(userPassword)
     const sessionToken = useSelector(userSessionToken)
@@ -41,36 +39,13 @@ export const PhaseContextProvider = ({ children }) => {
     })
 
     const {
-        data: labelsData,
-        isFetching: labelsIsFetching,
-        isLoading: labelsIsLoading,
+        data: programsData,
+        isFetching: programsIsFetching,
+        isLoading: programsIsLoading,
     } = useQuery({
-        queryKey: ['labels'],
+        queryKey: ['programs'],
         queryFn: async () => {
-            const response = await apiInstance(
-                sessionToken
-            ).get('/labels')
-
-            const labels = response.data.map(label => ({
-                value: label.id,
-                label: label.value,
-            }))
-
-            return labels
-        },
-        refetchOnWindowFocus: false,
-    })
-
-    const {
-        data: bookmarkedPostsData,
-        isFetching: bookmarkedPostsIsFetching,
-        isLoading: bookmarkedPostsIsLoading,
-    } = useQuery({
-        queryKey: ['bookmarkedPosts'],
-        queryFn: async () => {
-            const response = await apiInstance(
-                sessionToken
-            ).get(`/bookmarks/${profile.id}`)
+            const response = await apiInstance(sessionToken).get('/api/training-programs')
 
             return response.data
         },
@@ -84,41 +59,19 @@ export const PhaseContextProvider = ({ children }) => {
     }, [postsData, postsIsFetching])
 
     useEffect(() => {
-        if (labelsData && !labelsIsFetching) {
-            setLabels(labelsData)
+        if (programsData && !programsIsFetching) {
+            setPrograms(programsData)
         }
-    }, [labelsData, labelsIsFetching])
-
-    useEffect(() => {
-        if (bookmarkedPostsData && !bookmarkedPostsIsFetching) {
-            setBookmarkedPosts(bookmarkedPostsData);
-
-            if (bookmarkedPostsData && postsData) {
-                // Create a new array to avoid mutating state directly
-                const updatedPosts = posts.map(post => {
-                    const isBookmarked = bookmarkedPostsData.some(bookmarkedPost => bookmarkedPost.id === post.id);
-                    return {
-                        ...post,
-                        isBookmarked: isBookmarked,
-                    };
-                });
-
-                setPosts(updatedPosts);
-            }
-        }
-    }, [bookmarkedPostsData, bookmarkedPostsIsFetching]);
+    }, [programsData, programsIsFetching])
 
     return (
         <PostContext.Provider value={{
             posts: posts,
-            labels: labels,
-            bookmarkedPosts: bookmarkedPosts,
             isLoadingPosts: postsIsLoading,
             isFetchingPosts: postsIsFetching,
-            isLoadingLabels: labelsIsLoading,
-            isFetchingLabels: labelsIsFetching,
-            isLoadingBookmarkedPosts: bookmarkedPostsIsLoading,
-            isFetchingBookmarkedPosts: bookmarkedPostsIsFetching,
+            programs: programs,
+            isLoadingPrograms: programsIsLoading,
+            isFetchingPrograms: programsIsFetching,
         }}>
             {children}
         </PostContext.Provider>

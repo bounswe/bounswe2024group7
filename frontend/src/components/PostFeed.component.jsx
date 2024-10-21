@@ -15,7 +15,7 @@ import { PostContext } from '../context/PostContext'
 import PostFeedCard from './PostFeedCard.component'
 
 function PostFeed() {
-    const { posts, isLoadingPosts, isFetchingPosts } = useContext(PostContext)
+    const { posts, isLoadingPosts, isFetchingPosts, programs, isFetchingPrograms, isLoadingPrograms } = useContext(PostContext)
 
     return (
         <Box
@@ -31,26 +31,50 @@ function PostFeed() {
                     justify="space-between"
                     align="center"
                 >
-                    <Heading size="lg">Posts</Heading>
+                    <Heading size="lg">Your Feed</Heading>
                 </Flex>
-                {/* <Input
-                    placeholder="Search posts..."
-                    variant="filled"
-                /> */}
-                {isLoadingPosts && (
+                {isLoadingPosts && isFetchingPrograms && (
                     <Flex justify="center">
                         <Spinner />
-                        <Text>Loading posts...</Text>
+                        <Text>
+                            Loading Content...
+                        </Text>
                     </Flex>
                 )}
-                {posts.length > 0 ? posts.map(post => (
-                    <PostFeedCard
-                        key={post.id}
-                        post={post}
-                    />
-                )) : (
-                    <Text>No posts found.</Text>
+                {posts.length > 0 ? (
+                    posts.map((post) => (
+                        <PostFeedCard post={post} key={post.id} />
+                    ))
+                ) : (
+                    <Text>
+                        Nothing to show here...
+                    </Text>
                 )}
+                {
+                    programs.length > 0 && (
+                        <Stack>
+                            <Heading size="md">Recommended Programs</Heading>
+                            {programs.map((program) => (
+                                <Box
+                                    key={program.id}
+                                    p={4}
+                                    borderWidth={1}
+                                    borderRadius={8}
+                                    borderColor={useColorModeValue('gray.200', 'gray.700')}
+                                >
+                                    <Heading size="sm">{program.name}</Heading>
+                                    <Text>{program.description}</Text>
+                                    <Button
+                                        colorScheme="purple"
+                                        mt={4}
+                                    >
+                                        View Program
+                                    </Button>
+                                </Box>
+                            ))}
+                        </Stack>
+                    )
+                }
             </Stack>
         </Box>
     )
