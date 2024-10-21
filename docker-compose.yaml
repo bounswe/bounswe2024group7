@@ -21,6 +21,8 @@ services:
   springboot-app:
     image: springboot
     build: ./backend/demo-group7
+    volumes:
+      - ./backend/demo-group7:/app
     container_name: springboot-app
     ports:
       - "8080:8080"
@@ -40,12 +42,15 @@ services:
     container_name: frontend
     ports:
       - "${VITE_PORT}:${VITE_PORT}"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - springboot-app
     env_file:
       - .env
-    environment:
-      - NODE_ENV=development
 
 volumes:
   postgres-data:
