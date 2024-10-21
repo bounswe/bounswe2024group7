@@ -93,13 +93,8 @@ public class PostService {
     }
 
     public List<PostResponse> getPostsByTags(Set<String> tagNames) {
-        // Fetch all posts with tags
-        List<Post> posts = postRepository.findAllPostsWithTags();
-
-        // Filter posts that have at least one of the requested tags
+        List<Post> posts = postRepository.findPostsByTags(tagNames);
         return posts.stream()
-                .filter(post -> post.getTags().stream()
-                        .anyMatch(tag -> tagNames.contains(tag.getName())))
                 .map(this::mapToPostResponse)
                 .collect(Collectors.toList());
     }

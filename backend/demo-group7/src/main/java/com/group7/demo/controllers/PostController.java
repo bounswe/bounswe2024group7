@@ -32,7 +32,6 @@ public class PostController {
 
         if (tags != null) {
             posts = postService.getPostsByTags(tags);
-            return ResponseEntity.ok(posts);
         } else {
             posts = postService.getAllPosts();
         }
