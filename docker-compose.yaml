@@ -52,7 +52,7 @@ services:
     env_file:
       - .env
 
-  mobile: # TODO: Check whether "build" is under the correct directory. 
+  mobile:  
     build: ./mobile
     image: mobile
     container_name: mobile
