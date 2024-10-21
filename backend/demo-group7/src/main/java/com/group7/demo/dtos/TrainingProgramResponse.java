@@ -19,5 +19,5 @@ public class TrainingProgramResponse {
     private LocationType locationType;
     private List<ExerciseResponse> exercises;
     private String description;
-    private Long trainerId;
+    private String trainerUsername;
 }

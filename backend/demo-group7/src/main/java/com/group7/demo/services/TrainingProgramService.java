@@ -81,7 +81,7 @@ public class TrainingProgramService {
                         .map(this::mapToExerciseResponse)
                         .collect(Collectors.toList()))
                 .description(program.getDescription())
-                .trainerId(program.getTrainer().getId())
+                .trainerUsername(program.getTrainer().getUsername())
                 .build();
     }
 
