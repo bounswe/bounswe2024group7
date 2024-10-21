@@ -25,9 +25,13 @@ export const UserContextProvider = ({ children }) => {
     } = useQuery({
         queryKey: ['followers'],
         queryFn: async () => {
-            const response = await apiInstance(sessionToken).get(`/user/${username}/followers`)
+            try {
+                const response = await apiInstance(sessionToken).get(`/user/${username}/followers`)
 
-            return response.data
+                return response.data
+            } catch (error) {
+                return []
+            }
         },
         refetchOnWindowFocus: false,
     })
@@ -39,9 +43,13 @@ export const UserContextProvider = ({ children }) => {
     } = useQuery({
         queryKey: ['following'],
         queryFn: async () => {
-            const response = await apiInstance(sessionToken).get(`/user/${username}/following`)
+            try {
+                const response = await apiInstance(sessionToken).get(`/user/${username}/following`)
 
-            return response.data
+                return response.data
+            } catch (error) {
+                return []
+            }
         },
         refetchOnWindowFocus: false,
     })

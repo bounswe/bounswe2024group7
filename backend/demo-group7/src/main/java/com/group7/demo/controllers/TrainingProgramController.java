@@ -55,6 +55,7 @@ public class TrainingProgramController {
         }
     }
 
+
     @PostMapping("/{programId}/join")
     public ResponseEntity<String> joinTrainingProgram(@RequestParam Long userId, @PathVariable Long programId , HttpServletRequest request) {
         trainingProgramService.joinTrainingProgram(userId, programId ,request);
@@ -73,5 +74,11 @@ public class TrainingProgramController {
         return ResponseEntity.ok(usernames);
     }
 
+
+    @GetMapping("/trainer/{username}")
+    public ResponseEntity<List<TrainingProgramResponse>> getTrainingProgramsByTrainer(@PathVariable String username) {
+        List<TrainingProgramResponse> trainingPrograms = trainingProgramService.getTrainingProgramByTrainer(username);
+        return ResponseEntity.ok(trainingPrograms);
+    }
 
 }

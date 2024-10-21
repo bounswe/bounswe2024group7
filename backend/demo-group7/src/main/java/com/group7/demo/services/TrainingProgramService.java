@@ -7,6 +7,7 @@ import com.group7.demo.dtos.TrainingProgramResponse;
 import com.group7.demo.models.*;
 import com.group7.demo.repository.TrainingProgramRepository;
 import com.group7.demo.repository.UserTrainingProgramRepository;
+import com.group7.demo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -27,6 +28,8 @@ public class TrainingProgramService {
 
     private final UserTrainingProgramRepository userTrainingProgramRepository;
 
+    private final UserRepository userRepository;
+  
     @Transactional
     public TrainingProgramResponse createTrainingProgram(TrainingProgramRequest trainingProgramRequest, HttpServletRequest request) throws IllegalAccessException {
         User user = authenticationService.getAuthenticatedUserInternal(request);
@@ -117,6 +120,16 @@ public class TrainingProgramService {
 
         // Map the TrainingProgram entity to TrainingProgramResponse DTO
         return mapToTrainingProgramResponse(trainingProgram);
+    }
+
+    public List<TrainingProgramResponse> getTrainingProgramByTrainer(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+        List<TrainingProgram> trainingPrograms = trainingProgramRepository.findByTrainer(user);
+
+        return trainingPrograms.stream()
+                .map(this::mapToTrainingProgramResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
