@@ -33,6 +33,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                .sessionToken(UUID.randomUUID().toString())
                 .build();
         return userRepository.save(newUser);
     }

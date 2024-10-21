@@ -27,7 +27,11 @@ export default defineConfig(({ mode }) => {
           plugins: ['@emotion/babel-plugin']
         }
       }),
-      TanStackRouterVite()
+      TanStackRouterVite({
+        routesDir: `${process.cwd()}/src/routes`,
+        rootRoute: "__root",
+        react: true,
+      })
     ],
     server: {
       host: "0.0.0.0",

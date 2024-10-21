@@ -30,7 +30,7 @@ export default function LoginCard() {
     const handleUserLogin = async () => {
         try {
             const response = await apiInstance().post(
-                "login",
+                "auth/login",
                 {
                     username,
                     password
@@ -43,8 +43,8 @@ export default function LoginCard() {
                 dispatch(
                     userActions.login({
                         userName: username,
-                        profile: response.data.profile,
-                        password
+                        password,
+                        sessionToken: response.data.sessionToken
                     })
                 )
 

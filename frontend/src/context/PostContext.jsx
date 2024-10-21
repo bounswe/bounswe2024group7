@@ -2,7 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import apiInstance from "../instance/apiInstance";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { userProfile, userPassword } from "../context/user";
+import { userProfile, userPassword, userSessionToken } from "../context/user";
 
 export const PostContext = createContext(
     {
@@ -24,6 +24,7 @@ export const PhaseContextProvider = ({ children }) => {
     const [bookmarkedPosts, setBookmarkedPosts] = useState([])
     const profile = useSelector(userProfile)
     const password = useSelector(userPassword)
+    const sessionToken = useSelector(userSessionToken)
 
     const {
         data: postsData,
@@ -32,7 +33,7 @@ export const PhaseContextProvider = ({ children }) => {
     } = useQuery({
         queryKey: ['posts'],
         queryFn: async () => {
-            const response = await apiInstance().get('/posts')
+            const response = await apiInstance(sessionToken).get('/posts')
 
             if (!profile || !password) {
                 const emptyLikesAndComments = await Promise.all(response.data.map(async (post) => {
@@ -51,12 +52,10 @@ export const PhaseContextProvider = ({ children }) => {
             // Get the like_count and comments for each post
             const data = await Promise.all(response.data.map(async (post) => {
                 const likesResponse = await apiInstance(
-                    profile.username,
-                    password
+                    sessionToken
                 ).get(`/posts/${post.id}/likes`)
                 const commentsResponse = await apiInstance(
-                    profile.username,
-                    password
+                    sessionToken
                 ).get(`/posts/${post.id}/comments`)
 
                 const likes = likesResponse.data
@@ -82,8 +81,7 @@ export const PhaseContextProvider = ({ children }) => {
         queryKey: ['labels'],
         queryFn: async () => {
             const response = await apiInstance(
-                profile.username,
-                password
+                sessionToken
             ).get('/labels')
 
             const labels = response.data.map(label => ({
@@ -104,8 +102,7 @@ export const PhaseContextProvider = ({ children }) => {
         queryKey: ['bookmarkedPosts'],
         queryFn: async () => {
             const response = await apiInstance(
-                profile.username,
-                password
+                sessionToken
             ).get(`/bookmarks/${profile.id}`)
 
             return response.data

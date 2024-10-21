@@ -38,7 +38,7 @@ import {
     indexPath
 } from "../constants/paths.js"
 import { useDispatch, useSelector } from "react-redux";
-import { userName, userProfile } from '../context/user.js';
+import { userName, userProfile, userSessionToken } from '../context/user.js';
 import apiInstance from "../instance/apiInstance.js"
 import { useNavigate } from "@tanstack/react-router"
 import { userActions } from '../context/user.js'
@@ -59,6 +59,7 @@ export default function NavigationResponsive() {
     const { colorMode, toggleColorMode } = useColorMode()
     const username = useSelector(userName)
     const profile = useSelector(userProfile)
+    const sessionToken = useSelector(userSessionToken)
     const navigate = useNavigate()
     const toast = useToast()
     const dispatch = useDispatch();
@@ -83,7 +84,7 @@ export default function NavigationResponsive() {
 
     const handleLogOut = async () => {
         try {
-            const response = await apiInstance().post("logout")
+            const response = await apiInstance(sessionToken).post(`auth/logout?sessionToken=${sessionToken}`)
 
             if (response.status === 200) {
 
@@ -208,7 +209,7 @@ export default function NavigationResponsive() {
                                 {/* <MenuItem>Account Settings</MenuItem> */}
                                 <MenuItem
                                     onClick={handleLogOut}
-                                >Logout</MenuItem>
+                                >Log out</MenuItem>
                             </MenuList>
                         </Menu>) : (
                             <>

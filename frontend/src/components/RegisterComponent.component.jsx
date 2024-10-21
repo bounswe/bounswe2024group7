@@ -13,7 +13,8 @@ import {
     Text,
     useColorModeValue,
     Link,
-    useToast
+    useToast,
+    Select,
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
@@ -26,12 +27,28 @@ import { useDispatch } from "react-redux";
 import { userActions, userProfile } from '../context/user.js'
 import Cookies from "js-cookie"
 
+const userRoles = [
+    {
+        value: "TRAINEE",
+        label: "Trainee"
+    },
+    {
+        value: "TRAINER",
+        label: "Trainer"
+    },
+    {
+        value: "DIETICIAN",
+        label: "Dietician"
+    }
+]
+
 export default function RegisterComponent() {
     const [showPassword, setShowPassword] = useState(false)
 
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [role, setRole] = useState("")
     const navigate = useNavigate()
     const toast = useToast()
     const dispatch = useDispatch();
@@ -39,11 +56,13 @@ export default function RegisterComponent() {
     const handleUserRegister = async () => {
         try {
             const response = await apiInstance().post(
-                "signup",
+                "auth/register",
                 {
                     username,
+                    fullName: username,
                     email,
-                    password
+                    password,
+                    role
                 }
             )
 
@@ -53,7 +72,7 @@ export default function RegisterComponent() {
                     userActions.login({
                         userName: username,
                         password: password,
-                        profile: response.data.profile
+                        // profile: response.data.profile
                     })
                 )
 
@@ -144,6 +163,28 @@ export default function RegisterComponent() {
                                     </Button>
                                 </InputRightElement>
                             </InputGroup>
+                        </FormControl>
+                        <FormControl id="role" isRequired>
+                            <FormLabel>Role</FormLabel>
+                            <Select
+                                placeholder="Select role"
+                                focusBorderColor='purple.500'
+                                onChange={
+                                    (e) => {
+                                        setRole(e.target.value)
+                                    }
+                                }
+                            >
+                                {
+                                    userRoles.map(
+                                        (role, index) => {
+                                            return (
+                                                <option key={index} value={role.value}>{role.label}</option>
+                                            )
+                                        }
+                                    )
+                                }
+                            </Select>
                         </FormControl>
                         <Stack spacing={10} pt={2}>
                             <Button
