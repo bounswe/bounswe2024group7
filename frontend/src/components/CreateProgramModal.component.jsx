@@ -31,12 +31,12 @@ import { useContext } from 'react'
 import { PostContext } from '../context/PostContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { muscleGroups, locationType, programTypes } from '../constants/program'
+import { UserContext } from '../context/UserContext'
 
 function CreateProgramModal({
     isOpen,
     onClose
 }) {
-    const profile = useSelector(userProfile)
     const password = useSelector(userPassword)
     const sessionToken = useSelector(userSessionToken)
 
@@ -50,6 +50,8 @@ function CreateProgramModal({
     const [exerciseSets, setExerciseSets] = useState('')
     const [exerciseReps, setExerciseReps] = useState('')
     const [exerciseMuscleGroup, setExerciseMuscleGroup] = useState('')
+
+    const { user } = useContext(UserContext)
 
     const {
         isOpen: isExerciseModalOpen,
@@ -140,7 +142,7 @@ function CreateProgramModal({
     const createProgramMutation = useMutation(
         {
             mutationFn: async () => {
-                if (!profile) {
+                if (!user) {
                     toast({
                         title: 'Not logged in.',
                         description: 'Please log in to create a post.',
