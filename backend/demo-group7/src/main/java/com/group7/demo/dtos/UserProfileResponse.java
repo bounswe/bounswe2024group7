@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -16,4 +17,5 @@ public class UserProfileResponse {
     private Role role;
     private Set<String> followers;
     private Set<String> following;
+    private List<PostResponse> posts;
 }
