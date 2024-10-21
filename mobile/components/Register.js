@@ -16,16 +16,17 @@ const Signup = ({ navigation })=>{
   
   const goLogin = () => navigation.navigate('Login');
 
-  const checkDatabase = async (username, email, password) => {
-    console.log({username, email, password});
+  const checkDatabase = async (username, email, password, role) => {
+    console.log({username, email, password, role});
     goHome();
-    /*try {
+    try {
         const response = await apiInstance().post(
             "signup",
             {
                 username,
                 email,
-                password
+                password,
+                role
             }
         )
 
@@ -43,14 +44,14 @@ const Signup = ({ navigation })=>{
         Toast.show({
           type: 'error',
           position: 'bottom',
-          text1: 'Login Error',
-          text2: 'There was an error while logging in. Please try again.',
+          text1: 'Register Error',
+          text2: 'There was an error while registering. Please try again.',
           visibilityTime: 2000,
           autoHide: true,
           topOffset: 30,
           bottomOffset: 40
         });
-    }*/
+    }
   };
 
   return (
@@ -77,7 +78,7 @@ const Signup = ({ navigation })=>{
       />
       <TouchableOpacity
         style={styles.button}
-        onPress={() => checkDatabase(username, email, password)}
+        onPress={() => checkDatabase(username, email, password, 'TRAINEE')}
       >
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
