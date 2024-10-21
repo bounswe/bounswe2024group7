@@ -18,14 +18,10 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
-        try {
-            User registeredUser = authenticationService.register(request);
-            // TODO: can create and return session token on signing up.
-            return ResponseEntity.status(HttpStatus.CREATED).body(null);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<String> register(@RequestBody RegisterRequest request) throws Exception {
+        User registeredUser = authenticationService.register(request);
+        // TODO: can create and return session token on signing up.
+        return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
     @PostMapping("/login")
