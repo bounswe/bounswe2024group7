@@ -52,5 +52,21 @@ services:
     env_file:
       - .env
 
+  mobile: # TODO: Check whether "build" is under the correct directory. 
+    build: ./mobile
+    image: mobile
+    container_name: mobile
+    volumes:
+      - ./mobile:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "8081:8081"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - springboot-app
+    env_file:
+      - .env
+
 volumes:
   postgres-data:
