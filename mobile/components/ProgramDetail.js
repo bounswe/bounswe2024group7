@@ -64,9 +64,9 @@ const ProgramDetail = ({ route }) => {
         onIndexChange={setIndex}
         initialLayout={{ width: Dimensions.get('window').width }}
         renderTabBar={(props) => {
-            const { key, ...rest } = props; // Destructure key and rest of props
-            return <TabBar key={key} {...rest} style={styles.tabBar} indicatorStyle={styles.indicator} />;
-          }}
+          const { key, ...rest } = props; // Destructure key and rest of props
+          return <TabBar {...rest} style={styles.tabBar} indicatorStyle={styles.indicator} />;
+        }}
       />
     </View>
   );

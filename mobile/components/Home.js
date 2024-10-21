@@ -17,8 +17,8 @@ const FeedPageContainer = () => (
 );
 
 const Home = ({ navigation }) => {
-  // const { isLoggedIn, logout } = useAuth();   // TODO: Uncomment this line after connecting with the DB
-  const isLoggedIn = true;  // TODO: Comment this line after connecting with the DB
+   const { isLoggedIn, logout } = useAuth();   // TODO: Uncomment this line after connecting with the DB
+  //const isLoggedIn = false;  // TODO: Comment this line after connecting with the DB
   const [selectedTab, setSelectedTab] = useState('Feed');
 
   return (
