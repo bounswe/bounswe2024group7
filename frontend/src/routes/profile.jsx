@@ -1,6 +1,7 @@
-import { createFileRoute, createRoute } from '@tanstack/react-router'
+import { createRoute } from '@tanstack/react-router'
 import ProfilePage from '../components/profilePage.component'
 import { rootRoute } from './__root'
+import { UserContextProvider } from '../context/UserContext'
 
 export const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -9,5 +10,9 @@ export const profileRoute = createRoute({
 })
 
 function Profile() {
-  return <ProfilePage />
+  return (
+    <UserContextProvider>
+      <ProfilePage />
+    </UserContextProvider>
+  )
 }
