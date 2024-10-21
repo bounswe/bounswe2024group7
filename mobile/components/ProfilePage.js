@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList } from 'react
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../AuthContext';
 import PostCard from './PostCard';
+import ProgramCard from './ProgramCard';
 
 const ProfilePage = () => {
   const navigation = useNavigation();
@@ -15,8 +16,8 @@ const ProfilePage = () => {
   ];
 
   const programs = [
-    { id: 1, title: 'Powerlifting Program', description: 'A 12-week strength program for powerlifting.', owner: 'john_doe', likeCount: 100 },
-    { id: 2, title: 'Hypertrophy Program', description: 'Gain muscle with this 6-week hypertrophy program.', owner: 'john_doe', likeCount: 85 },
+    { id: 1, title: 'Powerlifting Program', description: 'A 12-week strength program for powerlifting.', owner: 'john_doe', followCount: 100, location: 'outdoor', muscle_list: ['chest','shoulder'] },
+    { id: 2, title: 'Hypertrophy Program', description: 'Gain muscle with this 6-week hypertrophy program.', owner: 'john_doe', followCount: 85, location: 'gym',muscle_list: ['leg'] },
   ];
 
   const [isFollowing, setIsFollowing] = useState(false);
@@ -52,11 +53,13 @@ const ProfilePage = () => {
           data={programs}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <PostCard
+            <ProgramCard
               title={item.title}
               owner={item.owner}
               description={item.description}
-              likeCount={item.likeCount}
+              followCount={item.followCount}
+              location={item.location}
+              muscle_list={item.muscle_list}
               navigation={navigation}
             />
           )}
