@@ -33,42 +33,9 @@ export const PhaseContextProvider = ({ children }) => {
     } = useQuery({
         queryKey: ['posts'],
         queryFn: async () => {
-            const response = await apiInstance(sessionToken).get('/posts')
+            const response = await apiInstance().get('/api/posts/random')
 
-            if (!profile || !password) {
-                const emptyLikesAndComments = await Promise.all(response.data.map(async (post) => {
-                    return {
-                        ...post,
-                        likes: [],
-                        comments: [],
-                    }
-                }
-                ))
-
-                return emptyLikesAndComments
-            }
-
-
-            // Get the like_count and comments for each post
-            const data = await Promise.all(response.data.map(async (post) => {
-                const likesResponse = await apiInstance(
-                    sessionToken
-                ).get(`/posts/${post.id}/likes`)
-                const commentsResponse = await apiInstance(
-                    sessionToken
-                ).get(`/posts/${post.id}/comments`)
-
-                const likes = likesResponse.data
-                const comments = commentsResponse.data
-
-                return {
-                    ...post,
-                    likes: likes,
-                    comments: comments,
-                }
-            }))
-
-            return data
+            return response.data
         },
         refetchOnWindowFocus: false,
     })
