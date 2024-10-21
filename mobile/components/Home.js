@@ -18,7 +18,7 @@ const FeedPageContainer = () => (
 
 const Home = ({ navigation }) => {
   // const { isLoggedIn, logout } = useAuth();   // TODO: Uncomment this line after connecting with the DB
-  const isLoggedIn = false;  // TODO: Comment this line after connecting with the DB
+  const isLoggedIn = true;  // TODO: Comment this line after connecting with the DB
   const [selectedTab, setSelectedTab] = useState('Feed');
 
   return (
@@ -42,10 +42,10 @@ const Home = ({ navigation }) => {
       {isLoggedIn && (
         <View style={styles.appContainer}>
           <TabList selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-          <ScrollView style={styles.content}>
+          <View style={styles.content}>
             {selectedTab === 'Profile' && <ProfilePageContainer />}
             {selectedTab === 'Feed' && <FeedPageContainer />}
-          </ScrollView>
+          </View>
         </View>
       )}
     </View>

@@ -16,7 +16,7 @@ const Login = ({ navigation })=>{
 
   const checkDatabase = async (username, password) => {
     goHome();   // TODO: Open the comment after connecting the database. 
-    /* try {
+     try {
         const response = await apiInstance().post(
             "login",
             {
@@ -45,7 +45,7 @@ const Login = ({ navigation })=>{
           topOffset: 30,
           bottomOffset: 40
         });
-    } */
+    } 
   };
 
   return (
