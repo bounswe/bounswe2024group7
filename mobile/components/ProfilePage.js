@@ -6,8 +6,8 @@ import PostCard from './PostCard';
 
 const ProfilePage = () => {
   const navigation = useNavigation();
-  //const { user } = useAuth();
-  const user = "first";
+  const { user } = useAuth();
+
   // Mock data for posts
   const forumPosts = [
     { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', labels: ['forum', 'discussion'], likeCount: 20 },
@@ -20,9 +20,51 @@ const ProfilePage = () => {
   ];
 
   const [isFollowing, setIsFollowing] = useState(false);
+  const [selectedTab, setSelectedTab] = useState('forum'); // To track the selected tab
 
   const handleFollowToggle = () => {
     setIsFollowing(!isFollowing);
+  };
+
+  const renderPosts = () => {
+    if (selectedTab === 'forum') {
+      return (
+        <FlatList
+          data={forumPosts}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <PostCard
+              title={item.title}
+              owner={item.owner}
+              description={item.description}
+              labels={item.labels}
+              likeCount={item.likeCount}
+              navigation={navigation}
+            />
+          )}
+          style={styles.postList}
+          showsVerticalScrollIndicator={false}
+        />
+      );
+    } else if (selectedTab === 'programs') {
+      return (
+        <FlatList
+          data={programs}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <PostCard
+              title={item.title}
+              owner={item.owner}
+              description={item.description}
+              likeCount={item.likeCount}
+              navigation={navigation}
+            />
+          )}
+          style={styles.postList}
+          showsVerticalScrollIndicator={false}
+        />
+      );
+    }
   };
 
   return (
@@ -52,41 +94,26 @@ const ProfilePage = () => {
         </TouchableOpacity>
       </View>
 
-      {/* User posts */}
-      <Text style={styles.sectionTitle}>Forum Posts</Text>
-      <FlatList
-        data={forumPosts}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <PostCard
-            title={item.title}
-            owner={item.owner}
-            description={item.description}
-            labels={item.labels}
-            likeCount={item.likeCount}
-            navigation={navigation}
-          />
-        )}
-        style={styles.postList}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* Tabs for Forum Posts and Programs */}
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={[styles.tabItem, selectedTab === 'forum' && styles.activeTab]}
+          onPress={() => setSelectedTab('forum')}
+        >
+          <Text style={[styles.tabText, selectedTab === 'forum' && styles.activeTabText]}>Forum Posts</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabItem, selectedTab === 'programs' && styles.activeTab]}
+          onPress={() => setSelectedTab('programs')}
+        >
+          <Text style={[styles.tabText, selectedTab === 'programs' && styles.activeTabText]}>Programs</Text>
+        </TouchableOpacity>
+      </View>
 
-      <Text style={styles.sectionTitle}>Programs</Text>
-      <FlatList
-        data={programs}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <PostCard
-            title={item.title}
-            owner={item.owner}
-            description={item.description}
-            likeCount={item.likeCount}
-            navigation={navigation}
-          />
-        )}
-        style={styles.postList}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* Display content based on selected tab */}
+      <View style={styles.contentContainer}>
+        {renderPosts()}
+      </View>
     </View>
   );
 };
@@ -145,14 +172,35 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
   },
-  sectionTitle: {
-    fontSize: 18,
+  tabsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  tabItem: {
+    paddingVertical: 10,
+    flex: 1,
+    alignItems: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#007bff',
+  },
+  tabText: {
+    fontSize: 16,
+    color: 'gray',
+  },
+  activeTabText: {
+    color: '#007bff',
     fontWeight: 'bold',
-    marginVertical: 10,
-    alignSelf: 'flex-start',
+  },
+  contentContainer: {
+    flex: 1,
   },
   postList: {
-    marginBottom: 20,
+    marginTop: 10,
   },
 });
 
