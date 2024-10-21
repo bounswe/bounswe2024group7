@@ -3,6 +3,7 @@ package com.group7.demo.controllers;
 import com.group7.demo.dtos.TrainingProgramRequest;
 import com.group7.demo.dtos.TrainingProgramResponse;
 import com.group7.demo.services.TrainingProgramService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +20,14 @@ public class TrainingProgramController {
 
     // Endpoint to create a new training program
     @PostMapping
-    public ResponseEntity<TrainingProgramResponse> createTrainingProgram(@RequestBody TrainingProgramRequest request) {
-        TrainingProgramResponse createdProgram = trainingProgramService.createTrainingProgram(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProgram);
+    public ResponseEntity<TrainingProgramResponse> createTrainingProgram(@RequestBody TrainingProgramRequest trainingProgramRequest, HttpServletRequest request) throws IllegalAccessException {
+        try {
+            TrainingProgramResponse createdProgram = trainingProgramService.createTrainingProgram(trainingProgramRequest, request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdProgram);
+        } catch (IllegalAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
     }
 
     // Optional: Endpoint to fetch a list of training programs
@@ -40,8 +46,12 @@ public class TrainingProgramController {
 
     // Optional: Endpoint to delete a training program by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTrainingProgram(@PathVariable Long id) {
-        trainingProgramService.deleteTrainingProgram(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> deleteTrainingProgram(@PathVariable Long id, HttpServletRequest request) throws Exception {
+        try {
+            trainingProgramService.deleteTrainingProgram(id, request);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 }

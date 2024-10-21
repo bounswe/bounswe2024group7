@@ -8,16 +8,14 @@ import com.group7.demo.models.Exercise;
 import com.group7.demo.models.ExerciseDetail;
 import com.group7.demo.models.TrainingProgram;
 import com.group7.demo.models.User;
-import com.group7.demo.repository.ExerciseRepository;
 import com.group7.demo.repository.TrainingProgramRepository;
-import com.group7.demo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,26 +24,25 @@ public class TrainingProgramService {
 
     private final TrainingProgramRepository trainingProgramRepository;
 
-    private final UserRepository userRepository;
-
-    private final ExerciseRepository exerciseRepository;
+    private final AuthenticationService authenticationService;
     @Transactional
-    public TrainingProgramResponse createTrainingProgram(TrainingProgramRequest request) {
-        // Find the trainer by ID (you should have a Trainer/User repository)
-        User trainer = userRepository.findById(request.getTrainerId())
-                .orElseThrow(() -> new EntityNotFoundException("Trainer not found"));
+    public TrainingProgramResponse createTrainingProgram(TrainingProgramRequest trainingProgramRequest, HttpServletRequest request) throws IllegalAccessException {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+        if (!user.getRole().name().equals("TRAINER")) {
+            throw new IllegalAccessException("Only trainers can create training programs.");
+        }
 
         // Create the training program
         TrainingProgram trainingProgram = TrainingProgram.builder()
-                .title(request.getTitle())
-                .programType(request.getProgramType())
-                .locationType(request.getLocationType())
-                .description(request.getDescription())
-                .trainer(trainer)
+                .title(trainingProgramRequest.getTitle())
+                .programType(trainingProgramRequest.getProgramType())
+                .locationType(trainingProgramRequest.getLocationType())
+                .description(trainingProgramRequest.getDescription())
+                .trainer(user)
                 .build();
 
-        // Map exercises from request to entity
-        List<Exercise> exercises = request.getExercises().stream()
+        // Map exercises from trainingProgramRequest to entity
+        List<Exercise> exercises = trainingProgramRequest.getExercises().stream()
                 .map(exerciseRequest -> {
                     // Create exercise
                     Exercise exercise = Exercise.builder()
@@ -55,8 +52,8 @@ public class TrainingProgramService {
 
                     // Create exercise detail (assuming `ExerciseRequest` has `getSets()` and `getRepetitions()` methods)
                     ExerciseDetail exerciseDetail = ExerciseDetail.builder()
-                            .sets(exerciseRequest.getSets())  // Make sure this retrieves the sets from the request
-                            .repetitions(exerciseRequest.getRepetitions())  // Retrieves repetitions from the request
+                            .sets(exerciseRequest.getSets())  // Make sure this retrieves the sets from the trainingProgramRequest
+                            .repetitions(exerciseRequest.getRepetitions())  // Retrieves repetitions from the trainingProgramRequest
                             .exercise(exercise)
                             .build();
 
@@ -121,10 +118,15 @@ public class TrainingProgramService {
     }
 
     @Transactional
-    public void deleteTrainingProgram(Long id) {
+    public void deleteTrainingProgram(Long id, HttpServletRequest request) throws Exception {
         // Find the training program by ID, or throw an exception if not found
         TrainingProgram trainingProgram = trainingProgramRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Training program not found with id: " + id));
+
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+        if (!trainingProgram.getTrainer().equals(user)) {
+            throw new IllegalAccessException("You can't delete a program you don't own");
+        }
 
         // Delete the training program
         trainingProgramRepository.delete(trainingProgram);
