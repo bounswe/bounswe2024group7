@@ -52,5 +52,21 @@ services:
     env_file:
       - .env
 
+  mobile:  
+    build: ./mobile
+    image: mobile
+    container_name: mobile
+    volumes:
+      - ./mobile:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "${MOBILE_PORT}:${MOBILE_PORT}"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - springboot-app
+    env_file:
+      - .env
+
 volumes:
   postgres-data:
