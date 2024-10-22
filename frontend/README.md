@@ -52,19 +52,19 @@ Ensure you have the following installed:
 Before starting, you need to set up the necessary environment variables. Create a `.env` file at the root of your project and populate it with the following variables:
 
 ```plaintext
-# Django settings
-SECRET_KEY=your_secret_key
-DEBUG=true_or_false
-DJANGO_ALLOWED_HOSTS=comma_separated_list_of_hosts
-
-# MySQL settings
-MYSQL_ROOT_PASSWORD=your_mysql_root_password
-MYSQL_DATABASE=your_database_name
-MYSQL_USER=your_mysql_user
-MYSQL_PASSWORD=your_mysql_password
+# PostgreSQL settings
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=postgres
+POSTGRES_PORT=5432
 
 # Frontend Environment Variables
 VITE_API_URL="http://localhost:8080"
+
+VITE_PORT=3000
+SPRING_PORT=8080
+MOBILE_PORT=8081
+
 ENV=DEVELOPMENT
 ```
 
