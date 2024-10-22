@@ -68,11 +68,13 @@ export default function RegisterComponent() {
 
             if (response.status === 201) {
 
+                const token = response.data
+
                 dispatch(
                     userActions.login({
                         userName: username,
                         password: password,
-                        // profile: response.data.profile
+                        sessionToken: token
                     })
                 )
 
