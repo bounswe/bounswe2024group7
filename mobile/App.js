@@ -11,6 +11,8 @@ import ProfilePage from './components/ProfilePage';
 import PostDetail from './components/PostDetail'; // Import PostDetail
 import ProgramDetail from './components/ProgramDetail'; // Import ProgramDetail
 import UserProfile from './components/UserProfile';
+import NewHome from './components/NewHome';
+
 import { enableScreens } from 'react-native-screens';
 
 enableScreens();
