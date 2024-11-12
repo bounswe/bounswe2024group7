@@ -11,7 +11,6 @@ COPY src ./src
 
 RUN ./mvnw dependency:resolve
 
-# Step 2: Expose the port using environment variable
-EXPOSE $SPRING_PORT
+EXPOSE 8080
 
 CMD ["./mvnw", "spring-boot:run"]
