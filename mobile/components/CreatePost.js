@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
 
-const CreatePost = () => {
+const CreatePost = ({darkMode}) => {
+  const styles = darkMode? darkStyles : lightStyles;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [labels, setLabels] = useState([]);
@@ -36,6 +37,7 @@ const CreatePost = () => {
       <TextInput
         style={styles.input}
         placeholder="Title"
+        placeholderTextColor={'white'}
         value={title}
         onChangeText={setTitle}
       />
@@ -43,6 +45,7 @@ const CreatePost = () => {
       <TextInput
         style={[styles.input, styles.descriptionInput]}
         placeholder="Description"
+        placeholderTextColor={'white'}
         multiline
         value={description}
         onChangeText={setDescription}
@@ -52,6 +55,7 @@ const CreatePost = () => {
         <TextInput
           style={styles.input}
           placeholder="Add Label"
+          placeholderTextColor={'white'}
           value={labelText}
           onChangeText={setLabelText}
         />
@@ -63,7 +67,7 @@ const CreatePost = () => {
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <View style={styles.labelItem}>
-            <Text>{item}</Text>
+            <Text style={styles.labelItemText}>{item}</Text>
             <TouchableOpacity onPress={() => removeLabel(index)}>
               <Text style={styles.removeLabel}>Remove</Text>
             </TouchableOpacity>
@@ -76,7 +80,7 @@ const CreatePost = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const lightStyles = StyleSheet.create({
   container: {
     padding: 20,
   },
@@ -107,6 +111,62 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 5,
+  },
+  labelItemText: {
+    fontSize: 14,
+    fontWeight:'bold',
+    fontFamily: 'sans-serif'
+  },
+  removeLabel: {
+    color: 'red',
+    marginLeft: 10,
+  },
+});
+
+const darkStyles = StyleSheet.create({
+  container: {
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color:'white',
+    marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: '#ddd',
+    color: 'white',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    placeholderTextColor: 'white'
+  },
+  descriptionInput: {
+    height: 100,
+    textAlignVertical: 'top',
+    borderColor: '#ddd',
+    color: 'white',
+    placeholderTextColor: 'white'
+  },
+  labelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  labelItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 5,
+    color:'white'
+  },
+  labelItemText: {
+    fontSize: 14,
+    color:'white',
+    fontFamily: 'sans-serif',
+    fontWeight:'bold'
   },
   removeLabel: {
     color: 'red',
