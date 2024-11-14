@@ -4,6 +4,9 @@ import { useAuth } from '../AuthContext';
 import ProfilePage from './ProfilePage';
 import Feed from './Feed';
 import CreatePost from './CreatePost';
+import CreateProgram from './CreateProgram';
+import Create from './Create';
+
 
 
 const Home = ({ navigation }) => {
@@ -106,18 +109,23 @@ const Home = ({ navigation }) => {
           <View style={currentStyles.content}>
             {selectedPage === 'Profile' && <ProfilePageContainer />}
             {selectedPage === 'Feed' && <FeedPageContainer />}
+            {selectedPage === 'Create' && <Create darkMode={darkMode} />}
           </View>
 
-          {/* Floating "Create Post" Button */}
-          {selectedPage !== 'CreatePost' && <TouchableOpacity
-            style={currentStyles.createPostButton}
-            onPress={() => setSelectedPage('CreatePost')}
-          >
-            <Text style={currentStyles.createPostButtonText}>+</Text>
-          </TouchableOpacity>}
+          {/* Floating "Create" Button */}
+          {selectedPage !== 'Create' && (
+            <TouchableOpacity
+              style={currentStyles.createPostButton}
+              onPress={() => setSelectedPage('Create')}
+            >
+              <Text style={currentStyles.createPostButtonText}>+</Text>
+            </TouchableOpacity>
+          )}
 
           {/* Display CreatePost component if selected */}
-          {selectedPage === 'CreatePost' && <CreatePost darkMode = {darkMode}/>}
+          {/*selectedPage === 'CreatePost' && <CreatePost darkMode = {darkMode}/>*/
+          //selectedPage === 'CreatePost' && <CreateProgram darkMode = {darkMode}/>
+          }
         </View>
       )}
     </View>

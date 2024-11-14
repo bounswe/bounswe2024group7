@@ -1,33 +1,28 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
 
-const CreatePost = ({darkMode}) => {
-  const styles = darkMode? darkStyles : lightStyles;
+const CreatePost = ({ darkMode }) => {
+  const styles = darkMode ? darkStyles : lightStyles;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [labels, setLabels] = useState([]);
-  const [labelText, setLabelText] = useState(''); // Single label input
+  const [labelText, setLabelText] = useState('');
 
   const handlePost = () => {
-    // Handle post creation logic here, including sending data to the server
-    const newPost = {
-      title,
-      description,
-      labels,
-    };
+    const newPost = { title, description, labels };
     console.log('Creating post:', newPost);
-    // ... your logic to send the data to the server
+    // Add your logic to handle post submission
   };
 
   const addLabel = () => {
     if (labelText.trim()) {
-      setLabels([...labels, labelText.trim()]); // Add new label to labels array
-      setLabelText(''); // Clear label input after adding
+      setLabels([...labels, labelText.trim()]);
+      setLabelText('');
     }
   };
 
   const removeLabel = (index) => {
-    setLabels(labels.filter((_, i) => i !== index)); // Remove label by index
+    setLabels(labels.filter((_, i) => i !== index));
   };
 
   return (
@@ -37,7 +32,7 @@ const CreatePost = ({darkMode}) => {
       <TextInput
         style={styles.input}
         placeholder="Title"
-        placeholderTextColor={'white'}
+        placeholderTextColor={styles.placeholderColor}
         value={title}
         onChangeText={setTitle}
       />
@@ -45,7 +40,7 @@ const CreatePost = ({darkMode}) => {
       <TextInput
         style={[styles.input, styles.descriptionInput]}
         placeholder="Description"
-        placeholderTextColor={'white'}
+        placeholderTextColor={styles.placeholderColor}
         multiline
         value={description}
         onChangeText={setDescription}
@@ -53,13 +48,15 @@ const CreatePost = ({darkMode}) => {
 
       <View style={styles.labelContainer}>
         <TextInput
-          style={styles.input}
+          style={styles.labelInput}
           placeholder="Add Label"
-          placeholderTextColor={'white'}
+          placeholderTextColor={styles.placeholderColor}
           value={labelText}
           onChangeText={setLabelText}
         />
-        <Button title="Add Label" onPress={addLabel} />
+        <TouchableOpacity style={styles.addButton} onPress={addLabel}>
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -69,32 +66,46 @@ const CreatePost = ({darkMode}) => {
           <View style={styles.labelItem}>
             <Text style={styles.labelItemText}>{item}</Text>
             <TouchableOpacity onPress={() => removeLabel(index)}>
-              <Text style={styles.removeLabel}>Remove</Text>
+              <Text style={styles.removeLabel}>✕</Text>
             </TouchableOpacity>
           </View>
         )}
+        horizontal
+        showsHorizontalScrollIndicator={false}
       />
 
-      <Button title="Post" onPress={handlePost} />
+      <TouchableOpacity style={styles.postButton} onPress={handlePost}>
+        <Text style={styles.postButtonText}>Post</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
+// Light Mode Styles
 const lightStyles = StyleSheet.create({
   container: {
     padding: 20,
+    backgroundColor: '#f5f5f5',
+    flex: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#333',
+    marginBottom: 15,
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    paddingHorizontal: 10,
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 15,
     marginBottom: 10,
+    fontSize: 16,
+    color: '#333',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   descriptionInput: {
     height: 100,
@@ -103,75 +114,121 @@ const lightStyles = StyleSheet.create({
   labelContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     marginBottom: 10,
+  },
+  labelInput: {
+    flex: 1,
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  addButton: {
+    marginLeft: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#007bff',
+    borderRadius: 10,
+    elevation: 3,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   labelItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#e0e0e0',
+    paddingHorizontal: 10,
     paddingVertical: 5,
+    borderRadius: 15,
+    marginRight: 5,
   },
   labelItemText: {
     fontSize: 14,
-    fontWeight:'bold',
-    fontFamily: 'sans-serif'
+    color: '#333',
   },
   removeLabel: {
-    color: 'red',
-    marginLeft: 10,
+    color: '#ff3b30',
+    marginLeft: 5,
+    fontWeight: 'bold',
   },
+  postButton: {
+    backgroundColor: '#007bff',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+    shadowColor: '#007bff',
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  postButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  placeholderColor: 'gray',
 });
 
+// Dark Mode Styles
 const darkStyles = StyleSheet.create({
+  ...lightStyles,
   container: {
-    padding: 20,
+    ...lightStyles.container,
+    backgroundColor: '#121212',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color:'white',
-    marginBottom: 20,
+    ...lightStyles.title,
+    color: '#fff',
   },
   input: {
-    height: 40,
-    borderColor: '#ddd',
-    color: 'white',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    placeholderTextColor: 'white'
+    ...lightStyles.input,
+    backgroundColor: '#1e1e1e',
+    color: '#fff',
   },
   descriptionInput: {
-    height: 100,
-    textAlignVertical: 'top',
-    borderColor: '#ddd',
-    color: 'white',
-    placeholderTextColor: 'white'
+    ...lightStyles.descriptionInput,
+    backgroundColor: '#1e1e1e',
+    color: '#fff',
   },
-  labelContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
+  labelInput: {
+    ...lightStyles.labelInput,
+    backgroundColor: '#1e1e1e',
+    color: '#fff',
+  },
+  addButton: {
+    ...lightStyles.addButton,
+    backgroundColor: '#ff4081',
+  },
+  addButtonText: {
+    ...lightStyles.addButtonText,
+    color: '#fff',
   },
   labelItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 5,
-    color:'white'
+    ...lightStyles.labelItem,
+    backgroundColor: '#333',
   },
   labelItemText: {
-    fontSize: 14,
-    color:'white',
-    fontFamily: 'sans-serif',
-    fontWeight:'bold'
+    ...lightStyles.labelItemText,
+    color: '#fff',
   },
-  removeLabel: {
-    color: 'red',
-    marginLeft: 10,
+  postButton: {
+    ...lightStyles.postButton,
+    backgroundColor: '#ff4081',
+    shadowColor: '#ff4081',
   },
+  postButtonText: {
+    ...lightStyles.postButtonText,
+    color: '#fff',
+  },
+  placeholderColor: 'lightgray',
 });
 
 export default CreatePost;
