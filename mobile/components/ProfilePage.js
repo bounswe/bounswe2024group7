@@ -12,8 +12,8 @@ const ProfilePage = ({ darkMode }) => {
 
   // Mock data for posts
   const forumPosts = [
-    { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', labels: ['forum', 'discussion'], likeCount: 20 },
-    { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: 'john_doe', labels: ['forum', 'diet'], likeCount: 15 },
+    { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', date: '14.11.2024',commentCount: 2, labels: ['forum', 'discussion'], likeCount: 20 },
+    { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: 'jane_doe', labels: ['forum', 'diet'], date: '13.11.2024',commentCount: 1, likeCount: 15 },
   ];
 
   const programs = [
