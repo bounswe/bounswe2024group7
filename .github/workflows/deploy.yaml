@@ -62,7 +62,7 @@ jobs:
       # Login to DigitalOcean Droplet and trigger deployment updates
       - name: Deploy to DigitalOcean
         run: |
-          sshpass -p "${{ secrets.DO_SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@${{ secrets.DO_REMOTE }} << EOF
+          sshpass -p "${{ $DO_SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@${{ $DO_REMOTE }} << EOF
             echo "Updating backend and frontend deployments"
             kubectl set image deployment/frontend frontend=cmpe451group7/frontend:${{ github.sha }} --namespace=default
             kubectl set image deployment/backend backend=cmpe451group7/backend:${{ github.sha }} --namespace=default
