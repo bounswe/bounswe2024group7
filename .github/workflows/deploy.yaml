@@ -62,12 +62,12 @@ jobs:
       # Login to DigitalOcean Droplet and trigger deployment updates
       - name: Deploy to DigitalOcean
         run: |
-          sshpass -p "$DO_SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@$DO_REMOTE << EOF
-            echo "Updating backend and frontend deployments"
-            kubectl set image deployment/frontend frontend=cmpe451group7/frontend:${{ github.sha }} --namespace=default
-            kubectl set image deployment/backend backend=cmpe451group7/backend:${{ github.sha }} --namespace=default
-            kubectl rollout status deployment/frontend --timeout=5m --namespace=default
-            kubectl rollout status deployment/backend --timeout=5m --namespace=default
+          sshpass -p "$DO_SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@$DO_REMOTE <<EOF
+          echo "Updating backend and frontend deployments"
+          kubectl set image deployment/frontend frontend=cmpe451group7/frontend:b627a16df72e654b1fc3a66b50ff9cd917a3a774 --namespace=default
+          kubectl set image deployment/backend backend=cmpe451group7/backend:b627a16df72e654b1fc3a66b50ff9cd917a3a774 --namespace=default
+          kubectl rollout status deployment/frontend --timeout=5m --namespace=default
+          kubectl rollout status deployment/backend --timeout=5m --namespace=default
           EOF
 
       # Sleep before checking pod status
