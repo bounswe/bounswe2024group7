@@ -59,6 +59,7 @@ jobs:
           docker push cmpe451group7/backend:$BACKEND_IMAGE_TAG
           docker push cmpe451group7/backend:latest
 
+      #
       # Login to DigitalOcean Droplet and trigger deployment updates
       - name: Deploy to DigitalOcean
         run: |
