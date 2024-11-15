@@ -1,43 +1,105 @@
-name: Deploy to DigitalOcean Droplet
+name: Deploy Dev to Docker Hub and DigitalOcean
 
 on:
   push:
     branches:
-      - main
+      - k8s-branch
+
+
+env:
+#  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+#  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+#  DO_SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
+#  DO_REMOTE: ${{ secrets.DO_REMOTE }}
+# pw of  droplet2: busNF?6Hqx=x#7N
+
+  DOCKER_USERNAME: cmpe451group7
+  DOCKER_PASSWORD: Suzanuskudarli451
+  DO_SSH_PASSWORD: dop_v1_32046525c349ded0c2e69fabe229d4d9f803765110080040e7177d59732bd9dd
+  DO_REMOTE: 144.126.246.157
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the code
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Log in to DigitalOcean Registry
-        run: echo "dop_v1_32046525c349ded0c2e69fabe229d4d9f803765110080040e7177d59732bd9dd" | docker login registry.digitalocean.com -u samet@leext.com --password-stdin
+      # Log in to Docker Hub
+      - name: Docker Hub login
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-      # Step 3: Build and push frontend Docker image
+      # Build the frontend image
       - name: Build frontend Docker image
-        run: docker build -t registry.digitalocean.com/group7-droplet/frontend ./frontend
+        run: |
+          FRONTEND_IMAGE_TAG=${{ github.sha }}
+          docker build -t cmpe451group7/frontend:$FRONTEND_IMAGE_TAG ./frontend
+          docker tag cmpe451group7/frontend:${{ github.sha }} cmpe451group7/frontend:latest
 
-      - name: Push frontend Docker image
-        run: docker push registry.digitalocean.com/group7-droplet/frontend
-
-      # Step 4: Build and push backend Docker image
+      # Build the backend image
       - name: Build backend Docker image
-        run: docker build -t registry.digitalocean.com/group7-droplet/backend ./backend/demo-group7
+        run: |
+          BACKEND_IMAGE_TAG=${{ github.sha }}
+          docker build -t cmpe451group7/backend:$BACKEND_IMAGE_TAG ./backend/demo-group7
+          docker tag cmpe451group7/backend:${{ github.sha }} cmpe451group7/backend:latest
 
+      # Push the frontend image to Docker Hub
+      - name: Push frontend Docker image
+        run: |
+          FRONTEND_IMAGE_TAG=${{ github.sha }}
+          docker push cmpe451group7/frontend:$FRONTEND_IMAGE_TAG
+          docker push cmpe451group7/frontend:latest
+
+      # Push the backend image to Docker Hub
       - name: Push backend Docker image
-        run: docker push registry.digitalocean.com/group7-droplet/backend
+        run: |
+          BACKEND_IMAGE_TAG=${{ github.sha }}
+          docker push cmpe451group7/backend:$BACKEND_IMAGE_TAG
+          docker push cmpe451group7/backend:latest
 
-      # Step 5: Deploy to Droplet
-      - name: Deploy to DigitalOcean Droplet
-        uses: appleboy/ssh-action@master
-        with:
-          host: 64.226.89.57
-          username: root
-          password: dop_v1_32046525c349ded0c2e69fabe229d4d9f803765110080040e7177d59732bd9dd
-          script: |
-            docker pull registry.digitalocean.com/group7-droplet/frontend
-            docker pull registry.digitalocean.com/group7-droplet/backend
-            docker-compose -f . up -d --build
+      # Login to DigitalOcean Droplet and trigger deployment updates
+      - name: Deploy to DigitalOcean
+        run: |
+          sshpass -p "${{ secrets.DO_SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@${{ secrets.DO_REMOTE }} << EOF
+            echo "Updating backend and frontend deployments"
+            kubectl set image deployment/frontend frontend=cmpe451group7/frontend:${{ github.sha }} --namespace=default
+            kubectl set image deployment/backend backend=cmpe451group7/backend:${{ github.sha }} --namespace=default
+            kubectl rollout status deployment/frontend --timeout=5m --namespace=default
+            kubectl rollout status deployment/backend --timeout=5m --namespace=default
+          EOF
+
+      # Sleep before checking pod status
+#      - name: Sleep before checking pod status
+#        run: sleep 30
+
+      # Check the status of the frontend pods
+#      - name: Check frontend pod status
+#        run: |
+#          sshpass -p "${{ secrets.DO_SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@${{ secrets.DO_REMOTE }} << EOF
+#            echo "Checking the status of the frontend pods:"
+#            FRONTEND_WAITING_REASONS=\$(kubectl get pods -l app=frontend --namespace=default -o jsonpath='{.items[*].status.containerStatuses[*].state.waiting.reason}')
+#            if [ -z "\$FRONTEND_WAITING_REASONS" ]; then
+#              echo "All frontend pods are running successfully. No containers are waiting."
+#            else
+#              echo "Error: Some frontend pods are not running successfully."
+#              echo "Waiting reasons for frontend pods: \$FRONTEND_WAITING_REASONS"
+#              exit 1
+#            fi
+#          EOF
+
+#      # Check the status of the backend pods
+#      - name: Check backend pod status
+#        run: |
+#          sshpass -p "${{ secrets.DO_SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@${{ secrets.DO_REMOTE }} << EOF
+#            echo "Checking the status of the backend pods:"
+#            BACKEND_WAITING_REASONS=\$(kubectl get pods -l app=backend --namespace=default -o jsonpath='{.items[*].status.containerStatuses[*].state.waiting.reason}')
+#            if [ -z "\$BACKEND_WAITING_REASONS" ]; then
+#              echo "All backend pods are running successfully. No containers are waiting."
+#            else
+#              echo "Error: Some backend pods are not running successfully."
+#              echo "Waiting reasons for backend pods: \$BACKEND_WAITING_REASONS"
+#              exit 1
+#            fi
+#          EOF
