@@ -8,6 +8,7 @@ import { rootRoute } from "./routes/__root"
 import { indexRoute } from './routes/index'
 import { loginRoute } from './routes/login'
 import { profileRoute } from './routes/profile'
+import { programRoute } from './routes/program'
 import React from 'react'
 import { registerRoute } from './routes/register'
 import {
@@ -21,7 +22,8 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   registerRoute,
-  profileRoute
+  profileRoute,
+  programRoute,
 ])
 
 const router = createRouter({ routeTree })

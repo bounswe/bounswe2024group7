@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as RegisterImport } from './routes/register'
+import { Route as ProgramImport } from './routes/program'
 import { Route as ProfileImport } from './routes/profile'
 import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
@@ -21,6 +22,12 @@ import { Route as IndexImport } from './routes/index'
 const RegisterRoute = RegisterImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProgramRoute = ProgramImport.update({
+  id: '/program',
+  path: '/program',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,6 +74,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileImport
       parentRoute: typeof rootRoute
     }
+    '/program': {
+      id: '/program'
+      path: '/program'
+      fullPath: '/program'
+      preLoaderRoute: typeof ProgramImport
+      parentRoute: typeof rootRoute
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -83,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/program': typeof ProgramRoute
   '/register': typeof RegisterRoute
 }
 
@@ -90,6 +105,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/program': typeof ProgramRoute
   '/register': typeof RegisterRoute
 }
 
@@ -98,15 +114,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/program': typeof ProgramRoute
   '/register': typeof RegisterRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/profile' | '/register'
+  fullPaths: '/' | '/login' | '/profile' | '/program' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/profile' | '/register'
-  id: '__root__' | '/' | '/login' | '/profile' | '/register'
+  to: '/' | '/login' | '/profile' | '/program' | '/register'
+  id: '__root__' | '/' | '/login' | '/profile' | '/program' | '/register'
   fileRoutesById: FileRoutesById
 }
 
@@ -114,6 +131,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
+  ProgramRoute: typeof ProgramRoute
   RegisterRoute: typeof RegisterRoute
 }
 
@@ -121,6 +139,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
+  ProgramRoute: ProgramRoute,
   RegisterRoute: RegisterRoute,
 }
 
@@ -139,6 +158,7 @@ export const routeTree = rootRoute
         "/",
         "/login",
         "/profile",
+        "/program",
         "/register"
       ]
     },
@@ -150,6 +170,9 @@ export const routeTree = rootRoute
     },
     "/profile": {
       "filePath": "profile.jsx"
+    },
+    "/program": {
+      "filePath": "program.jsx"
     },
     "/register": {
       "filePath": "register.jsx"
