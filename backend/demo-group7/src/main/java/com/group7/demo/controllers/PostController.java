@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 @RestController
@@ -66,6 +67,11 @@ public class PostController {
             @RequestParam(defaultValue = "10") int count) {
         List<PostResponse> randomPosts = postService.getRandomPosts(count);
         return ResponseEntity.ok(randomPosts);
+    }
+
+    @GetMapping("/test-cicd")
+    public ResponseEntity<String> testCiCdPipeline() {
+        return ResponseEntity.ok("CI/CD Pipeline is working fine!");
     }
 
 }
