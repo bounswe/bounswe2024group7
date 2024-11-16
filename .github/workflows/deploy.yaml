@@ -13,10 +13,14 @@ env:
 #  DO_REMOTE: ${{ secrets.DO_REMOTE }}
 # pw of  droplet2: busNF?6Hqx=x#7N
 
-  DOCKER_USERNAME: cmpe451group7
-  DOCKER_PASSWORD: Suzanuskudarli451
-  DO_SSH_PASSWORD: dop_v1_32046525c349ded0c2e69fabe229d4d9f803765110080040e7177d59732bd9dd
-  DO_REMOTE: 144.126.246.157
+#  DOCKER_USERNAME: cmpe451group7
+#  DOCKER_PASSWORD: Suzanuskudarli451
+#  DO_SSH_PASSWORD: dop_v1_32046525c349ded0c2e69fabe229d4d9f803765110080040e7177d59732bd9dd
+#  DO_REMOTE: 144.126.246.157
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  DO_SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
+  DO_REMOTE: ${{ secrets.DO_REMOTE }}
 
 jobs:
   build-and-deploy:
@@ -63,7 +67,7 @@ jobs:
       # Login to DigitalOcean Droplet and trigger deployment updates
       - name: Deploy to DigitalOcean
         run: |
-          sshpass -p "$DO_SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@$DO_REMOTE << EOF
+          sshpass -p "${{ secrets.DO_SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no root@${{ secrets.DO_REMOTE }} << EOF
             echo "Updating backend and frontend deployments"
             kubectl set image deployment/frontend frontend=cmpe451group7/frontend:${{ github.sha }} --namespace=default
             kubectl set image deployment/backend backend=cmpe451group7/backend:${{ github.sha }} --namespace=default
