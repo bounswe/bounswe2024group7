@@ -70,7 +70,6 @@ jobs:
             kubectl rollout status deployment/frontend --timeout=5m --namespace=default
             kubectl rollout status deployment/backend --timeout=5m --namespace=default
           EOF
-
       # Sleep before checking pod status
 #      - name: Sleep before checking pod status
 #        run: sleep 30
