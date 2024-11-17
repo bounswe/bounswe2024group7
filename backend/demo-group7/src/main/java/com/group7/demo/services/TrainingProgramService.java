@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,9 +84,11 @@ public class TrainingProgramService {
                 .exercises(program.getExercises().stream()
                         .map(this::mapToExerciseResponse)
                         .collect(Collectors.toList()))
-                .participants(program.getParticipants().stream()
-                        .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
-                        .collect(Collectors.toList()))
+                .participants(program.getParticipants() == null ?
+                        List.of() :
+                        program.getParticipants().stream()
+                                .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
+                                .collect(Collectors.toList()))
                 .build();
     }
 
@@ -119,6 +120,7 @@ public class TrainingProgramService {
         return mapToTrainingProgramResponse(trainingProgram);
     }
 
+    @Transactional
     public List<TrainingProgramResponse> getTrainingProgramByTrainer(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
