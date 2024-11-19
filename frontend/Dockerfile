@@ -17,7 +17,8 @@ RUN npm install
 EXPOSE 3000
 
 # Define environment variable
-ENV NODE_ENV=development
+#ENV NODE_ENV=development
+ENV REACT_APP_API_BASE_URL=http://localhost:30002
 
 # Run the app when the container launches
 CMD ["npm", "run", "dev"]
