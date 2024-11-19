@@ -1,107 +1,111 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { useDispatch } from 'react-redux';
-import apiInstance from './Api'; 
+import Icon from 'react-native-vector-icons/FontAwesome5'; // Import search icon from react-native-vector-icons
+import apiInstance from '../Api';
 
-function SearchBar({ screen, setSearchResults, setLoading, loading }) {
-    const dispatch = useDispatch();
-    
-    const [searchQuery, setSearchQuery] = useState('');
+function SearchBar({ screen, setResults, setLoading, loading }) {
+  const [searchQuery, setSearchQuery] = useState('');
 
-    const handleSearch = async (val) => {
-        try {
-            const response = await apiInstance().post("search", {
-                query: val
-            })
-    
-            if (response.status === 200) {
-    
-                const data = await response.data
-    
-                console.log(data)
-                setResults(data)
-                setSearchText("")
-            }
-        } catch (e) {
-            console.log(e)
-            Toast.show({
-              type: 'error',
-              position: 'bottom',
-              text1: 'Search Error',
-              text2: 'There was an error while searching. Please try again.',
-              visibilityTime: 2000,
-              autoHide: true,
-              topOffset: 30,
-              bottomOffset: 40
-            });
-        }
-        
-      };
+  const handleSearch = async (val) => {
+    if (!val.trim()) {
+      Toast.show({
+        type: 'info',
+        position: 'bottom',
+        text1: 'Empty Search Query',
+        text2: 'Please enter a search term.',
+        visibilityTime: 2000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40,
+      });
+      return;
+    }
 
-    const flexStyleObject = screen === 'mobile' ? { flexDirection: 'row' } : { flexDirection: 'column' };
+    /*try {
+      setLoading(true);
+      const response = await apiInstance().post('search', {
+        query: val,
+      });
 
-    return (
-        <View style={[styles.searchContainer, flexStyleObject]}>
-            <View style={styles.inputGroup}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Discover the world of fitness..."
-                    value={searchQuery}
-                    onChangeText={(text) => setSearchQuery(text)}
-                />
-                <TouchableOpacity
-                    style={[styles.searchButton, { opacity: loading || !searchQuery ? 0.5 : 1 }]}
-                    onPress={handleSearch}
-                    disabled={loading || !searchQuery}
-                >
-                    {loading ? (
-                        <ActivityIndicator size="small" color="purple" />
-                    ) : (
-                        <Text style={styles.searchButtonText}>Search</Text>
-                    )}
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
+      if (response.status === 200) {
+        const data = response.data;
+        console.log(data);
+        setResults(data);
+        setSearchQuery('');
+      }
+    } catch (e) {
+      console.error(e);
+      Toast.show({
+        type: 'error',
+        position: 'bottom',
+        text1: 'Search Error',
+        text2: 'There was an error while searching. Please try again.',
+        visibilityTime: 2000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40,
+      });
+    } finally {
+      setLoading(false);
+
+  };*/
+  };
+
+  return (
+    <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder="Search here..."
+        placeholderTextColor="#A9A9A9"
+        value={searchQuery}
+        onChangeText={(text) => setSearchQuery(text)}
+      />
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => handleSearch(searchQuery)}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color="#FFFFFF" />
+        ) : (
+          <Icon name="search" size={20} color="#FFFFFF" /> // Search icon
+        )}
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    searchContainer: {
-        padding: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    inputGroup: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        width: '90%', 
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        paddingLeft: 8,
-    },
-    input: {
-        flex: 1,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        fontSize: 16,
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    searchButton: {
-        backgroundColor: 'purple',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    searchButtonText: {
-        color: 'white',
-        fontSize: 16,
-    },
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent:'space-between',
+    marginVertical: 10,
+    marginHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: '#F8F8F8',
+    padding: 6,
+  },
+  input: {
+    flex: 1,
+    color: '#333',
+    fontSize: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderColor: '#DDDDDD',
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+  },
+  button: {
+    marginLeft: 8,
+    backgroundColor: '#6B46C1', // Purple button to match your website
+    padding: 12,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default SearchBar;
