@@ -1,18 +1,12 @@
 package com.group7.demo.models;
-import com.group7.demo.models.enums.MuscleGroup;
+import com.group7.demo.models.enums.BodyPart;
+import com.group7.demo.models.enums.Equipment;
+import com.group7.demo.models.enums.TargetMuscle;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -26,15 +20,26 @@ public class Exercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String name;  // Name of the exercise
+    private String name;
+
+    private String gifUrl;
 
     @Enumerated(EnumType.STRING)
-    private MuscleGroup muscleGroup;  // Targeted muscle group
+    private BodyPart bodyPart;
 
-    @OneToOne(mappedBy = "exercise", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private ExerciseDetail exerciseDetail;  // Link to the sets and repetitions
+    @Enumerated(EnumType.STRING)
+    private TargetMuscle targetMuscle;
 
-    @ManyToMany(mappedBy = "exercises", fetch = FetchType.LAZY)
-    private List<TrainingProgram> trainingPrograms = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    private Equipment equipment;
+
+    @ElementCollection
+    @CollectionTable(name = "exercise_instructions", joinColumns = @JoinColumn(name = "exercise_id"))
+    @Column(name = "instruction")
+    private List<String> instructions;
+
+    @ElementCollection(targetClass = TargetMuscle.class)
+    @CollectionTable(name = "exercise_secondary_muscles", joinColumns = @JoinColumn(name = "exercise_id"))
+    @Enumerated(EnumType.STRING)
+    private List<TargetMuscle> secondaryMuscles;
 }

@@ -3,6 +3,7 @@ package com.group7.demo.configs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -32,7 +33,15 @@ public class SecurityConfiguration {
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS configuration
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/auth/register", "/auth/login").permitAll() // Allow registration and login without authentication
-                    .requestMatchers("GET", "/api/user/{username}", "/api/user/{username}/followers", "/api/user/{username}/following", "/api/posts/random", "api/training-programs").permitAll()
+                    .requestMatchers(
+                            HttpMethod.GET,
+                            "/api/user/{username}",
+                            "/api/user/{username}/followers",
+                            "/api/user/{username}/following",
+                            "/api/posts/**",
+                            "api/training-programs/**",
+                            "api/exercises/**"
+                    ).permitAll()
                     .anyRequest().authenticated() // All other requests require authentication
             )
             .sessionManagement(session -> session
