@@ -10,6 +10,7 @@ import SearchResults from './SearchResults';
 
 
 
+
 const Home = ({ navigation }) => {
   const { isLoggedIn, logout } = useAuth();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -36,6 +37,7 @@ const Home = ({ navigation }) => {
         <SearchResults/>
       </View>
     );
+
   // Apply styles based on dark mode
 
   return (
@@ -103,6 +105,7 @@ const Home = ({ navigation }) => {
                   <Text style={currentStyles.profileMenuItemText}>Feed</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+
                                   style={currentStyles.profileMenuItem}
                                   onPress={() => {
                                     setSelectedPage('Search');
@@ -112,6 +115,7 @@ const Home = ({ navigation }) => {
                 <Text style={currentStyles.profileMenuItemText}>Search</Text>
                                 </TouchableOpacity>
                 <TouchableOpacity
+
                   style={currentStyles.profileMenuItem}
                   onPress={logout}
                 >
@@ -126,6 +130,7 @@ const Home = ({ navigation }) => {
             {selectedPage === 'Profile' && <ProfilePageContainer />}
             {selectedPage === 'Feed' && <FeedPageContainer />}
             {selectedPage === 'Search' && <SearchPageContainer />}
+
             {selectedPage === 'Create' && <Create darkMode={darkMode} />}
           </View>
 
@@ -176,6 +181,7 @@ const lightStyles = StyleSheet.create({
     backgroundColor: '#4F46E5',
     width: '80%',
     height: 40,
+
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
@@ -185,11 +191,23 @@ const lightStyles = StyleSheet.create({
     backgroundColor: '#E5E7EB',
     width: '80%',
     height: 40,
+
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
     borderRadius: 5,
   },
+
+  buttonSecondary: {
+    backgroundColor: '#E5E7EB',
+    width: '80%',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    borderRadius: 5,
+  },
+
   buttonText: {
     color: '#fff',
     fontSize: 18,

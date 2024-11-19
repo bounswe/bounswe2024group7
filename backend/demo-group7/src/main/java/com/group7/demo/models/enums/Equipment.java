@@ -1,0 +1,32 @@
+package com.group7.demo.models.enums;
+
+public enum Equipment {
+    ASSISTED,
+    BAND,
+    BARBELL,
+    BODY_WEIGHT,
+    BOSU_BALL,
+    CABLE,
+    DUMBBELL,
+    ELLIPTICAL_MACHINE,
+    EZ_BARBELL,
+    HAMMER,
+    KETTLEBELL,
+    LEVERAGE_MACHINE,
+    MEDICINE_BALL,
+    OLYMPIC_BARBELL,
+    RESISTANCE_BAND,
+    ROLLER,
+    ROPE,
+    SKIERG_MACHINE,
+    SLED_MACHINE,
+    SMITH_MACHINE,
+    STABILITY_BALL,
+    STATIONARY_BIKE,
+    STEPMILL_MACHINE,
+    TIRE,
+    TRAP_BAR,
+    UPPER_BODY_ERGOMETER,
+    WEIGHTED,
+    WHEEL_ROLLER
+}

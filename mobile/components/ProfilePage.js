@@ -5,14 +5,15 @@ import { useAuth } from '../AuthContext';
 import PostCard from './PostCard';
 import ProgramCard from './ProgramCard';
 
-const ProfilePage = () => {
+const ProfilePage = ({ darkMode }) => {
+  const styles = darkMode ? darkStyles : lightStyles;
   const navigation = useNavigation();
   const { user } = useAuth();
 
   // Mock data for posts
   const forumPosts = [
-    { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', labels: ['forum', 'discussion'], likeCount: 20 },
-    { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: 'john_doe', labels: ['forum', 'diet'], likeCount: 15 },
+    { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', date: '14.11.2024',commentCount: 2, labels: ['forum', 'discussion'], likeCount: 20 },
+    { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: 'jane_doe', labels: ['forum', 'diet'], date: '13.11.2024',commentCount: 1, likeCount: 15 },
   ];
 
   const programs = [
@@ -139,7 +140,7 @@ const ProfilePage = () => {
 };
 
 // Define styles for the profile page
-const styles = StyleSheet.create({
+const lightStyles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
@@ -214,6 +215,99 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: '#007bff',
+    fontWeight: 'bold',
+  },
+  contentContainer: {
+    flex: 1,
+  },
+  postList: {
+    marginTop: 10,
+  },
+});
+
+const darkStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#111827',
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginBottom: 16,
+  },
+  profileName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#F9FAFB',
+    fontFamily: 'sans-serif',
+  },
+  profileUsername: {
+    fontSize: 16,
+    color: '#F9FAFB',
+    fontFamily: 'sans-serif',
+    marginBottom: 16,
+  },
+  badgesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  statContainer: {
+    alignItems: 'center',
+    marginHorizontal: 20,
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#F9FAFB',
+    fontFamily: 'sans-serif',
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#F9FAFB',
+    fontFamily: 'sans-serif',
+  },
+  followButton: {
+    backgroundColor: '#6366F1',
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderRadius: 20,
+  },
+  followButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+  },
+  tabItem: {
+    paddingVertical: 10,
+    flex: 1,
+    alignItems: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#FBBF24',
+  },
+  tabText: {
+    fontSize: 16,
+    color: '#A0AEC0',
+    fontFamily: 'sans-serif',
+  },
+  activeTabText: {
+    color: '#FBBF24',
+    fontFamily: 'sans-serif',
     fontWeight: 'bold',
   },
   contentContainer: {
