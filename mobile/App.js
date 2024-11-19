@@ -11,7 +11,9 @@ import ProfilePage from './components/ProfilePage';
 import PostDetail from './components/PostDetail'; // Import PostDetail
 import ProgramDetail from './components/ProgramDetail'; // Import ProgramDetail
 import UserProfile from './components/UserProfile';
-
+import Label from './components/Label';
+import SearchBar from './components/SearchBar';
+import SearchResult from './components/SearchResult';
 import { enableScreens } from 'react-native-screens';
 
 enableScreens();
@@ -45,6 +47,9 @@ const App = () => {
             <Stack.Screen name="PostDetail" component={PostDetail} />
             <Stack.Screen name="ProgramDetail" component={ProgramDetail} />
             <Stack.Screen name="UserProfile" component={UserProfile} />
+            <Stack.Screen name="Label" component={Label} />
+            <Stack.Screen name="SearchBar" component={SearchBar} />
+            <Stack.Screen name="SearchResult" component={SearchResult} />
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>
