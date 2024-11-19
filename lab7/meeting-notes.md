@@ -1,58 +1,24 @@
-# Meeting Details
-_**Where?**_ \
-&nbsp;&nbsp;&nbsp; BM-B3\
-_**When?**_ \
-&nbsp;&nbsp;&nbsp; 19.11.2024 15.00-17.00 \
-_**Notes by:**_ \
-&nbsp;&nbsp;&nbsp;  
-## Attendees
-* Mustafa Ocak 
-* Asim Dag 
-* Mustafa Oguz hekim 
-* Abdulsamet Alan
-* Deniz Bilge Akkoç
-* Eren Pakelgil
-* Hanaa Zaqout
-* Mert Cengiz
+# Lab Report #7
 
-### **Agenda:**
+## Overview  
+In this lab, we discussed our plan for Milestone 2, including which features to present, the key points in the scenario to highlight, and the unit tests that each developer will implement.
 
-1. **Search Functionality Enhancement:**
-   - Finalize semantic search implementation for exercises and forum posts.
-   - Integrate hashtag prioritization and search filters.
+### Features to present in milestone2:
+* Ordering exercises in training program.
+* Marking the exercises as completed in a program.
+* Tracking mechanism for users' progress.
+* Creating Diet program by a dietician. 
+* Searching feature for posts and training programs.
+* Adding training program to posts.
+* Liking and bookmarking feature for posts
 
-2. **Digital Ocean Migration:**
-   - Transition deployment from GCP to Digital Ocean.
-   - Update and test the CI/CD pipeline.
+### Unit tests:
+Everyone will implement a unit test for the part he/she implements as the following:
+ - Hanaa, Deniz, and Samet will create unit tests for frontend.
+ - Asim, Mustafa and Oğuz will create unit tests for backend.
+ - Eren and Mert will create unit tests for mobile development. 
 
-3. **Profile Page Enhancements:**
-   - Add "Completed" and "In Progress" posts to user profiles.
-
-4. **Training Program Integration:**
-   - Enable linking of training programs to posts.
-
-5. **Demo Preparation:**
-   - Populate database with sample exercises and posts.
-   - Prepare demo scenarios to showcase features.
-
----
-
-### **Action Items:**
-
-1. **Search Functionality:**
-   - Implement Elasticsearch or equivalent indexing.
-   - Test semantic search queries for accuracy and relevance.
-
-2. **Digital Ocean Migration:**
-   - Set up Kubernetes cluster on Digital Ocean.
-   - Migrate application and validate deployment.
-
-3. **Profile Page:**
-   - Develop and test the "Completed" and "In Progress" post features.
-
-4. **Training Program Integration:**
-   - Link training programs to posts in the database and interface.
-
-5. **Demo Setup:**
-   - Populate data and create realistic use cases for the demo.
-   - Ensure all features are functional and tested for presentation.
+### PullRequests:
+We have worked on implementation side and closed the following pull requests in this lab:
+* https://github.com/bounswe/bounswe2024group7/pull/194
+* https://github.com/bounswe/bounswe2024group7/pull/191
