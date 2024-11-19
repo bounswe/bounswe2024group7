@@ -21,8 +21,8 @@
 
 #### **Plan for Demo Next Week:**
 1. **Data Population Strategy:**
-   - Populate the database with 100 sample exercises covering various body parts, muscles, and equipment.
-   - Add 50 sample posts, including hashtags and linked training programs.
+   - Populate the database with external api (will be decided of two options) sample exercises covering various body parts, muscles, and equipment.
+   - Add 20 (at least) sample posts, including hashtags and linked training programs.
    - Ensure diverse scenarios, such as:
      - Searching exercises with broad and specific terms.
      - Searching posts with hashtags related to fitness goals.
@@ -43,7 +43,7 @@
    - Cover 90% of search functionality, including:
      - Exercise search.
      - Forum post search with hashtag prioritization.
-   - Validate database indexing and data retrieval accuracy.
+
 
 2. **Integration Testing:**
    - Test end-to-end search flow for exercises and posts.
@@ -52,18 +52,14 @@
 
 ---
 
-#### **User Experience Decisions (From Previous Lab):**
-1. Simplified search bar design with autocomplete suggestions for hashtags and exercises.
-2. "Completed" and "In Progress" posts made visually distinct for user clarity.
-3. Integration of training programs in posts allows users to directly engage with structured workout plans.
+
 
 ---
 
 #### **Milestone 2 Preparation:**
 - **Team Tasks:**
   - **Search Functionality:** Finalize semantic search implementation and indexing strategy.
-  - **Digital Ocean Migration:** Deploy the application to Digital Ocean and ensure the CI/CD pipeline is operational.
   - **Profile Page Enhancements:** Complete the "Completed" and "In Progress" post features.
   - **Training Program Integration:** Implement the linking of training programs to posts.
 
-Individuals may work on specific aspects to ensure all items are completed by the milestone.
+Authors: All team members.
