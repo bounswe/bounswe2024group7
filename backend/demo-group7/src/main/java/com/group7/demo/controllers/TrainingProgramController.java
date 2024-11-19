@@ -62,8 +62,8 @@ public class TrainingProgramController {
         return ResponseEntity.ok("User has successfully joined the training program.");
     }
 
-    @DeleteMapping("/leave")
-    public ResponseEntity<String> leaveProgram(@RequestParam Long programId, HttpServletRequest request) {
+    @DeleteMapping("/{programId}/leave")
+    public ResponseEntity<String> leaveProgram(@PathVariable Long programId, HttpServletRequest request) {
         trainingProgramService.leaveTrainingProgram(programId, request);
         return ResponseEntity.ok("Successfully left the training program.");
     }
