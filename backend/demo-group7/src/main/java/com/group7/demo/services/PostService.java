@@ -2,6 +2,7 @@ package com.group7.demo.services;
 
 import com.group7.demo.dtos.PostRequest;
 import com.group7.demo.dtos.PostResponse;
+import com.group7.demo.dtos.mapper.Mapper;
 import com.group7.demo.models.Post;
 import com.group7.demo.models.Tag;
 import com.group7.demo.models.User;
@@ -30,6 +31,8 @@ public class PostService {
 
     private AuthenticationService authenticationService;
 
+    private Mapper mapper;
+
     public PostResponse createPost(PostRequest postRequest, HttpServletRequest request) {
         Set<Tag> tags = new HashSet<>();
 
@@ -53,7 +56,7 @@ public class PostService {
 
         Post savedPost = postRepository.save(post);
 
-        return mapToPostResponse(savedPost);
+        return mapper.mapToPostResponse(savedPost);
     }
 
 
@@ -61,7 +64,7 @@ public class PostService {
         List<Post> posts = postRepository.findAll();
 
         return posts.stream()
-                .map(this::mapToPostResponse)
+                .map(mapper::mapToPostResponse)
                 .collect(Collectors.toList());
     }
 
@@ -72,7 +75,7 @@ public class PostService {
         List<Post> posts = postRepository.findByUser(user);
 
         return posts.stream()
-                .map(this::mapToPostResponse)
+                .map(mapper::mapToPostResponse)
                 .collect(Collectors.toList());
     }
 
@@ -106,7 +109,7 @@ public class PostService {
     public List<PostResponse> getPostsByTags(Set<String> tagNames) {
         List<Post> posts = postRepository.findPostsByTags(tagNames);
         return posts.stream()
-                .map(this::mapToPostResponse)
+                .map(mapper::mapToPostResponse)
                 .collect(Collectors.toList());
     }
 
@@ -115,19 +118,7 @@ public class PostService {
         Collections.shuffle(allPosts);
         return allPosts.stream()
                 .limit(count)
-                .map(this::mapToPostResponse)
+                .map(mapper::mapToPostResponse)
                 .collect(Collectors.toList());
     }
-
-    private PostResponse mapToPostResponse(Post post) {
-        return new PostResponse(
-                post.getId(),
-                post.getContent(),
-                post.getTags().stream().map(Tag::getName).collect(Collectors.toSet()),  // Only tag names
-                post.getCreatedAt(),
-                post.getUser().getUsername()
-        );
-    }
-
-
 }
