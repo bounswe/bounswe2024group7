@@ -65,6 +65,8 @@ const ProfilePage = ({ darkMode }) => {
               description={item.description}
               labels={item.labels}
               likeCount={item.likeCount}
+              commentCount={item.commentCount}
+              date={item.date}
               navigation={navigation}
             />
           )}

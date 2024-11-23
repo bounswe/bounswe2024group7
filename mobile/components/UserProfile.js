@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList } from 'react
 import { useNavigation } from '@react-navigation/native';
 import PostCard from './PostCard'; // Import your PostCard component
 import ProgramCard from './ProgramCard'; // Import your ProgramCard component
+import DietCard from './DietCard';
 
 const UserProfile = ({ route }) => {
   const navigation = useNavigation();
@@ -19,7 +20,26 @@ const UserProfile = ({ route }) => {
        { id: 2, title: 'Leg Program', description: 'An 8-week strength program for leg.', trainerUsername: 'trainer_john', exercises: ['Bicep Curls', 'Deadlift']},
 
     ];
-
+const diet_programs = [
+        { id: 1, title: 'Gluten-free Diet Program', description: 'A protein based gluten-free diet.', owner: 'dietician_john', followCount: 100, category: 'gluten-free', nutrition_list: ['180 g fat', '300 g protein'], weeklySchedule: {
+      Monday: ['Egg', 'Squats', 'Turkey', 'Orange'],
+      Tuesday: ['Avocado Toast', 'Grilled Chicken', 'Deadlift', 'Kefir'],
+      Wednesday: ['Pancakes', 'Meatballs', 'Beef Steak', 'Pineapple'],
+      Thursday: ['Olive', 'Rice', 'Manti', 'Turkish Yoghurt'],
+      Friday: ['Kashar Cheese', 'Broccoli', 'Lentil', 'Apple'],
+      Saturday: ['Cottage Cheese', 'Pasta', 'Falafel', 'Banana'],
+      Sunday: ['Cucumber', 'Tuna Salad', 'Mushroom', 'Ayran']
+    }},
+        { id: 2, title: 'My Diet Program', description: 'Vitamin rich diet program.', owner: 'dietician_jane', followCount: 85, category: 'vitamin-rich', nutrition_list: ['120g protein', '200g fat', '230g carbonhydrate'], weeklySchedule: {
+          Monday: ['Egg', 'Squats', 'Turkey', 'Orange'],
+              Tuesday: ['Avocado Toast', 'Grilled Chicken', 'Deadlift', 'Kefir'],
+              Wednesday: ['Pancakes', 'Meatballs', 'Beef Steak', 'Pineapple'],
+              Thursday: ['Olive', 'Rice', 'Manti', 'Turkish Yoghurt'],
+              Friday: ['Kashar Cheese', 'Broccoli', 'Lentil', 'Apple'],
+              Saturday: ['Cottage Cheese', 'Pasta', 'Falafel', 'Banana'],
+              Sunday: ['Cucumber', 'Tuna Salad', 'Mushroom', 'Ayran']
+            }},
+      ];
   const [isFollowing, setIsFollowing] = useState(false);
   const [selectedTab, setSelectedTab] = useState('forum'); // To track the selected tab
 
@@ -40,6 +60,8 @@ const UserProfile = ({ route }) => {
               description={item.description}
               labels={item.labels}
               likeCount={item.likeCount}
+              commentCount={item.commentCount}
+              date={item.date}
               navigation={navigation}
             />
           )}
@@ -66,6 +88,27 @@ const UserProfile = ({ route }) => {
         />
       );
     }
+    else if (selectedTab === 'diet') {
+                  return (
+                    <FlatList
+                      data={diet_programs}
+                      keyExtractor={(item) => item.id.toString()}
+                      renderItem={({ item }) => (
+                        <DietCard
+                          title={item.title}
+                          description={item.description}
+                          owner={item.owner}
+                          followCount={item.followCount}
+                          category={item.category}
+                          nutrition_list={item.nutrition_list}
+                          weeklySchedule={item.weeklySchedule}
+                          navigation={navigation}
+                        />
+                      )}
+                      showsVerticalScrollIndicator={false}
+                    />
+                  );
+                }
   };
 
   return (
@@ -109,6 +152,12 @@ const UserProfile = ({ route }) => {
         >
           <Text style={[styles.tabText, selectedTab === 'programs' && styles.activeTabText]}>Programs</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+                          style={[styles.tabItem, selectedTab === 'diet' && styles.activeTab]}
+                          onPress={() => setSelectedTab('diet')}
+                        >
+                          <Text style={[styles.tabText, selectedTab === 'diet' && styles.activeTabText]}>Diet</Text>
+                        </TouchableOpacity>
       </View>
 
       {/* Display content based on selected tab */}

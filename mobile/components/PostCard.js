@@ -2,9 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const PostCard = ({ title, description, owner, date, likeCount, commentCount }) => {
+const PostCard = ({ title, description, owner, date, likeCount, commentCount, navigation }) => {
   return (
-    <View style={styles.card}>
+    <TouchableOpacity
+              style={styles.card}
+              onPress={() => navigation.navigate('PostDetail', { title, description, owner, date, likeCount, commentCount, navigation })}
+            >
       {/* Post Image */}
       <Image
         source={{ uri: 'https://commons.wikimedia.org/wiki/File:FitnessBerlin.jpg' }} // Replace with actual image source
@@ -22,7 +25,9 @@ const PostCard = ({ title, description, owner, date, likeCount, commentCount }) 
             <Icon name="user-circle" size={20} color="#ccc" />
           </View>
           <View>
-            <Text style={styles.ownerName}>{owner}</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { username: owner })}>
+                    <Text style={styles.ownerName}>{owner}</Text>
+                  </TouchableOpacity>
             <Text style={styles.date}>{date}</Text>
           </View>
         </View>
@@ -45,7 +50,7 @@ const PostCard = ({ title, description, owner, date, likeCount, commentCount }) 
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

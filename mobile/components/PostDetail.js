@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
 const PostDetail = ({ route }) => {
-  const { title, description, owner, labels, likeCount } = route.params;
+  const { title, description, owner, date, likeCount, commentCount, navigation } = route.params;
 
   return (
     <ScrollView style={styles.container}>
@@ -11,11 +11,12 @@ const PostDetail = ({ route }) => {
       {/* Owner and Like Count in a horizontal layout */}
       <View style={styles.headerContainer}>
         <Text style={styles.owner}>Posted by: {owner}</Text>
+        <Text style={styles.date}>Posted in: {date}</Text>
         <Text style={styles.likeCount}>Likes: {likeCount}</Text>
       </View>
 
       <Text style={styles.description}>{description}</Text>
-      <Text style={styles.labels}>Tags: {labels.join(', ')}</Text>
+      <Text style={styles.commentCount}>Comments: {commentCount}</Text>
     </ScrollView>
   );
 };
@@ -40,10 +41,20 @@ const styles = StyleSheet.create({
   owner: {
     fontSize: 16,
     color: '#555',
+    marginBottom:5,
   },
   likeCount: {
     fontSize: 16,
     color: '#888',
+  },
+  commentCount: {
+      fontSize: 14,
+      color: '#888',
+    },
+  date:{
+  fontSize: 16,
+      color: '#888',
+
   },
   description: {
     fontSize: 16,
