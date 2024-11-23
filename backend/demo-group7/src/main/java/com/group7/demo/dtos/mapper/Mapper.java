@@ -15,7 +15,8 @@ public class Mapper {
                 post.getContent(),
                 post.getTags().stream().map(Tag::getName).collect(Collectors.toSet()),  // Only tag names
                 post.getCreatedAt(),
-                post.getUser().getUsername()
+                post.getUser().getUsername(),
+                post.getTrainingProgram() == null ? null : mapToTrainingProgramResponse(post.getTrainingProgram())
         );
     }
 

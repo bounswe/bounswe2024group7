@@ -3,11 +3,10 @@ package com.group7.demo.services;
 import com.group7.demo.dtos.PostRequest;
 import com.group7.demo.dtos.PostResponse;
 import com.group7.demo.dtos.mapper.Mapper;
-import com.group7.demo.models.Post;
-import com.group7.demo.models.Tag;
-import com.group7.demo.models.User;
+import com.group7.demo.models.*;
 import com.group7.demo.repository.PostRepository;
 import com.group7.demo.repository.TagRepository;
+import com.group7.demo.repository.TrainingProgramRepository;
 import com.group7.demo.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -29,10 +28,13 @@ public class PostService {
 
     private UserRepository userRepository;
 
+    private TrainingProgramRepository trainingProgramRepository;
+
     private AuthenticationService authenticationService;
 
     private Mapper mapper;
 
+    @Transactional
     public PostResponse createPost(PostRequest postRequest, HttpServletRequest request) {
         Set<Tag> tags = new HashSet<>();
 
@@ -46,12 +48,17 @@ public class PostService {
             tags.add(tag);
         }
         User user = authenticationService.getAuthenticatedUserInternal(request);
+        // Fetch the associated TrainingProgram if provided
+        TrainingProgram trainingProgram = Optional.ofNullable(postRequest.getTrainingProgramId())
+                .flatMap(trainingProgramRepository::findById)
+                .orElse(null);
 
         Post post = Post.builder()
                 .content(postRequest.getContent())
                 .createdAt(LocalDateTime.now())
                 .tags(tags)
                 .user(user)  // Associate the post with the user
+                .trainingProgram(trainingProgram)
                 .build();
 
         Post savedPost = postRepository.save(post);
@@ -59,7 +66,7 @@ public class PostService {
         return mapper.mapToPostResponse(savedPost);
     }
 
-
+    @Transactional
     public List<PostResponse> getAllPosts() {
         List<Post> posts = postRepository.findAll();
 
@@ -68,6 +75,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public List<PostResponse> getPostsByUser(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
@@ -106,6 +114,7 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    @Transactional
     public List<PostResponse> getPostsByTags(Set<String> tagNames) {
         List<Post> posts = postRepository.findPostsByTags(tagNames);
         return posts.stream()
@@ -113,6 +122,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public List<PostResponse> getRandomPosts(int count) {
         List<Post> allPosts = postRepository.findAll();
         Collections.shuffle(allPosts);
