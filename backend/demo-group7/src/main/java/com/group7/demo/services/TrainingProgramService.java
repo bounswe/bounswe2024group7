@@ -1,8 +1,8 @@
 package com.group7.demo.services;
 
-import com.group7.demo.dtos.ExerciseDetail;
-import com.group7.demo.dtos.TrainingProgramRequest;
-import com.group7.demo.dtos.TrainingProgramResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group7.demo.dtos.*;
 import com.group7.demo.dtos.mapper.Mapper;
 import com.group7.demo.models.*;
 import com.group7.demo.repository.ExerciseRepository;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,6 +77,7 @@ public class TrainingProgramService {
         return mapper.mapToTrainingProgramResponse(savedProgram);
     }
 
+    @Transactional
     public List<TrainingProgramResponse> getAllTrainingPrograms() {
         // Fetch all training programs from the repository
         List<TrainingProgram> trainingPrograms = trainingProgramRepository.findAll();
@@ -86,6 +88,7 @@ public class TrainingProgramService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public TrainingProgramResponse getTrainingProgramById(Long id) {
         // Find the training program by ID, or throw an exception if not found
         TrainingProgram trainingProgram = trainingProgramRepository.findById(id)
@@ -133,11 +136,28 @@ public class TrainingProgramService {
             throw new IllegalStateException("User has already joined the training program.");
         }
 
+        // Initialize the progress JSON object
+        ObjectMapper mapper = new ObjectMapper();
+        Map<Long, Boolean> exerciseProgress = trainingProgram.getExercises().stream()
+                .collect(Collectors.toMap(
+                        exercise -> exercise.getExercise().getId(), // Exercise ID
+                        exercise -> false // Not completed yet
+                ));
+
+        String progressJson;
+        try {
+            progressJson = mapper.writeValueAsString(exerciseProgress);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Failed to initialize exercise progress JSON", e);
+        }
+
         // Create a new UserTrainingProgram entity
         UserTrainingProgram userTrainingProgram = UserTrainingProgram.builder()
                 .user(user)
                 .trainingProgram(trainingProgram)
                 .joinedAt(LocalDateTime.now())
+                .completed(false)
+                .exerciseProgress(progressJson)
                 .build();
 
         // Save the UserTrainingProgram entity
@@ -161,6 +181,7 @@ public class TrainingProgramService {
         userTrainingProgramRepository.delete(userTrainingProgram);
     }
 
+    @Transactional
     public List<String> getRegisteredUsernames(Long trainingProgramId) {
         // Fetch the training program by its ID
         TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
@@ -173,19 +194,106 @@ public class TrainingProgramService {
     }
 
     // Return the list of joined training programs for the authenticated user
-    public List<TrainingProgramResponse> getJoinedTrainingPrograms(String username) throws Exception {
+    @Transactional
+    public List<UserTrainingProgramResponse> getJoinedTrainingPrograms(String username) throws Exception {
         // Fetch the authenticated user
         User user = userService.getUserByUsername(username);
 
         // Fetch the list of training programs the user has joined
         List<UserTrainingProgram> userTrainingPrograms = userTrainingProgramRepository.findByUser(user);
 
-        // Map the list of UserTrainingProgram entities to TrainingProgramResponse DTOs
+        // Map the list of UserTrainingProgram entities to UserTrainingProgramResponse DTOs
         return userTrainingPrograms.stream()
-                .map(UserTrainingProgram::getTrainingProgram)
-                .map(mapper::mapToTrainingProgramResponse)
+                .map(mapper::mapToUserTrainingProgramResponse) // Map to UserTrainingProgramResponse instead of TrainingProgramResponse
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void markExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        UserTrainingProgram userTrainingProgram = userTrainingProgramRepository.findByUserIdAndTrainingProgramId(user.getId(), trainingProgramId)
+                .orElseThrow(() -> new EntityNotFoundException("User Training Program not found"));
+
+        // Get the current progress map
+        Map<Long, Boolean> exerciseProgress = userTrainingProgram.getExerciseProgress();
+
+        // Mark the exercise as completed
+        exerciseProgress.put(exerciseId, true);
+
+        // Serialize the updated exercise progress map back to JSON
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String updatedProgressJson = objectMapper.writeValueAsString(exerciseProgress);
+            userTrainingProgram.setExerciseProgress(updatedProgressJson); // Save the updated JSON string
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle exception, possibly throw a runtime exception or return an error response
+        }
+
+        // Check if the whole program is completed
+        boolean allCompleted = exerciseProgress.values().stream().allMatch(Boolean::booleanValue);
+        if (allCompleted) {
+            userTrainingProgram.setCompleted(true);
+        }
+
+        userTrainingProgramRepository.save(userTrainingProgram);
+    }
+
+    @Transactional
+    public void unmarkExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        UserTrainingProgram userTrainingProgram = userTrainingProgramRepository.findByUserIdAndTrainingProgramId(user.getId(), trainingProgramId)
+                .orElseThrow(() -> new EntityNotFoundException("User Training Program not found"));
+
+        // Get the current progress map from the serialized exerciseProgress
+        Map<Long, Boolean> exerciseProgress = userTrainingProgram.getExerciseProgress();
+
+        // Mark the exercise as incomplete (unmark)
+        exerciseProgress.put(exerciseId, false);
+
+        // Serialize the updated progress map back to JSON
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String updatedProgressJson = objectMapper.writeValueAsString(exerciseProgress);
+            userTrainingProgram.setExerciseProgress(updatedProgressJson); // Save the updated JSON string
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle exception, possibly throw a runtime exception or return an error response
+        }
+
+        // Check if the whole program is completed
+        boolean allCompleted = exerciseProgress.values().stream().allMatch(Boolean::booleanValue);
+        userTrainingProgram.setCompleted(allCompleted);
+
+        userTrainingProgramRepository.save(userTrainingProgram);
+    }
+
+    @Transactional
+    public void markTrainingProgramAsCompleted(Long trainingProgramId, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        UserTrainingProgram userTrainingProgram = userTrainingProgramRepository.findByUserIdAndTrainingProgramId(user.getId(), trainingProgramId)
+                .orElseThrow(() -> new EntityNotFoundException("User Training Program not found"));
+
+        // Mark the entire training program as completed
+        userTrainingProgram.setCompleted(true);
+
+        userTrainingProgramRepository.save(userTrainingProgram);
+    }
+
+    @Transactional
+    public void unmarkTrainingProgramAsCompleted(Long trainingProgramId, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        UserTrainingProgram userTrainingProgram = userTrainingProgramRepository.findByUserIdAndTrainingProgramId(user.getId(), trainingProgramId)
+                .orElseThrow(() -> new EntityNotFoundException("User Training Program not found"));
+
+        // Unmark the entire training program as completed
+        userTrainingProgram.setCompleted(false);
+
+        userTrainingProgramRepository.save(userTrainingProgram);
+    }
 
 }

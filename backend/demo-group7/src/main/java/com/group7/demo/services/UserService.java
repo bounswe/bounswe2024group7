@@ -3,6 +3,7 @@ package com.group7.demo.services;
 import com.group7.demo.dtos.PostResponse;
 import com.group7.demo.dtos.TrainingProgramResponse;
 import com.group7.demo.dtos.UserProfileResponse;
+import com.group7.demo.dtos.UserTrainingProgramResponse;
 import com.group7.demo.models.User;
 import com.group7.demo.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,7 +49,7 @@ public class UserService {
 
         List<PostResponse> posts = postService.getPostsByUser(user.getUsername());
         List<TrainingProgramResponse> trainingPrograms = trainingProgramService.getTrainingProgramByTrainer(user.getUsername());
-        List<TrainingProgramResponse> joinedPrograms = trainingProgramService.getJoinedTrainingPrograms(user.getUsername());
+        List<UserTrainingProgramResponse> joinedPrograms = trainingProgramService.getJoinedTrainingPrograms(user.getUsername());
 
         return UserProfileResponse.builder()
                 .username(user.getUsername())

@@ -81,4 +81,40 @@ public class TrainingProgramController {
         return ResponseEntity.ok(trainingPrograms);
     }
 
+    @PostMapping("/{trainingProgramId}/exercises/{exerciseId}/complete")
+    public ResponseEntity<Void> markExerciseAsCompleted(
+            @PathVariable Long trainingProgramId,
+            @PathVariable Long exerciseId,
+            HttpServletRequest request
+    ) {
+        trainingProgramService.markExerciseAsCompleted(trainingProgramId, exerciseId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{trainingProgramId}/exercises/{exerciseId}/uncomplete")
+    public ResponseEntity<Void> unmarkExerciseAsCompleted(
+            @PathVariable Long trainingProgramId,
+            @PathVariable Long exerciseId,
+            HttpServletRequest request) {
+        trainingProgramService.unmarkExerciseAsCompleted(trainingProgramId, exerciseId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{trainingProgramId}/complete")
+    public ResponseEntity<Void> markTrainingProgramAsCompleted(
+            @PathVariable Long trainingProgramId,
+            HttpServletRequest request
+    ) {
+        trainingProgramService.markTrainingProgramAsCompleted(trainingProgramId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{trainingProgramId}/uncomplete")
+    public ResponseEntity<Void> unmarkTrainingProgramAsCompleted(
+            @PathVariable Long trainingProgramId,
+            HttpServletRequest request
+    ) {
+        trainingProgramService.unmarkTrainingProgramAsCompleted(trainingProgramId, request);
+        return ResponseEntity.ok().build();
+    }
 }
