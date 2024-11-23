@@ -30,7 +30,9 @@ import {
     ChevronDownIcon,
     ChevronRightIcon,
     MoonIcon,
-    SunIcon
+    SunIcon,
+    SearchIcon,
+    Search2Icon
 } from '@chakra-ui/icons'
 import {
     loginPath,
@@ -92,6 +94,14 @@ export default function NavigationResponsive() {
             onSearchResultsOpen()
         }
     }, [searchResults])
+
+    const goToSearchPage = () => {
+        navigate(
+            {
+                to: "/search"
+            }
+        )
+    };
 
     const handleLogOut = async () => {
         try {
@@ -167,15 +177,19 @@ export default function NavigationResponsive() {
                         <DesktopNav />
                     </Flex>
                 </Flex>
-                {/* <SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading={setLoading} loading={loading} /> */}
+                {/* <SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading={setLoading} loading={loading} />*/ }
                 <Stack
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
                     direction={'row'}
                     spacing={6}>
+                    <Button onClick={goToSearchPage}>
+                        {colorMode === 'light' ? <Search2Icon /> : <SearchIcon />}
+                    </Button>
                     <Button onClick={toggleColorMode}>
                         {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
                     </Button>
+
                     {
                         username ? (<Menu>
                             <MenuButton
