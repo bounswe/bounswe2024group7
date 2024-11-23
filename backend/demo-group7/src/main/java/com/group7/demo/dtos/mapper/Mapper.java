@@ -5,6 +5,7 @@ import com.group7.demo.models.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -43,6 +44,39 @@ public class Mapper {
                 .exercise(trainingProgramExercise.getExercise())
                 .repetitions(trainingProgramExercise.getRepetitions())
                 .sets(trainingProgramExercise.getSets())
+                .build();
+    }
+
+    public UserTrainingProgramResponse mapToUserTrainingProgramResponse(UserTrainingProgram userTrainingProgram) {
+        TrainingProgram program = userTrainingProgram.getTrainingProgram();
+        Map<Long, Boolean> completedExercises = userTrainingProgram.getExerciseProgress(); // Now returns Map<Long, Boolean>
+
+        // Use the new mapper function for exercises
+        List<UserExerciseDetail> exerciseDetails = program.getExercises().stream()
+                .map(exercise -> mapToUserExerciseDetailResponse(exercise, completedExercises))
+                .collect(Collectors.toList());
+
+        return UserTrainingProgramResponse.builder()
+                .id(program.getId())
+                .title(program.getTitle())
+                .description(program.getDescription())
+                .trainerUsername(program.getTrainer().getUsername())
+                .participants(program.getParticipants().stream()
+                        .map(participant -> participant.getUser().getUsername())
+                        .collect(Collectors.toList()))
+                .exercises(exerciseDetails)
+                .completed(userTrainingProgram.isCompleted())
+                .createdAt(program.getCreatedAt())
+                .build();
+    }
+
+    public UserExerciseDetail mapToUserExerciseDetailResponse(TrainingProgramExercise trainingProgramExercise, Map<Long, Boolean> completedExercises) {
+        Long exerciseId = trainingProgramExercise.getExercise().getId();
+        return UserExerciseDetail.builder()
+                .exercise(trainingProgramExercise.getExercise())
+                .repetitions(trainingProgramExercise.getRepetitions())
+                .sets(trainingProgramExercise.getSets())
+                .completed(completedExercises.getOrDefault(exerciseId, false)) // Use `getOrDefault` to handle missing keys
                 .build();
     }
 }
