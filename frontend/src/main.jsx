@@ -8,6 +8,7 @@ import { rootRoute } from "./routes/__root"
 import { indexRoute } from './routes/index'
 import { loginRoute } from './routes/login'
 import { profileRoute } from './routes/profile'
+import {searchRoute} from './routes/search'
 import React from 'react'
 import { registerRoute } from './routes/register'
 import {
@@ -16,12 +17,14 @@ import {
 } from '@tanstack/react-query'
 
 import './index.css'
+import SearchPage from './components/searchPage.component.jsx'
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   registerRoute,
-  profileRoute
+  profileRoute,
+  searchRoute
 ])
 
 const router = createRouter({ routeTree })
