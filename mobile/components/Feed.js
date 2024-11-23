@@ -16,24 +16,9 @@ const FeedPage = ({ darkMode }) => {
   ];
 
   const programs = [
-    { id: 1, title: 'Powerlifting Program', description: 'A 12-week strength program for powerlifting.', owner: 'trainer_john', followCount: 100, location: 'Gym A', muscle_list: ['Legs', 'Back'], weeklySchedule: {
-      Monday: ['Push-ups', 'Squats', 'Plank'],
-      Tuesday: ['Pull-ups', 'Lunges', 'Deadlift'],
-      Wednesday: ['Rest Day'],
-      Thursday: ['Bench Press', 'Rows', 'Bicep Curls'],
-      Friday: ['Overhead Press', 'Leg Press', 'Lat Pulldown'],
-      Saturday: ['Cardio', 'Abs Workout'],
-      Sunday: ['Rest Day']
-    }},
-    { id: 2, title: 'Hypertrophy Program', description: 'Gain muscle with this 6-week hypertrophy program.', owner: 'trainer_jane', followCount: 85, location: 'Gym B', muscle_list: ['Arms', 'Chest'], weeklySchedule: {
-      Monday: ['Push-ups', 'Squats', 'Plank'],
-      Tuesday: ['Pull-ups', 'Lunges', 'Deadlift'],
-      Wednesday: ['Rest Day'],
-      Thursday: ['Bench Press', 'Rows', 'Bicep Curls'],
-      Friday: ['Overhead Press', 'Leg Press', 'Lat Pulldown'],
-      Saturday: ['Cardio', 'Abs Workout'],
-      Sunday: ['Rest Day']
-    }},
+    { id: 1, title: 'Full Body Program', description: 'A 12-week strength program for powerlifting.', trainerUsername: 'trainer_john', exercises: ['Bicep Curls', 'Deadlift']},
+     { id: 2, title: 'Leg Program', description: 'An 8-week strength program for leg.', trainerUsername: 'trainer_john', exercises: ['Bicep Curls', 'Deadlift']},
+
   ];
 
   const diet_programs = [
@@ -88,12 +73,10 @@ const FeedPage = ({ darkMode }) => {
             <ProgramCard
               title={item.title}
               description={item.description}
-              owner={item.owner}
-              followCount={item.followCount}
-              location={item.location}
-              muscle_list={item.muscle_list}
-              weeklySchedule={item.weeklySchedule}
-              navigation={navigation}
+              trainerUsername={item.trainerUsername}
+              exercises={item.exercises}
+              navigation = {navigation}
+
             />
           )}
           showsVerticalScrollIndicator={false}

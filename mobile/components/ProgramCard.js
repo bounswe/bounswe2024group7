@@ -1,20 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const ProgramCard = ({ owner, title, description, followCount, location, muscle_list, weeklySchedule, navigation }) => {
+const ProgramCard = ({ trainerUsername, title, description, exercises, navigation }) => {
   return (
     <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('ProgramDetail', { title, description, owner, followCount, location, muscle_list, weeklySchedule })}
+          onPress={() => navigation.navigate('ProgramDetail', { trainerUsername, title, description, exercises, navigation })}
         >
-      <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { username: owner })}>
-        <Text style={styles.owner}>{owner}</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { username: trainerUsername })}>
+        <Text style={styles.owner}>{trainerUsername}</Text>
       </TouchableOpacity>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
-      <Text style={styles.location}>Location: {location}</Text>
-      <Text style={styles.muscle_type}>Targeted muscles: {muscle_list.join(', ')}</Text>
-      <Text style={styles.follow}>Followers: {followCount}</Text>
+      <Text style={styles.description}>Exercises: {exercises.join(', ')}</Text>
     </TouchableOpacity>
   );
 };
@@ -56,7 +54,8 @@ const styles = StyleSheet.create({
   follow: {
     fontSize: 12,
     color: '#888',
-  },
+  }
+
 });
 
 export default ProgramCard;

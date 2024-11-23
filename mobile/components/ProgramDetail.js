@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 
 const ProgramDetail = ({ route }) => {
-  const { title, description, owner, followCount, location, muscle_list, weeklySchedule } = route.params;
+  const { title, description, trainerUsername, exercises} = route.params;
 
   // Mock data for daily exercises
   /*const weeklySchedule = {
@@ -17,7 +17,7 @@ const ProgramDetail = ({ route }) => {
   };*/
 
   // Render exercises for each day
-  const renderExercises = (day) => (
+  /*const renderExercises = (day) => (
     <View style={styles.dayContainer}>
       {weeklySchedule[day].map((exercise, index) => (
         <Text key={index} style={styles.exerciseText}>{exercise}</Text>
@@ -47,18 +47,15 @@ const ProgramDetail = ({ route }) => {
     { key: 'Saturday', title: 'Sa' },
     { key: 'Sunday', title: 'Su' },
   ]);
-
+*/
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.owner}>Trainer: {owner}</Text>
+      <Text style={styles.owner}>Trainer: {trainerUsername}</Text>
       <Text style={styles.description}>{description}</Text>
-      <Text style={styles.location}>Location: {location}</Text>
-      <Text style={styles.muscleList}>Targeted Muscles: {muscle_list.join(', ')}</Text>
-      <Text style={styles.followCount}>Followers: {followCount}</Text>
-
+      <Text style={styles.exerciseList}>Exercise List: {exercises.join(', ')}</Text>
       {/* Weekly Schedule Tabs */}
-      <TabView
+      {/*<TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
@@ -67,7 +64,7 @@ const ProgramDetail = ({ route }) => {
           const { key, ...rest } = props; // Destructure key and rest of props
           return <TabBar {...rest} style={styles.tabBar} indicatorStyle={styles.indicator} />;
         }}
-      />
+      />*/}
     </View>
   );
 };
@@ -98,7 +95,7 @@ const styles = StyleSheet.create({
     color: '#888',
     marginBottom: 10,
   },
-  muscleList: {
+  exerciseList: {
     fontSize: 14,
     color: '#888',
     marginBottom: 10,

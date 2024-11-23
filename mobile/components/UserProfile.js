@@ -15,25 +15,10 @@ const UserProfile = ({ route }) => {
   ];
 
   const programs = [
-    { id: 1, title: 'Powerlifting Program', description: 'A 12-week strength program for powerlifting.', owner: username, followCount: 100, location: 'outdoor', muscle_list: ['chest', 'shoulder'], weeklySchedule: {
-        Monday: ['Push-ups', 'Squats', 'Plank'],
-        Tuesday: ['Pull-ups', 'Leg Press', 'Deadlift'],
-        Wednesday: ['Rest Day'],
-        Thursday: ['Bench Press', 'Rows', 'Bicep Curls'],
-        Friday: ['Overhead Press', 'Lunges', 'Lat Pulldown'],
-        Saturday: ['Cardio', 'Abs Workout'],
-        Sunday: ['Rest Day'],
-      }},
-    { id: 2, title: 'Hypertrophy Program', description: 'Gain muscle with this 6-week hypertrophy program.', owner: username, followCount: 85, location: 'gym', muscle_list: ['leg'], weeklySchedule: {
-        Monday: ['Push-ups', 'Squats', 'Plank'],
-        Tuesday: ['Pull-ups', 'Lunges', 'Deadlift'],
-        Wednesday: ['Rest Day'],
-        Thursday: ['Bench Press', 'Rows', 'Bicep Curls'],
-        Friday: ['Overhead Press', 'Leg Press', 'Lat Pulldown'],
-        Saturday: ['Cardio', 'Abs Workout'],
-        Sunday: ['Rest Day'],
-      }},
-  ];
+      { id: 1, title: 'Full Body Program', description: 'A 12-week strength program for powerlifting.', trainerUsername: 'trainer_john', exercises: ['Bicep Curls', 'Deadlift']},
+       { id: 2, title: 'Leg Program', description: 'An 8-week strength program for leg.', trainerUsername: 'trainer_john', exercises: ['Bicep Curls', 'Deadlift']},
+
+    ];
 
   const [isFollowing, setIsFollowing] = useState(false);
   const [selectedTab, setSelectedTab] = useState('forum'); // To track the selected tab
@@ -70,13 +55,10 @@ const UserProfile = ({ route }) => {
           renderItem={({ item }) => (
             <ProgramCard
               title={item.title}
-              owner={item.owner}
-              description={item.description}
-              followCount={item.followCount}
-              location={item.location}
-              muscle_list={item.muscle_list}
-              weeklySchedule={item.weeklySchedule}
-              navigation={navigation}
+                            description={item.description}
+                            trainerUsername={item.trainerUsername}
+                            exercises={item.exercises}
+                            navigation = {navigation}
             />
           )}
           style={styles.postList}
