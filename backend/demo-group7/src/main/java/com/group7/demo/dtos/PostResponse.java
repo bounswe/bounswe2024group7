@@ -17,4 +17,5 @@ public class PostResponse {
     private Set<String> tags;
     private LocalDateTime createdAt;
     private String username;
+    private TrainingProgramResponse trainingProgram;
 }

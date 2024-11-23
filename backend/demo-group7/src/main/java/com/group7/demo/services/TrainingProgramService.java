@@ -3,6 +3,7 @@ package com.group7.demo.services;
 import com.group7.demo.dtos.ExerciseDetail;
 import com.group7.demo.dtos.TrainingProgramRequest;
 import com.group7.demo.dtos.TrainingProgramResponse;
+import com.group7.demo.dtos.mapper.Mapper;
 import com.group7.demo.models.*;
 import com.group7.demo.repository.ExerciseRepository;
 import com.group7.demo.repository.TrainingProgramRepository;
@@ -32,6 +33,8 @@ public class TrainingProgramService {
     private final UserService userService;
 
     private final ExerciseRepository exerciseRepository;
+
+    private final Mapper mapper;
 
     @Transactional
     public TrainingProgramResponse createTrainingProgram(TrainingProgramRequest trainingProgramRequest, HttpServletRequest request) throws IllegalAccessException {
@@ -70,35 +73,7 @@ public class TrainingProgramService {
 
         // Save the training program and return a response
         TrainingProgram savedProgram = trainingProgramRepository.save(trainingProgram);
-        return mapToTrainingProgramResponse(savedProgram);
-    }
-
-    // Add a method to map TrainingProgram to TrainingProgramResponse
-    private TrainingProgramResponse mapToTrainingProgramResponse(TrainingProgram program) {
-        return TrainingProgramResponse.builder()
-                .id(program.getId())
-                .title(program.getTitle())
-                .description(program.getDescription())
-                .trainerUsername(program.getTrainer().getUsername())
-                .createdAt(program.getCreatedAt())
-                .exercises(program.getExercises().stream()
-                        .map(this::mapToExerciseResponse)
-                        .collect(Collectors.toList()))
-                .participants(program.getParticipants() == null ?
-                        List.of() :
-                        program.getParticipants().stream()
-                                .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
-                                .collect(Collectors.toList()))
-                .build();
-    }
-
-
-    private ExerciseDetail mapToExerciseResponse(TrainingProgramExercise trainingProgramExercise) {
-        return ExerciseDetail.builder()
-                .exercise(trainingProgramExercise.getExercise())
-                .repetitions(trainingProgramExercise.getRepetitions())
-                .sets(trainingProgramExercise.getSets())
-                .build();
+        return mapper.mapToTrainingProgramResponse(savedProgram);
     }
 
     public List<TrainingProgramResponse> getAllTrainingPrograms() {
@@ -107,7 +82,7 @@ public class TrainingProgramService {
 
         // Map the list of TrainingProgram entities to TrainingProgramResponse DTOs
         return trainingPrograms.stream()
-                .map(this::mapToTrainingProgramResponse)  // Use the mapping method to convert to response DTOs
+                .map(mapper::mapToTrainingProgramResponse)  // Use the mapping method to convert to response DTOs
                 .collect(Collectors.toList());
     }
 
@@ -117,7 +92,7 @@ public class TrainingProgramService {
                 .orElseThrow(() -> new EntityNotFoundException("Training program not found with id: " + id));
 
         // Map the TrainingProgram entity to TrainingProgramResponse DTO
-        return mapToTrainingProgramResponse(trainingProgram);
+        return mapper.mapToTrainingProgramResponse(trainingProgram);
     }
 
     @Transactional
@@ -127,7 +102,7 @@ public class TrainingProgramService {
         List<TrainingProgram> trainingPrograms = trainingProgramRepository.findByTrainer(user);
 
         return trainingPrograms.stream()
-                .map(this::mapToTrainingProgramResponse)
+                .map(mapper::mapToTrainingProgramResponse)
                 .collect(Collectors.toList());
     }
 
@@ -208,7 +183,7 @@ public class TrainingProgramService {
         // Map the list of UserTrainingProgram entities to TrainingProgramResponse DTOs
         return userTrainingPrograms.stream()
                 .map(UserTrainingProgram::getTrainingProgram)
-                .map(this::mapToTrainingProgramResponse)
+                .map(mapper::mapToTrainingProgramResponse)
                 .collect(Collectors.toList());
     }
 
