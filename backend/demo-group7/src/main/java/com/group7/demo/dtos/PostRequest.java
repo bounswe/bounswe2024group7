@@ -14,4 +14,5 @@ public class PostRequest {
     private String content;
     private Set<String> tags;
     private Long trainingProgramId;
+    private String imageUrl;
 }
