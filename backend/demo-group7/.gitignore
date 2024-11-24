@@ -13,6 +13,7 @@ Dockerfile.*
 docker-compose.yml
 docker-compose.override.yml
 docker-compose.*.yml
+../../docker-compose.yaml
 
 
 ### STS ###
