@@ -1,8 +1,16 @@
 HELP.md
+application.properties
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
+# Ignore all docker-compose files by name
+docker-compose*.yaml
+docker-compose*.yml
+
+# Ignore all Dockerfiles by name
+Dockerfile*
 
 ### STS ###
 .apt_generated
@@ -12,6 +20,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
+
 
 ### IntelliJ IDEA ###
 .idea

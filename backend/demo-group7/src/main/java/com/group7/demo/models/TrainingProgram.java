@@ -22,7 +22,8 @@ public class TrainingProgram {
 
     private String title;
 
-    @Lob
+//    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne

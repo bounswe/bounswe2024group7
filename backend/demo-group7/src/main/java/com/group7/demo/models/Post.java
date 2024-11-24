@@ -19,7 +19,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
+//    @Lob
     @Column(columnDefinition = "TEXT")
     private String content;
 
