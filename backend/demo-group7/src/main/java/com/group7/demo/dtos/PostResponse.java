@@ -18,4 +18,5 @@ public class PostResponse {
     private LocalDateTime createdAt;
     private String username;
     private TrainingProgramResponse trainingProgram;
+    private String imageUrl;
 }

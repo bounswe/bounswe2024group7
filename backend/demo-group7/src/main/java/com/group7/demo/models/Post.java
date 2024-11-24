@@ -40,4 +40,7 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "training_program_id")
     private TrainingProgram trainingProgram;
+
+    @Column(nullable = true)
+    private String imageUrl;
 }
