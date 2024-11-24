@@ -12,14 +12,12 @@ dist
 dist-ssr
 *.local
 
-# Ignore Dockerfiles
-Dockerfile
-Dockerfile.*
+# Ignore all docker-compose files by name
+docker-compose*.yaml
+docker-compose*.yml
 
-# Ignore Docker Compose files
-docker-compose.yml
-docker-compose.override.yml
-docker-compose.*.yml
+# Ignore all Dockerfiles by name
+Dockerfile*
 
 
 # Editor directories and files
