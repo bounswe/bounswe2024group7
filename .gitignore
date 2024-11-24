@@ -36,5 +36,6 @@ artifact_backend/.idea
 venv
 staticfiles
 ./frontend/package-lock.json
-.frontend/package.json
+./frontend/package.json
 jsonconfig.json
+./frontend/src/routeTree.gen.ts
