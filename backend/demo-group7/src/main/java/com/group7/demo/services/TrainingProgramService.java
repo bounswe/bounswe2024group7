@@ -127,7 +127,7 @@ public class TrainingProgramService {
     }
 
     @Transactional
-    public void joinTrainingProgram(Long trainingProgramId , HttpServletRequest request) {
+    public UserTrainingProgramResponse joinTrainingProgram(Long trainingProgramId , HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
         TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
@@ -144,7 +144,7 @@ public class TrainingProgramService {
         }
 
         // Initialize the progress JSON object
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         Map<Long, Boolean> exerciseProgress = trainingProgram.getExercises().stream()
                 .collect(Collectors.toMap(
                         TrainingProgramExercise::getId, // Exercise ID
@@ -153,7 +153,7 @@ public class TrainingProgramService {
 
         String progressJson;
         try {
-            progressJson = mapper.writeValueAsString(exerciseProgress);
+            progressJson = objectMapper.writeValueAsString(exerciseProgress);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Failed to initialize exercise progress JSON", e);
         }
@@ -168,7 +168,7 @@ public class TrainingProgramService {
                 .build();
 
         // Save the UserTrainingProgram entity
-        userTrainingProgramRepository.save(userTrainingProgram);
+        return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
 
     @Transactional
@@ -208,7 +208,7 @@ public class TrainingProgramService {
     }
 
     @Transactional
-    public void markExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
+    public UserTrainingProgramResponse markExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
         UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
@@ -228,13 +228,13 @@ public class TrainingProgramService {
             throw new IllegalStateException("Failed to update exercise progress JSON", e);
         }
 
-        userTrainingProgramRepository.save(userTrainingProgram);
+        return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
 
 
 
     @Transactional
-    public void unmarkExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
+    public UserTrainingProgramResponse unmarkExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
         UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
@@ -251,15 +251,14 @@ public class TrainingProgramService {
             String updatedProgressJson = objectMapper.writeValueAsString(exerciseProgress);
             userTrainingProgram.setExerciseProgress(updatedProgressJson); // Save the updated JSON string
         } catch (Exception e) {
-            e.printStackTrace();
-            // Handle exception, possibly throw a runtime exception or return an error response
+            throw new IllegalStateException("Failed to update exercise progress JSON", e);
         }
 
-        userTrainingProgramRepository.save(userTrainingProgram);
+        return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
 
     @Transactional
-    public void markTrainingProgramAsCompleted(Long trainingProgramId, HttpServletRequest request) {
+    public UserTrainingProgramResponse markTrainingProgramAsCompleted(Long trainingProgramId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
         UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
@@ -267,11 +266,11 @@ public class TrainingProgramService {
         // Mark the entire training program as completed
         userTrainingProgram.setStatus(UserTrainingProgramStatus.COMPLETED);
 
-        userTrainingProgramRepository.save(userTrainingProgram);
+        return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
 
     @Transactional
-    public void leaveTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
+    public UserTrainingProgramResponse leaveTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
         UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
@@ -280,7 +279,7 @@ public class TrainingProgramService {
         // Mark the training program as left
         userTrainingProgram.setStatus(UserTrainingProgramStatus.LEFT);
 
-        userTrainingProgramRepository.save(userTrainingProgram);
+        return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
 
 }

@@ -60,15 +60,15 @@ public class TrainingProgramController {
 
 
     @PostMapping("/{programId}/join")
-    public ResponseEntity<String> joinTrainingProgram(@PathVariable Long programId , HttpServletRequest request) {
-        trainingProgramService.joinTrainingProgram(programId ,request);
-        return ResponseEntity.ok("User has successfully joined the training program.");
+    public ResponseEntity<UserTrainingProgramResponse> joinTrainingProgram(@PathVariable Long programId , HttpServletRequest request) {
+        UserTrainingProgramResponse response = trainingProgramService.joinTrainingProgram(programId ,request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{programId}/leave")
-    public ResponseEntity<String> leaveProgram(@PathVariable Long programId, HttpServletRequest request) {
-        trainingProgramService.leaveTrainingProgram(programId, request);
-        return ResponseEntity.ok("Successfully left the training program.");
+    public ResponseEntity<UserTrainingProgramResponse> leaveProgram(@PathVariable Long programId, HttpServletRequest request) {
+        UserTrainingProgramResponse response = trainingProgramService.leaveTrainingProgram(programId, request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{programId}/participants")
@@ -85,31 +85,31 @@ public class TrainingProgramController {
     }
 
     @PostMapping("/{trainingProgramId}/exercises/{exerciseId}/complete")
-    public ResponseEntity<Void> markExerciseAsCompleted(
+    public ResponseEntity<UserTrainingProgramResponse> markExerciseAsCompleted(
             @PathVariable Long trainingProgramId,
             @PathVariable Long exerciseId,
             HttpServletRequest request
     ) {
-        trainingProgramService.markExerciseAsCompleted(trainingProgramId, exerciseId, request);
-        return ResponseEntity.ok().build();
+        UserTrainingProgramResponse response = trainingProgramService.markExerciseAsCompleted(trainingProgramId, exerciseId, request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{trainingProgramId}/exercises/{exerciseId}/uncomplete")
-    public ResponseEntity<Void> unmarkExerciseAsCompleted(
+    public ResponseEntity<UserTrainingProgramResponse> unmarkExerciseAsCompleted(
             @PathVariable Long trainingProgramId,
             @PathVariable Long exerciseId,
             HttpServletRequest request) {
-        trainingProgramService.unmarkExerciseAsCompleted(trainingProgramId, exerciseId, request);
-        return ResponseEntity.ok().build();
+        UserTrainingProgramResponse response = trainingProgramService.unmarkExerciseAsCompleted(trainingProgramId, exerciseId, request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{trainingProgramId}/complete")
-    public ResponseEntity<Void> markTrainingProgramAsCompleted(
+    public ResponseEntity<UserTrainingProgramResponse> markTrainingProgramAsCompleted(
             @PathVariable Long trainingProgramId,
             HttpServletRequest request
     ) {
-        trainingProgramService.markTrainingProgramAsCompleted(trainingProgramId, request);
-        return ResponseEntity.ok().build();
+        UserTrainingProgramResponse response = trainingProgramService.markTrainingProgramAsCompleted(trainingProgramId, request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/joined/{username}")
