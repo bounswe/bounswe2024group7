@@ -227,13 +227,6 @@ public class TrainingProgramService {
             throw new IllegalStateException("Failed to update exercise progress JSON", e);
         }
 
-        //TODO: Is it needed?
-        // Check if the whole program is completed
-        boolean allCompleted = exerciseProgress.values().stream().allMatch(Boolean::booleanValue);
-        if (allCompleted) {
-            userTrainingProgram.setStatus(UserTrainingProgramStatus.COMPLETED);
-        }
-
         userTrainingProgramRepository.save(userTrainingProgram);
     }
 
@@ -259,15 +252,6 @@ public class TrainingProgramService {
         } catch (Exception e) {
             e.printStackTrace();
             // Handle exception, possibly throw a runtime exception or return an error response
-        }
-
-        //TODO: ask if it is needed
-        // Check if the whole program is completed
-        boolean allCompleted = exerciseProgress.values().stream().allMatch(Boolean::booleanValue);
-        if (allCompleted){
-            userTrainingProgram.setStatus(UserTrainingProgramStatus.COMPLETED);
-        } else {
-            userTrainingProgram.setStatus(UserTrainingProgramStatus.ONGOING);
         }
 
         userTrainingProgramRepository.save(userTrainingProgram);
