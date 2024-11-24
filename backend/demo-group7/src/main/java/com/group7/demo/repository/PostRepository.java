@@ -15,5 +15,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT DISTINCT p FROM Post p JOIN p.tags t WHERE t.name IN :tagNames")
     List<Post> findPostsByTags(@Param("tagNames") Set<String> tagNames);
 
+    @Query("SELECT p FROM Post p " +
+            "LEFT JOIN p.tags t " +
+            "LEFT JOIN p.trainingProgram tp " +
+            "WHERE " +
+            "LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(tp.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(p.user.username) LIKE LOWER(CONCAT('%', :query, '%'))")
+    List<Post> search(@Param("query") String query);
 
 }
