@@ -6,6 +6,8 @@ import Feed from './Feed';
 import CreatePost from './CreatePost';
 import CreateProgram from './CreateProgram';
 import Create from './Create';
+import SearchResults from './SearchResults';
+
 
 
 
@@ -29,6 +31,13 @@ const Home = ({ navigation }) => {
       <Feed darkMode={darkMode}/>
     </View>
   );
+
+  const SearchPageContainer = () => (
+      <View style={currentStyles.page}>
+        <SearchResults/>
+      </View>
+    );
+
   // Apply styles based on dark mode
 
   return (
@@ -96,6 +105,17 @@ const Home = ({ navigation }) => {
                   <Text style={currentStyles.profileMenuItemText}>Feed</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+
+                                  style={currentStyles.profileMenuItem}
+                                  onPress={() => {
+                                    setSelectedPage('Search');
+                                    setIsProfileMenuOpen(false);
+                                  }}
+                                >
+                <Text style={currentStyles.profileMenuItemText}>Search</Text>
+                                </TouchableOpacity>
+                <TouchableOpacity
+
                   style={currentStyles.profileMenuItem}
                   onPress={logout}
                 >
@@ -109,6 +129,8 @@ const Home = ({ navigation }) => {
           <View style={currentStyles.content}>
             {selectedPage === 'Profile' && <ProfilePageContainer />}
             {selectedPage === 'Feed' && <FeedPageContainer />}
+            {selectedPage === 'Search' && <SearchPageContainer />}
+
             {selectedPage === 'Create' && <Create darkMode={darkMode} />}
           </View>
 
@@ -159,6 +181,7 @@ const lightStyles = StyleSheet.create({
     backgroundColor: '#4F46E5',
     width: '80%',
     height: 40,
+
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
@@ -168,11 +191,23 @@ const lightStyles = StyleSheet.create({
     backgroundColor: '#E5E7EB',
     width: '80%',
     height: 40,
+
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
     borderRadius: 5,
   },
+
+  buttonSecondary: {
+    backgroundColor: '#E5E7EB',
+    width: '80%',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    borderRadius: 5,
+  },
+
   buttonText: {
     color: '#fff',
     fontSize: 18,

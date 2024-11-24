@@ -1,11 +1,8 @@
 package com.group7.demo.dtos;
 
-import com.group7.demo.models.enums.LocationType;
-import com.group7.demo.models.enums.ProgramType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -14,10 +11,16 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class TrainingProgramRequest {
-
     private String title;
-    private ProgramType programType;
-    private LocationType locationType;
-    private List<ExerciseRequest> exercises;
+    private List<ExerciseDto> exercises;
     private String description;
+
+
+    @Data
+    @AllArgsConstructor
+    public static class ExerciseDto {
+        private Long id;
+        private int repetitions;
+        private int sets;
+    }
 }

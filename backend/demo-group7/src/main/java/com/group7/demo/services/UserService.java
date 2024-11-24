@@ -6,7 +6,7 @@ import com.group7.demo.dtos.UserProfileResponse;
 import com.group7.demo.models.User;
 import com.group7.demo.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +31,7 @@ public class UserService {
         this.trainingProgramService = trainingProgramService;
     }
 
+    @Transactional
     public UserProfileResponse getUserProfile(String username) throws Exception {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new Exception("User not found"));

@@ -1,16 +1,21 @@
-# Step 1: Use the official OpenJDK image as the base image
+FROM maven:3.9.5 AS builder
+
+WORKDIR /app
+
+COPY pom.xml .
+
+RUN mvn -B dependency:go-offline
+
+COPY src ./src
+
+RUN mvn -B package -DskipTests
+
 FROM openjdk:20-jdk-slim
 
 WORKDIR /app
 
-COPY mvnw ./
-COPY .mvn .mvn
+COPY --from=builder /app/target/demo-0.0.1-SNAPSHOT.jar ./backend-app.jar
 
-COPY pom.xml .
-COPY src ./src
+EXPOSE 8000
 
-RUN ./mvnw dependency:resolve
-
-EXPOSE 8080
-
-CMD ["./mvnw", "spring-boot:run"]
+CMD ["java", "-jar", "backend-app.jar"]
