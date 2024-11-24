@@ -1,122 +1,244 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Image,
+  Dimensions,
+  ScrollView
+} from 'react-native';
 
 const ProgramDetail = ({ route }) => {
-  const { title, description, trainerUsername, exercises} = route.params;
+  const { title, description, trainerUsername, exercises } = route.params;
+  /*const {title, description, trainerUsername, exercises} = {
+    title: "Full Body Workout",
+    description: "This is a comprehensive program targeting all major muscle groups.",
+    trainerUsername: "fitness_guru_123",
+    exercises: [
+      { exercise:{
+        name: "Push-Up",
+        gifUrl: "https://example.com/push-up.gif",
+        bodyPart: "Chest",
+        target: "Pectorals",
+        equipment: "None",
+        secondaryMuscles: "Triceps, Shoulders",
+        instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
+      },
+      reps:10,
+      sets:3
+      },
+      {
+      exercise:{
+        name: "Squat",
+        gifUrl: "https://example.com/squat.gif",
+        bodyPart: "Legs",
+        target: "Quadriceps",
+        equipment: "None",
+        secondaryMuscles: "Glutes, Hamstrings",
+        instructions: "Keep your back straight, bend your knees, and lower your hips.",
+      },reps:8,
+              sets:4
+          }
+    ],
+  }*/
+  const [expandedExercise, setExpandedExercise] = useState(null);
 
-  // Mock data for daily exercises
-  /*const weeklySchedule = {
-    Monday: ['Push-ups', 'Squats', 'Plank'],
-    Tuesday: ['Pull-ups', 'Lunges', 'Deadlift'],
-    Wednesday: ['Rest Day'],
-    Thursday: ['Bench Press', 'Rows', 'Bicep Curls'],
-    Friday: ['Overhead Press', 'Leg Press', 'Lat Pulldown'],
-    Saturday: ['Cardio', 'Abs Workout'],
-    Sunday: ['Rest Day']
-  };*/
+  const toggleExerciseDetails = (index) => {
+    setExpandedExercise(expandedExercise === index ? null : index);
+  };
 
-  // Render exercises for each day
-  /*const renderExercises = (day) => (
-    <View style={styles.dayContainer}>
-      {weeklySchedule[day].map((exercise, index) => (
-        <Text key={index} style={styles.exerciseText}>{exercise}</Text>
-      ))}
-    </View>
-  );
+  const renderExercise = ({ item, index }) => {
+    const isExpanded = expandedExercise === index;
 
-  // Scene map for tabs
-  const renderScene = SceneMap({
-    Monday: () => renderExercises('Monday'),
-    Tuesday: () => renderExercises('Tuesday'),
-    Wednesday: () => renderExercises('Wednesday'),
-    Thursday: () => renderExercises('Thursday'),
-    Friday: () => renderExercises('Friday'),
-    Saturday: () => renderExercises('Saturday'),
-    Sunday: () => renderExercises('Sunday'),
-  });
+    return (
+      <View style={styles.exerciseContainer}>
+        {/* Exercise Title */}
+        <TouchableOpacity
+          style={styles.exerciseHeader}
+          onPress={() => toggleExerciseDetails(index)}
+        >
+          <Text style={styles.exerciseTitle}>{item.exercise.name}</Text>
+          <Text style={styles.exerciseTitle}>{item.reps} reps</Text>
+          <Text style={styles.exerciseTitle}>{item.sets} sets</Text>
+          <Text style={styles.expandIcon}>{isExpanded ? '▲' : '▼'}</Text>
+        </TouchableOpacity>
 
-  // State for tab view index and routes
-  const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    { key: 'Monday', title: 'Mo' },
-    { key: 'Tuesday', title: 'Tue' },
-    { key: 'Wednesday', title: 'We' },
-    { key: 'Thursday', title: 'Th' },
-    { key: 'Friday', title: 'Fri' },
-    { key: 'Saturday', title: 'Sa' },
-    { key: 'Sunday', title: 'Su' },
-  ]);
-*/
+        {/* Exercise Details */}
+        {isExpanded && (
+          <View style={styles.exerciseDetails}>
+            <Image
+              source={{ uri: item.exercise.gifUrl }}
+              style={styles.exerciseImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.detailText}>
+              <Text style={styles.detailLabel}>Body Part:</Text> {item.exercise.bodyPart}
+            </Text>
+            <Text style={styles.detailText}>
+              <Text style={styles.detailLabel}>Target Muscle:</Text>{' '}
+              {item.exercise.target}
+            </Text>
+            <Text style={styles.detailText}>
+              <Text style={styles.detailLabel}>Equipment:</Text> {item.exercise.equipment}
+            </Text>
+            <Text style={styles.detailText}>
+              <Text style={styles.detailLabel}>Secondary Muscles:</Text>{' '}
+              {item.exercise.secondaryMuscles || 'None'}
+            </Text>
+            <Text style={styles.detailText}>
+              <Text style={styles.detailLabel}>Instructions:</Text>{' '}
+              {item.exercise.instructions || 'No instructions available.'}
+            </Text>
+          </View>
+        )}
+      </View>
+    );
+  };
+
   return (
-    <View style={styles.container}>
+  <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.postContainer}>
+      {/* Program Info */}
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.owner}>Trainer: {trainerUsername}</Text>
+      <Text style={styles.owner}>{trainerUsername}</Text>
       <Text style={styles.description}>{description}</Text>
-      <Text style={styles.exerciseList}>Exercise List: {exercises.join(', ')}</Text>
-      {/* Weekly Schedule Tabs */}
-      {/*<TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={{ width: Dimensions.get('window').width }}
-        renderTabBar={(props) => {
-          const { key, ...rest } = props; // Destructure key and rest of props
-          return <TabBar {...rest} style={styles.tabBar} indicatorStyle={styles.indicator} />;
-        }}
-      />*/}
     </View>
+      {/* Exercises List */}
+      <View style={styles.exercisesContainer}>
+      <Text style={styles.exerciseListTitle}>Exercises:</Text>
+      <FlatList
+        data={exercises}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={renderExercise}
+        contentContainerStyle={styles.exerciseList}
+      />
+      </View>
+
+      {/* Join Program Button */}
+
+      <TouchableOpacity style={styles.joinButton}>
+        <Text style={styles.joinButtonText}>Join Program</Text>
+      </TouchableOpacity>
+
+
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: 'white',
+container: {
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#F5F8FA',
   },
+  postContainer: {
+      backgroundColor: '#FFFFFF',
+      borderRadius: 12,
+      padding: 20,
+      shadowColor: '#000',
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      marginBottom: 20,
+    },
+    interactionContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        paddingVertical: 10,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        marginBottom: 20,
+      },
   title: {
-    fontSize: 24,
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#333333',
+    },
+   owner: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#1E90FF',
+        marginBottom: 4,
+      },
+    description: {
+      fontSize: 14,
+      color: '#555555',
+      lineHeight: 20,
+    },
+  exerciseListTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  owner: {
-    fontSize: 16,
-    color: '#555',
-    marginBottom: 10,
-  },
-  description: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 10,
-  },
-  location: {
-    fontSize: 14,
-    color: '#888',
+    color: '#333',
     marginBottom: 10,
   },
   exerciseList: {
-    fontSize: 14,
-    color: '#888',
+    paddingBottom: 20,
+  },
+  exercisesContainer:{
+      backgroundColor: '#FFFFFF',
+      borderRadius: 12,
+      padding: 15,
+      shadowColor: '#000',
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      marginBottom: 20},
+  exerciseContainer: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    marginBottom: 10,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  exerciseHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  exerciseTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  expandIcon: {
+    fontSize: 18,
+    color: '#555',
+  },
+  exerciseDetails: {
+    marginTop: 10,
+  },
+  exerciseImage: {
+    width: '100%',
+    height: Dimensions.get('window').width * 0.5,
+    borderRadius: 10,
     marginBottom: 10,
   },
-  followCount: {
+  detailText: {
     fontSize: 14,
-    color: '#888',
+    color: '#555',
+    marginBottom: 6,
   },
-  tabBar: {
-    backgroundColor: '#007bff',
-  },
-  indicator: {
-    backgroundColor: 'white',
-  },
-  dayContainer: {
-    padding: 16,
-  },
-  exerciseText: {
-    fontSize: 16,
+  detailLabel: {
+    fontWeight: 'bold',
     color: '#333',
-    marginBottom: 8,
+  },
+  joinButton: {
+    backgroundColor: '#1E90FF',
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  joinButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

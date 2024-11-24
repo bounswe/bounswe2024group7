@@ -12,7 +12,7 @@ const ProgramCard = ({ trainerUsername, title, description, exercises, navigatio
       </TouchableOpacity>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
-      <Text style={styles.description}>Exercises: {exercises.join(', ')}</Text>
+      <Text style={styles.description}>Exercise count: {exercises.length}</Text>
     </TouchableOpacity>
   );
 };

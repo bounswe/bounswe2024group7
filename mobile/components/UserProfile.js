@@ -11,15 +11,78 @@ const UserProfile = ({ route }) => {
 
   // Static mock data for the user's profile
   const forumPosts = [
-    { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: username, labels: ['forum', 'discussion'], likeCount: 20 },
-    { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: username, labels: ['forum', 'diet'], likeCount: 15 },
-  ];
+      { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', date: '14.11.2024',commentList: [
+                                                                                                                                            { id: '1', user: 'jshine1337', text: 'Nope, that’s not a concept...' },
+                                                                                                                                            { id: '2', user: 'sqlpro23', text: 'You could try batching your statements!' },
+                                                                                                                                          ], labels: ['forum', 'discussion'], likeCount: 20 },
+      { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: 'jane_doe', labels: ['forum', 'diet'], date: '13.11.2024',commentList: [
+                                                                                                                                                                    { id: '1', user: 'jshine1337', text: 'Nope, that’s not a concept...' },
+                                                                                                                                                                    { id: '2', user: 'sqlpro23', text: 'You could try batching your statements!' },
+                                                                                                                                                                  ], likeCount: 15 },
+    ];
 
   const programs = [
-      { id: 1, title: 'Full Body Program', description: 'A 12-week strength program for powerlifting.', trainerUsername: 'trainer_john', exercises: ['Bicep Curls', 'Deadlift']},
-       { id: 2, title: 'Leg Program', description: 'An 8-week strength program for leg.', trainerUsername: 'trainer_john', exercises: ['Bicep Curls', 'Deadlift']},
+      { id: 1, title: "Full Body Workout",
+                   description: "This is a comprehensive program targeting all major muscle groups.",
+                   trainerUsername: "fitness_guru_123",
+                   exercises: [
+                     { exercise:{
+                       name: "Push-Up",
+                       gifUrl: "https://example.com/push-up.gif",
+                       bodyPart: "Chest",
+                       target: "Pectorals",
+                       equipment: "None",
+                       secondaryMuscles: "Triceps, Shoulders",
+                       instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
+                     },
+                     reps:10,
+                     sets:3
+                     },
+                     {
+                     exercise:{
+                       name: "Squat",
+                       gifUrl: "https://example.com/squat.gif",
+                       bodyPart: "Legs",
+                       target: "Quadriceps",
+                       equipment: "None",
+                       secondaryMuscles: "Glutes, Hamstrings",
+                       instructions: "Keep your back straight, bend your knees, and lower your hips.",
+                     },reps:8,
+                             sets:4
+                         }
+                   ]},
+       { id: 2, title: "Full Body Workout",
+                    description: "This is a comprehensive program targeting all major muscle groups.",
+                    trainerUsername: "fitness_guru_123",
+                    exercises: [
+                      { exercise:{
+                        name: "Push-Up",
+                        gifUrl: "https://example.com/push-up.gif",
+                        bodyPart: "Chest",
+                        target: "Pectorals",
+                        equipment: "None",
+                        secondaryMuscles: "Triceps, Shoulders",
+                        instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
+                      },
+                      reps:10,
+                      sets:3
+                      },
+                      {
+                      exercise:{
+                        name: "Squat",
+                        gifUrl: "https://example.com/squat.gif",
+                        bodyPart: "Legs",
+                        target: "Quadriceps",
+                        equipment: "None",
+                        secondaryMuscles: "Glutes, Hamstrings",
+                        instructions: "Keep your back straight, bend your knees, and lower your hips.",
+                      },reps:8,
+                              sets:4
+                          }
+                    ]}
 
     ];
+
 const diet_programs = [
         { id: 1, title: 'Gluten-free Diet Program', description: 'A protein based gluten-free diet.', owner: 'dietician_john', followCount: 100, category: 'gluten-free', nutrition_list: ['180 g fat', '300 g protein'], weeklySchedule: {
       Monday: ['Egg', 'Squats', 'Turkey', 'Orange'],
@@ -60,7 +123,7 @@ const diet_programs = [
               description={item.description}
               labels={item.labels}
               likeCount={item.likeCount}
-              commentCount={item.commentCount}
+              commentList={item.commentList}
               date={item.date}
               navigation={navigation}
             />
