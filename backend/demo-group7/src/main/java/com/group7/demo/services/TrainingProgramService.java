@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -171,7 +172,7 @@ public class TrainingProgramService {
     }
 
     @Transactional
-    public List<String> getRegisteredUsernames(Long trainingProgramId) {
+    public Set<String> getRegisteredUsernames(Long trainingProgramId) {
         // Fetch the training program by its ID
         TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
                 .orElseThrow(() -> new EntityNotFoundException("Training program not found with id: " + trainingProgramId));
@@ -179,7 +180,7 @@ public class TrainingProgramService {
         // Fetch the list of participants' usernames
         return trainingProgram.getParticipants().stream()
                 .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     // Return the list of joined training programs for the authenticated user

@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -16,6 +17,6 @@ public class TrainingProgramResponse {
     private List<ExerciseDetail> exercises;
     private String description;
     private String trainerUsername;
-    private List<String> participants;
+    private Set<String> participants;
     private LocalDateTime createdAt;
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -34,10 +35,10 @@ public class Mapper {
                         .sorted(Comparator.comparing(ExerciseDetail::getId))
                         .collect(Collectors.toList()))
                 .participants(program.getParticipants() == null ?
-                        List.of() :
+                        Set.of() :
                         program.getParticipants().stream()
                                 .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
-                                .collect(Collectors.toList()))
+                                .collect(Collectors.toSet()))
                 .build();
     }
 
@@ -67,7 +68,7 @@ public class Mapper {
                 .trainerUsername(program.getTrainer().getUsername())
                 .participants(program.getParticipants().stream()
                         .map(participant -> participant.getUser().getUsername())
-                        .collect(Collectors.toList()))
+                        .collect(Collectors.toSet()))
                 .exercises(exerciseDetails)
                 .status(userTrainingProgram.getStatus())
                 .createdAt(program.getCreatedAt())
