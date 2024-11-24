@@ -146,8 +146,8 @@ public class TrainingProgramService {
         ObjectMapper mapper = new ObjectMapper();
         Map<Long, Boolean> exerciseProgress = trainingProgram.getExercises().stream()
                 .collect(Collectors.toMap(
-                        exercise -> exercise.getExercise().getId(), // Exercise ID
-                        exercise -> false // Not completed yet
+                        TrainingProgramExercise::getId, // Exercise ID
+                        TrainingProgramExercise -> false // Not completed yet
                 ));
 
         String progressJson;

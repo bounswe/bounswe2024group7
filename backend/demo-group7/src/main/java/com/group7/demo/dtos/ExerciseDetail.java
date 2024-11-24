@@ -9,6 +9,7 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class ExerciseDetail {
+    private Long id;
     private Exercise exercise;
     private int repetitions;
     private int sets;
