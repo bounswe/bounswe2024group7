@@ -13,8 +13,14 @@ const ProfilePage = ({ darkMode }) => {
 
   // Mock data for posts
   const forumPosts = [
-    { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', date: '14.11.2024',commentCount: 2, labels: ['forum', 'discussion'], likeCount: 20 },
-    { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: 'jane_doe', labels: ['forum', 'diet'], date: '13.11.2024',commentCount: 1, likeCount: 15 },
+    { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', date: '14.11.2024',commentList: [
+                                                                                                                                          { id: '1', user: 'jshine1337', text: 'Nope, that’s not a concept...' },
+                                                                                                                                          { id: '2', user: 'sqlpro23', text: 'You could try batching your statements!' },
+                                                                                                                                        ], labels: ['forum', 'discussion'], likeCount: 20 },
+    { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: 'jane_doe', labels: ['forum', 'diet'], date: '13.11.2024',commentList: [
+                                                                                                                                                                  { id: '1', user: 'jshine1337', text: 'Nope, that’s not a concept...' },
+                                                                                                                                                                  { id: '2', user: 'sqlpro23', text: 'You could try batching your statements!' },
+                                                                                                                                                                ], likeCount: 15 },
   ];
 
   const programs = [
@@ -65,7 +71,7 @@ const ProfilePage = ({ darkMode }) => {
               description={item.description}
               labels={item.labels}
               likeCount={item.likeCount}
-              commentCount={item.commentCount}
+              commentList={item.commentList}
               date={item.date}
               navigation={navigation}
             />

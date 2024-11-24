@@ -18,6 +18,8 @@ import UserProfile from './components/UserProfile';
 import Label from './components/Label';
 import SearchBar from './components/SearchBar';
 import SearchResult from './components/SearchResult';
+import ProgressTracker from './components/ProgressTracker';
+
 import { enableScreens } from 'react-native-screens';
 
 enableScreens();
@@ -55,6 +57,9 @@ const App = () => {
             <Stack.Screen name="Label" component={Label} />
             <Stack.Screen name="SearchBar" component={SearchBar} />
             <Stack.Screen name="SearchResult" component={SearchResult} />
+            <Stack.Screen name="ProgressTracker" component={ProgressTracker} />
+            {/*<Stack.Screen name="NewPostDetail" component={NewPostDetail} />*/}
+
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>
