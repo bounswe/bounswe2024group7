@@ -35,3 +35,6 @@ artifact_backend/.idea
 
 venv
 staticfiles
+./frontend/package-lock.json
+.frontend/package.json
+jsonconfig.json
