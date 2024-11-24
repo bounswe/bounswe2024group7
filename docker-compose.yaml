@@ -1,0 +1,78 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 20s
+      retries: 10
+
+  springboot-app:
+    build:
+      context: ./backend/demo-group7
+    image: springboot-app:latest
+    container_name: springboot-app
+    restart: on-failure
+    ports:
+      - "${SPRING_PORT:-8080}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/demo-group7:/app
+    env_file:
+      - .env
+
+  frontend:
+    build:
+      context: ./frontend
+    image: frontend:latest
+    container_name: frontend
+    restart: on-failure
+    ports:
+      - "${VITE_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_BASE_URL=http://localhost:${SPRING_PORT:-8080}
+    depends_on:
+      - springboot-app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - .env
+
+  mobile:
+    build:
+      context: ./mobile
+    image: mobile:latest
+    container_name: mobile
+    restart: on-failure
+    ports:
+      - "${MOBILE_PORT:-3001}:3001"
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - springboot-app
+    volumes:
+      - ./mobile:/usr/src/app
+      - /usr/src/app/node_modules
+    env_file:
+      - .env
+
+volumes:
+  postgres-data:
