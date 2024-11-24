@@ -5,6 +5,7 @@ import { PhaseContextProvider } from '../context/PostContext'
 import PostFeed from '../components/PostFeed.component'
 import { UserContextProvider } from '../context/UserContext'
 
+
 export const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
