@@ -2,6 +2,7 @@ package com.group7.demo.controllers;
 
 import com.group7.demo.dtos.TrainingProgramRequest;
 import com.group7.demo.dtos.TrainingProgramResponse;
+import com.group7.demo.dtos.UserTrainingProgramResponse;
 import com.group7.demo.services.TrainingProgramService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/training-programs")
@@ -69,8 +72,8 @@ public class TrainingProgramController {
     }
 
     @GetMapping("/{programId}/participants")
-    public ResponseEntity<List<String>> getRegisteredUsernames(@PathVariable Long programId) {
-        List<String> usernames = trainingProgramService.getRegisteredUsernames(programId);
+    public ResponseEntity<Set<String>> getRegisteredUsernames(@PathVariable Long programId) {
+        Set<String> usernames = trainingProgramService.getRegisteredUsernames(programId);
         return ResponseEntity.ok(usernames);
     }
 
@@ -81,4 +84,42 @@ public class TrainingProgramController {
         return ResponseEntity.ok(trainingPrograms);
     }
 
+    @PostMapping("/{trainingProgramId}/exercises/{exerciseId}/complete")
+    public ResponseEntity<Void> markExerciseAsCompleted(
+            @PathVariable Long trainingProgramId,
+            @PathVariable Long exerciseId,
+            HttpServletRequest request
+    ) {
+        trainingProgramService.markExerciseAsCompleted(trainingProgramId, exerciseId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{trainingProgramId}/exercises/{exerciseId}/uncomplete")
+    public ResponseEntity<Void> unmarkExerciseAsCompleted(
+            @PathVariable Long trainingProgramId,
+            @PathVariable Long exerciseId,
+            HttpServletRequest request) {
+        trainingProgramService.unmarkExerciseAsCompleted(trainingProgramId, exerciseId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{trainingProgramId}/complete")
+    public ResponseEntity<Void> markTrainingProgramAsCompleted(
+            @PathVariable Long trainingProgramId,
+            HttpServletRequest request
+    ) {
+        trainingProgramService.markTrainingProgramAsCompleted(trainingProgramId, request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/joined/{username}")
+    public ResponseEntity<List<UserTrainingProgramResponse>> getJoinedTrainingPrograms(@PathVariable String username) {
+        try {
+            List<UserTrainingProgramResponse> responses = trainingProgramService.getJoinedTrainingPrograms(username);
+            return ResponseEntity.ok(responses);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.emptyList());
+        }
+    }
 }
