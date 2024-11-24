@@ -5,6 +5,16 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Ignore Dockerfiles
+Dockerfile
+Dockerfile.*
+
+# Ignore Docker Compose files
+docker-compose.yml
+docker-compose.override.yml
+docker-compose.*.yml
+
+
 ### STS ###
 .apt_generated
 .classpath
