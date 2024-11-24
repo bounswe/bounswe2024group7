@@ -1,24 +1,4 @@
-import React, { useState } from 'react';
-import {
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Box,
-    Checkbox,
-    Progress,
-    useColorModeValue,
-    Alert,
-    AlertIcon,
-    AlertTitle,
-    AlertDescription,
-    CloseButton,
-    Button,
-    useDisclosure,
-    Image,
-    Heading,
-} from '@chakra-ui/react';
+
 
 const programData = {
     title: 'Heavy Gym Instruments Fitness Program',
@@ -51,35 +31,72 @@ const programData = {
     ],
 };
 
-const steps = programData.steps;
+import React, { useState, useEffect } from 'react';
+import {
+    Box,
+    Heading,
+    Accordion,
+    AccordionItem,
+    AccordionButton,
+    AccordionIcon,
+    AccordionPanel,
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription,
+    CloseButton,
+    Progress,
+    Checkbox,
+    Image,
+    useDisclosure,
+    Text
+} from '@chakra-ui/react';
 
 const ProgramCard = () => {
-    const [completedSteps, setCompletedSteps] = useState(
-        Array(steps.length).fill(false)
-    );
-    const { isOpen: isAlertVisible, onClose, onOpen } = useDisclosure();
+    const steps = programData.steps;
+    const [completedSteps, setCompletedSteps] = useState(new Array(steps.length).fill(false));
     const [activeStep, setActiveStep] = useState(0);
+    const [isAlertVisible, setIsAlertVisible] = useState(false);
+    const [progressValue, setProgressValue] = useState(0);
 
+    const { onClose } = useDisclosure();
+
+    // Handle checkbox change
     const handleCheckboxChange = (index) => {
-        const updatedSteps = [...completedSteps];
-        updatedSteps[index] = true;
-        setCompletedSteps(updatedSteps);
+        const newCompletedSteps = [...completedSteps];
+        newCompletedSteps[index] = true;
+        setCompletedSteps(newCompletedSteps);
 
-        if (updatedSteps.every((step) => step)) {
-            onOpen();
-        } else {
-            setActiveStep(index + 1);
+        // Move to next step and set active step
+        if (index + 1 >= steps.length) { setIsAlertVisible(true); }
+        setActiveStep(index + 1);
+    };
+
+    // Calculate progress
+    useEffect(() => {
+        const completedCount = completedSteps.filter(step => step).length;
+        const progress = (completedCount / steps.length) * 100;
+        setProgressValue(progress);
+    }, [completedSteps]);
+
+    // Scroll to the active step
+    useEffect(() => {
+        const activeStepElement = document.getElementById(`step-${activeStep}`);
+        if (activeStepElement) {
+            window.scrollTo({
+                top: activeStepElement.offsetTop - 50, // Offset to make the step not hidden under the header
+                behavior: 'smooth',
+            });
         }
-    };
+    }, [activeStep]);
 
+    // Get step color
     const getStepColor = (index) => {
-        if (completedSteps[index]) return 'green.400';
-        if (index === completedSteps.findIndex((step) => !step)) return 'orange.400';
-        return useColorModeValue('gray.200', 'gray.700');
+        if (completedSteps[index]) return 'green';
+        if (index === activeStep) return 'orange';
+        if (index < activeStep) return 'green';
+        return 'gray';
     };
-
-    const completedCount = completedSteps.filter((step) => step).length;
-    const progressValue = (completedCount / steps.length) * 100;
 
     return (
         <Box
@@ -102,9 +119,9 @@ const ProgramCard = () => {
                     <Alert status="success" mb={4}>
                         <AlertIcon />
                         <Box>
-                            <AlertTitle>Success!</AlertTitle>
+                            <AlertTitle>You Nailed It !</AlertTitle>
                             <AlertDescription>
-                                You have completed {programData.title}. Keep up the good work!
+                                You have completed {programData.title} for today. Keep up the good work!
                             </AlertDescription>
                         </Box>
                         <CloseButton
@@ -118,22 +135,30 @@ const ProgramCard = () => {
                 ) : null}
 
                 {/* Progress Bar */}
-                <Progress
-                    hasStripe
-                    value={progressValue}
-                    colorScheme="green"
-                    size="lg"
-                    borderRadius="md"
-                    mb={4}
-                />
+                <Box display="flex" alignItems="center" mb={4}>
+                    {/* Progress Value */}
+                    <Text mr={2} fontWeight="bold">
+                        {progressValue}%
+                    </Text>
+                    {/* Progress Bar */}
+                    <Progress
+                        hasStripe
+                        value={progressValue}
+                        colorScheme="green"
+                        size="lg"
+                        borderRadius="md"
+                        flex="1" // Ensure the progress bar takes the remaining width
+                    />
+                </Box>
             </Box>
 
             {/* Accordion for Steps */}
-            <Accordion allowToggle index={activeStep} onChange={(index) => setActiveStep(index[0] || 0)}>
+            <Accordion allowToggle index={activeStep} onChange={(index) => setActiveStep(activeStep)}>
                 {steps.map((step, index) => (
                     <AccordionItem
                         key={index}
-                        isDisabled={index > 0 && !completedSteps[index - 1]}
+                        id={`step-${index}`}
+                        isDisabled={index != activeStep}  // Disable non active steps
                         border="1px solid"
                         borderColor={getStepColor(index)}
                         borderRadius="md"
@@ -141,9 +166,18 @@ const ProgramCard = () => {
                     >
                         <h2>
                             <AccordionButton
-                                _expanded={{ bg: getStepColor(index), color: 'white' }}
+                                bg={completedSteps[index] ? 'green' : 'white'}
+                                color={completedSteps[index] ? 'white' : 'black'}
+                                _expanded={{
+                                    bg: getStepColor(index),
+                                    color: 'white',
+                                }}
+                                _hover={{
+
+                                }}
                                 px={4}
                                 py={2}
+                                isDisabled={index !== activeStep} // Prevent collapsing on non active steps
                             >
                                 <Box as="span" flex="1" textAlign="left">
                                     {step.title}
@@ -154,7 +188,7 @@ const ProgramCard = () => {
                         <AccordionPanel pb={4}>
                             <p>{step.description}</p>
                             <Image
-                                boxSize='256px'
+                                boxSize="256px"
                                 src={step.gif}
                                 alt={step.title}
                             />
