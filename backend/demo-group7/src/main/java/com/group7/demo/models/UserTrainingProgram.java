@@ -2,6 +2,7 @@ package com.group7.demo.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group7.demo.models.enums.UserTrainingProgramStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +32,9 @@ public class UserTrainingProgram {
     @JoinColumn(name = "training_program_id", nullable = false)
     private TrainingProgram trainingProgram;
 
-    private boolean completed;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserTrainingProgramStatus status;
 
     @Lob
     @Column(columnDefinition = "TEXT")

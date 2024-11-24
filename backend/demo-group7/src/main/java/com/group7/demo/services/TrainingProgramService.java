@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group7.demo.dtos.*;
 import com.group7.demo.dtos.mapper.Mapper;
 import com.group7.demo.models.*;
+import com.group7.demo.models.enums.UserTrainingProgramStatus;
 import com.group7.demo.repository.ExerciseRepository;
 import com.group7.demo.repository.TrainingProgramRepository;
 import com.group7.demo.repository.UserTrainingProgramRepository;
@@ -131,9 +132,14 @@ public class TrainingProgramService {
         TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
                 .orElseThrow(() -> new EntityNotFoundException("Training Program not found with id: " + trainingProgramId));
 
-        boolean alreadyJoined = userTrainingProgramRepository.existsByUserAndTrainingProgram(user, trainingProgram);
-        if (alreadyJoined) {
-            throw new IllegalStateException("User has already joined the training program.");
+        // Check for all past participations
+        List<UserTrainingProgram> pastEntries = userTrainingProgramRepository.findAllByUserAndTrainingProgramId(user, trainingProgramId);
+
+        boolean hasOngoingEntry = pastEntries.stream()
+                .anyMatch(entry -> entry.getStatus() == UserTrainingProgramStatus.ONGOING);
+
+        if (hasOngoingEntry) {
+            throw new IllegalStateException("User is already actively participating in this training program.");
         }
 
         // Initialize the progress JSON object
@@ -156,29 +162,12 @@ public class TrainingProgramService {
                 .user(user)
                 .trainingProgram(trainingProgram)
                 .joinedAt(LocalDateTime.now())
-                .completed(false)
+                .status(UserTrainingProgramStatus.ONGOING)
                 .exerciseProgress(progressJson)
                 .build();
 
         // Save the UserTrainingProgram entity
         userTrainingProgramRepository.save(userTrainingProgram);
-    }
-
-    @Transactional
-    public void leaveTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
-        // Fetch the authenticated user from the request
-        User user = authenticationService.getAuthenticatedUserInternal(request);
-
-        // Fetch the training program by its ID
-        TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
-                .orElseThrow(() -> new EntityNotFoundException("Training program not found with id: " + trainingProgramId));
-
-        // Check if the user is participating in the program
-        UserTrainingProgram userTrainingProgram = userTrainingProgramRepository.findByUserIdAndTrainingProgramId(user.getId(), trainingProgram.getId())
-                .orElseThrow(() -> new IllegalStateException("User is not participating in this program."));
-
-        // Remove the user from the program
-        userTrainingProgramRepository.delete(userTrainingProgram);
     }
 
     @Transactional
@@ -208,12 +197,20 @@ public class TrainingProgramService {
                 .collect(Collectors.toList());
     }
 
+    private UserTrainingProgram getOngoingUserTrainingProgram(User user, Long trainingProgramId) {
+        // Fetch all entries and filter the ongoing one
+        return userTrainingProgramRepository.findAllByUserAndTrainingProgramId(user, trainingProgramId)
+                .stream()
+                .filter(entry -> entry.getStatus() == UserTrainingProgramStatus.ONGOING)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No ongoing training program found."));
+    }
+
     @Transactional
     public void markExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
-        UserTrainingProgram userTrainingProgram = userTrainingProgramRepository.findByUserIdAndTrainingProgramId(user.getId(), trainingProgramId)
-                .orElseThrow(() -> new EntityNotFoundException("User Training Program not found"));
+        UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
 
         // Get the current progress map
         Map<Long, Boolean> exerciseProgress = userTrainingProgram.getExerciseProgress();
@@ -227,25 +224,26 @@ public class TrainingProgramService {
             String updatedProgressJson = objectMapper.writeValueAsString(exerciseProgress);
             userTrainingProgram.setExerciseProgress(updatedProgressJson); // Save the updated JSON string
         } catch (Exception e) {
-            e.printStackTrace();
-            // Handle exception, possibly throw a runtime exception or return an error response
+            throw new IllegalStateException("Failed to update exercise progress JSON", e);
         }
 
+        //TODO: Is it needed?
         // Check if the whole program is completed
         boolean allCompleted = exerciseProgress.values().stream().allMatch(Boolean::booleanValue);
         if (allCompleted) {
-            userTrainingProgram.setCompleted(true);
+            userTrainingProgram.setStatus(UserTrainingProgramStatus.COMPLETED);
         }
 
         userTrainingProgramRepository.save(userTrainingProgram);
     }
 
+
+
     @Transactional
     public void unmarkExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
-        UserTrainingProgram userTrainingProgram = userTrainingProgramRepository.findByUserIdAndTrainingProgramId(user.getId(), trainingProgramId)
-                .orElseThrow(() -> new EntityNotFoundException("User Training Program not found"));
+        UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
 
         // Get the current progress map from the serialized exerciseProgress
         Map<Long, Boolean> exerciseProgress = userTrainingProgram.getExerciseProgress();
@@ -263,9 +261,14 @@ public class TrainingProgramService {
             // Handle exception, possibly throw a runtime exception or return an error response
         }
 
+        //TODO: ask if it is needed
         // Check if the whole program is completed
         boolean allCompleted = exerciseProgress.values().stream().allMatch(Boolean::booleanValue);
-        userTrainingProgram.setCompleted(allCompleted);
+        if (allCompleted){
+            userTrainingProgram.setStatus(UserTrainingProgramStatus.COMPLETED);
+        } else {
+            userTrainingProgram.setStatus(UserTrainingProgramStatus.ONGOING);
+        }
 
         userTrainingProgramRepository.save(userTrainingProgram);
     }
@@ -274,24 +277,23 @@ public class TrainingProgramService {
     public void markTrainingProgramAsCompleted(Long trainingProgramId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
-        UserTrainingProgram userTrainingProgram = userTrainingProgramRepository.findByUserIdAndTrainingProgramId(user.getId(), trainingProgramId)
-                .orElseThrow(() -> new EntityNotFoundException("User Training Program not found"));
+        UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
 
         // Mark the entire training program as completed
-        userTrainingProgram.setCompleted(true);
+        userTrainingProgram.setStatus(UserTrainingProgramStatus.COMPLETED);
 
         userTrainingProgramRepository.save(userTrainingProgram);
     }
 
     @Transactional
-    public void unmarkTrainingProgramAsCompleted(Long trainingProgramId, HttpServletRequest request) {
+    public void leaveTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
-        UserTrainingProgram userTrainingProgram = userTrainingProgramRepository.findByUserIdAndTrainingProgramId(user.getId(), trainingProgramId)
-                .orElseThrow(() -> new EntityNotFoundException("User Training Program not found"));
+        UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
 
-        // Unmark the entire training program as completed
-        userTrainingProgram.setCompleted(false);
+
+        // Mark the training program as left
+        userTrainingProgram.setStatus(UserTrainingProgramStatus.LEFT);
 
         userTrainingProgramRepository.save(userTrainingProgram);
     }

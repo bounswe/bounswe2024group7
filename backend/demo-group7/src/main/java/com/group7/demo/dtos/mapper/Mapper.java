@@ -65,7 +65,7 @@ public class Mapper {
                         .map(participant -> participant.getUser().getUsername())
                         .collect(Collectors.toList()))
                 .exercises(exerciseDetails)
-                .completed(userTrainingProgram.isCompleted())
+                .status(userTrainingProgram.getStatus())
                 .createdAt(program.getCreatedAt())
                 .build();
     }

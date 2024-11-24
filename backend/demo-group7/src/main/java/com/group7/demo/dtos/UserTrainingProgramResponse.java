@@ -1,5 +1,6 @@
 package com.group7.demo.dtos;
 
+import com.group7.demo.models.enums.UserTrainingProgramStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,6 @@ public class UserTrainingProgramResponse {
     private String description;
     private String trainerUsername;
     private List<String> participants;
-    private boolean completed;
+    private UserTrainingProgramStatus status;
     private LocalDateTime createdAt;
 }

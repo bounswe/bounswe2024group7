@@ -2,6 +2,7 @@ package com.group7.demo.controllers;
 
 import com.group7.demo.dtos.TrainingProgramRequest;
 import com.group7.demo.dtos.TrainingProgramResponse;
+import com.group7.demo.dtos.UserTrainingProgramResponse;
 import com.group7.demo.services.TrainingProgramService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -109,12 +111,14 @@ public class TrainingProgramController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{trainingProgramId}/uncomplete")
-    public ResponseEntity<Void> unmarkTrainingProgramAsCompleted(
-            @PathVariable Long trainingProgramId,
-            HttpServletRequest request
-    ) {
-        trainingProgramService.unmarkTrainingProgramAsCompleted(trainingProgramId, request);
-        return ResponseEntity.ok().build();
+    @GetMapping("/joined/{username}")
+    public ResponseEntity<List<UserTrainingProgramResponse>> getJoinedTrainingPrograms(@PathVariable String username) {
+        try {
+            List<UserTrainingProgramResponse> responses = trainingProgramService.getJoinedTrainingPrograms(username);
+            return ResponseEntity.ok(responses);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.emptyList());
+        }
     }
 }
