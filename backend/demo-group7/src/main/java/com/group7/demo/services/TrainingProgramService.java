@@ -1,10 +1,11 @@
 package com.group7.demo.services;
 
-import com.group7.demo.dtos.ExerciseDetailResponse;
-import com.group7.demo.dtos.ExerciseResponse;
+import com.group7.demo.dtos.ExerciseDetail;
 import com.group7.demo.dtos.TrainingProgramRequest;
 import com.group7.demo.dtos.TrainingProgramResponse;
+import com.group7.demo.dtos.mapper.Mapper;
 import com.group7.demo.models.*;
+import com.group7.demo.repository.ExerciseRepository;
 import com.group7.demo.repository.TrainingProgramRepository;
 import com.group7.demo.repository.UserTrainingProgramRepository;
 import com.group7.demo.repository.UserRepository;
@@ -31,6 +32,10 @@ public class TrainingProgramService {
     private final UserRepository userRepository;
     private final UserService userService;
 
+    private final ExerciseRepository exerciseRepository;
+
+    private final Mapper mapper;
+
     @Transactional
     public TrainingProgramResponse createTrainingProgram(TrainingProgramRequest trainingProgramRequest, HttpServletRequest request) throws IllegalAccessException {
         User user = authenticationService.getAuthenticatedUserInternal(request);
@@ -41,32 +46,25 @@ public class TrainingProgramService {
         // Create the training program
         TrainingProgram trainingProgram = TrainingProgram.builder()
                 .title(trainingProgramRequest.getTitle())
-                .programType(trainingProgramRequest.getProgramType())
-                .locationType(trainingProgramRequest.getLocationType())
                 .description(trainingProgramRequest.getDescription())
                 .trainer(user)
+                .createdAt(LocalDateTime.now())
                 .build();
 
-        // Map exercises from trainingProgramRequest to entity
-        List<Exercise> exercises = trainingProgramRequest.getExercises().stream()
+        List<TrainingProgramExercise> exercises = trainingProgramRequest.getExercises().stream()
                 .map(exerciseRequest -> {
-                    // Create exercise
-                    Exercise exercise = Exercise.builder()
-                            .name(exerciseRequest.getName())
-                            .muscleGroup(exerciseRequest.getMuscleGroup())
-                            .build();
+                    // Fetch the exercise from the database (assuming exerciseId is unique)
+                    Exercise exercise = exerciseRepository.findById(exerciseRequest.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Exercise not found with id: " + exerciseRequest.getId()));
 
-                    // Create exercise detail (assuming `ExerciseRequest` has `getSets()` and `getRepetitions()` methods)
-                    ExerciseDetail exerciseDetail = ExerciseDetail.builder()
-                            .sets(exerciseRequest.getSets())  // Make sure this retrieves the sets from the trainingProgramRequest
-                            .repetitions(exerciseRequest.getRepetitions())  // Retrieves repetitions from the trainingProgramRequest
-                            .exercise(exercise)
-                            .build();
+                    // Create the TrainingProgramExercise entity
+                    TrainingProgramExercise trainingProgramExercise = new TrainingProgramExercise();
+                    trainingProgramExercise.setTrainingProgram(trainingProgram);  // Set the training program reference
+                    trainingProgramExercise.setExercise(exercise);  // Set the exercise reference
+                    trainingProgramExercise.setRepetitions(exerciseRequest.getRepetitions());  // Set repetitions
+                    trainingProgramExercise.setSets(exerciseRequest.getSets());  // Set sets
 
-                    // Link the exercise with its exercise detail
-                    exercise.setExerciseDetail(exerciseDetail);
-
-                    return exercise;
+                    return trainingProgramExercise;
                 })
                 .collect(Collectors.toList());
 
@@ -75,33 +73,7 @@ public class TrainingProgramService {
 
         // Save the training program and return a response
         TrainingProgram savedProgram = trainingProgramRepository.save(trainingProgram);
-        return mapToTrainingProgramResponse(savedProgram);
-    }
-
-    // Add a method to map TrainingProgram to TrainingProgramResponse
-    private TrainingProgramResponse mapToTrainingProgramResponse(TrainingProgram program) {
-        return TrainingProgramResponse.builder()
-                .id(program.getId())
-                .title(program.getTitle())
-                .programType(program.getProgramType())
-                .locationType(program.getLocationType())
-                .exercises(program.getExercises().stream()
-                        .map(this::mapToExerciseResponse)
-                        .collect(Collectors.toList()))
-                .description(program.getDescription())
-                .trainerUsername(program.getTrainer().getUsername())
-                .build();
-    }
-
-    private ExerciseResponse mapToExerciseResponse(Exercise exercise) {
-        return ExerciseResponse.builder()
-                .name(exercise.getName())
-                .muscleGroup(exercise.getMuscleGroup())
-                .exerciseDetail(ExerciseDetailResponse.builder()
-                        .sets(exercise.getExerciseDetail().getSets())
-                        .repetitions(exercise.getExerciseDetail().getRepetitions())
-                        .build())
-                .build();
+        return mapper.mapToTrainingProgramResponse(savedProgram);
     }
 
     public List<TrainingProgramResponse> getAllTrainingPrograms() {
@@ -110,7 +82,7 @@ public class TrainingProgramService {
 
         // Map the list of TrainingProgram entities to TrainingProgramResponse DTOs
         return trainingPrograms.stream()
-                .map(this::mapToTrainingProgramResponse)  // Use the mapping method to convert to response DTOs
+                .map(mapper::mapToTrainingProgramResponse)  // Use the mapping method to convert to response DTOs
                 .collect(Collectors.toList());
     }
 
@@ -120,16 +92,17 @@ public class TrainingProgramService {
                 .orElseThrow(() -> new EntityNotFoundException("Training program not found with id: " + id));
 
         // Map the TrainingProgram entity to TrainingProgramResponse DTO
-        return mapToTrainingProgramResponse(trainingProgram);
+        return mapper.mapToTrainingProgramResponse(trainingProgram);
     }
 
+    @Transactional
     public List<TrainingProgramResponse> getTrainingProgramByTrainer(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
         List<TrainingProgram> trainingPrograms = trainingProgramRepository.findByTrainer(user);
 
         return trainingPrograms.stream()
-                .map(this::mapToTrainingProgramResponse)
+                .map(mapper::mapToTrainingProgramResponse)
                 .collect(Collectors.toList());
     }
 
@@ -210,7 +183,7 @@ public class TrainingProgramService {
         // Map the list of UserTrainingProgram entities to TrainingProgramResponse DTOs
         return userTrainingPrograms.stream()
                 .map(UserTrainingProgram::getTrainingProgram)
-                .map(this::mapToTrainingProgramResponse)
+                .map(mapper::mapToTrainingProgramResponse)
                 .collect(Collectors.toList());
     }
 

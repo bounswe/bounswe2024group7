@@ -15,9 +15,9 @@ const Login = ({ navigation })=>{
   const goSignup = () => navigation.navigate('Register');
 
   const checkDatabase = async (username, password) => {
-    goHome();   // TODO: Open the comment after connecting the database. 
+   // goHome();   // TODO: Open the comment after connecting the database. 
      try {
-        /*const response = await apiInstance().post(
+        const response = await apiInstance().post(
             "login",
             {
                 username,
@@ -32,12 +32,8 @@ const Login = ({ navigation })=>{
               password
             });
             goHome();
-        }*/
-        login({
-                      username,
-                      password
-                    });
-                    goHome();
+        }
+      
     } catch (e) {
         console.log(e)
         Toast.show({

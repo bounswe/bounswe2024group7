@@ -3,60 +3,56 @@ import apiInstance from '../Api';
 import React, { useState } from 'react';
 import Toast from 'react-native-toast-message';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; // Import Picker
 import { useAuth } from '../AuthContext';
 
-
-const Signup = ({ navigation })=>{
+const Signup = ({ navigation }) => {
+  const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [role, setRole] = useState('TRAINEE'); // Default role
   const { login } = useAuth();
-  
+
   const goHome = () => navigation.navigate('Home');
-  
+
   const goLogin = () => navigation.navigate('Login');
 
-  const checkDatabase = async (username, email, password, role) => {
-    console.log({username, email, password, role});
+  const checkDatabase = async (fullName, username, email, password, role) => {
+    console.log({ fullName, username, email, password, role });
     goHome();
     try {
-        const response = await apiInstance().post(
-            "signup",
-            {
-                username,
-                email,
-                password,
-                role
-            }
-        )
+      const response = await apiInstance().post("register", { fullName, username, email, password, role });
 
-        // successful login
-        if (response.status === 201) {
-            // login(response.data)
-            login({
-              username,
-              password
-            })
-            goHome()
-        }
+      // Successful login
+      if (response.status === 201) {
+        login({ username, password });
+        goHome();
+      }
     } catch (e) {
-        console.log(e)
-        Toast.show({
-          type: 'error',
-          position: 'bottom',
-          text1: 'Register Error',
-          text2: 'There was an error while registering. Please try again.',
-          visibilityTime: 2000,
-          autoHide: true,
-          topOffset: 30,
-          bottomOffset: 40
-        });
+      console.log(e);
+      Toast.show({
+        type: 'error',
+        position: 'bottom',
+        text1: 'Register Error',
+        text2: 'There was an error while registering. Please try again.',
+        visibilityTime: 2000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40
+      });
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}> Sign Up to Fitness Fact</Text>
+      <Text style={styles.title}>Sign Up to Fitness Fact</Text>
+      <TextInput
+        style={styles.input}
+        placeholder='Create Full Name'
+        onChangeText={(val) => setFullName(val)}
+        value={fullName}
+      />
       <TextInput
         style={styles.input}
         placeholder='Create Username'
@@ -76,21 +72,30 @@ const Signup = ({ navigation })=>{
         value={password}
         secureTextEntry={true}
       />
+      <Picker
+        selectedValue={role}
+        onValueChange={(itemValue) => setRole(itemValue)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Trainee" value="TRAINEE" />
+        <Picker.Item label="Trainer" value="TRAINER" />
+        <Picker.Item label="Dietician" value="DIETICIAN" />
+      </Picker>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => checkDatabase(username, email, password, 'TRAINEE')}
+        onPress={() => checkDatabase(fullName, username, email, password, role)}
       >
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => goLogin()} 
+        onPress={() => goLogin()}
       >
         <Text style={styles.buttonText}>Already have an account?</Text>
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -112,6 +117,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginTop: 10,
     paddingHorizontal: 10,
+  },
+  picker: {
+    width: '80%',
+    height: 50,
+    marginTop: 10,
+    backgroundColor: '#F8F8F8',
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
   },
   button: {
     backgroundColor: '#3C3633',
