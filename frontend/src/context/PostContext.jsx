@@ -27,6 +27,8 @@ export const PhaseContextProvider = ({ children }) => {
     const [bookmarkedPosts, setBookmarkedPosts] = useState([])
     const [tags, setTags] = useState([])
 
+    const sessionToken = useSelector(userSessionToken)
+
     const {
         data: postsData,
         isFetching: postsIsFetching,
@@ -48,7 +50,7 @@ export const PhaseContextProvider = ({ children }) => {
     } = useQuery({
         queryKey: ['bookmarkedPosts'],
         queryFn: async () => {
-            const response = await apiInstance().get('/api/posts/bookmarked')
+            const response = await apiInstance(sessionToken).get('/api/posts/bookmarked')
             return response.data
         },
         refetchOnWindowFocus: false,
