@@ -23,19 +23,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { muscleGroups, locationType, programTypes } from '../constants/program';
 import { UserContext } from '../context/UserContext';
 import { AppContext } from '../context/AppContext';
+import apiInstance from '../instance/apiInstance';
 
 function CreateProgramModal({ isOpen, onClose }) {
     const sessionToken = useSelector((state) => state.user.sessionToken);
 
     const [title, setTitle] = useState('');
-    const [programType, setProgramType] = useState('');
     const [exercises, setExercises] = useState([]);
-    const [location, setLocation] = useState('');
     const [description, setDescription] = useState('');
     const [selectedExercise, setSelectedExercise] = useState('');
     const [exerciseSets, setExerciseSets] = useState('');
     const [exerciseReps, setExerciseReps] = useState('');
-    const [exerciseMuscleGroup, setExerciseMuscleGroup] = useState('');
 
     const { user } = useContext(UserContext);
     const { exercises: exerciseOptions, isLoadingExercises } = useContext(AppContext);
@@ -58,6 +56,15 @@ function CreateProgramModal({ isOpen, onClose }) {
     const toast = useToast();
     const queryClient = useQueryClient();
 
+    const resetAllFields = () => {
+        setTitle('');
+        setDescription('');
+        setExercises([]);
+        setSelectedExercise('');
+        setExerciseSets('');
+        setExerciseReps('');
+    };
+
     const createProgramMutation = useMutation({
         mutationFn: async () => {
             if (!user) {
@@ -71,7 +78,7 @@ function CreateProgramModal({ isOpen, onClose }) {
                 return;
             }
 
-            if (!title || !description || !location || !programType || exercises.length === 0) {
+            if (!title || !description || exercises.length === 0) {
                 toast({
                     title: 'Invalid program.',
                     description: 'Please fill in all fields.',
@@ -85,8 +92,6 @@ function CreateProgramModal({ isOpen, onClose }) {
             const response = await apiInstance(sessionToken).post('api/training-programs', {
                 title,
                 description,
-                locationType: location,
-                programType,
                 exercises,
             });
 
@@ -111,12 +116,13 @@ function CreateProgramModal({ isOpen, onClose }) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries(['training-programs']);
+            resetAllFields();
             onClose();
         },
     });
 
     const addExercise = () => {
-        if (!selectedExercise || !exerciseSets || !exerciseReps || !exerciseMuscleGroup) {
+        if (!selectedExercise || !exerciseSets || !exerciseReps) {
             toast({
                 title: 'Invalid exercise.',
                 description: 'Please fill in all fields.',
@@ -130,22 +136,25 @@ function CreateProgramModal({ isOpen, onClose }) {
         setExercises([
             ...exercises,
             {
-                name: selectedExercise.label,
+                id: selectedExercise ? selectedExercise.value : '',
                 sets: exerciseSets,
                 repetitions: exerciseReps,
-                muscleGroup: exerciseMuscleGroup,
             },
         ]);
 
-        setSelectedExercise('');
         setExerciseSets('');
         setExerciseReps('');
-        setExerciseMuscleGroup('');
+        setSelectedExercise('');
         onExerciseModalClose();
     };
 
+    const onCloseReset = () => {
+        resetAllFields();
+        onClose();
+    }
+
     return (
-        <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onClose} size="3xl">
+        <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onCloseReset} size="3xl">
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Create a new program</ModalHeader>
@@ -164,22 +173,6 @@ function CreateProgramModal({ isOpen, onClose }) {
                         <Textarea
                             focusBorderColor="purple.500"
                             onChange={(e) => setDescription(e.target.value)}
-                        />
-                    </FormControl>
-                    <FormControl id="location">
-                        <FormLabel>Location</FormLabel>
-                        <Select
-                            options={locationType}
-                            styles={selectComponentStyles}
-                            onChange={(selected) => setLocation(selected.value)}
-                        />
-                    </FormControl>
-                    <FormControl id="programType">
-                        <FormLabel>Program Type</FormLabel>
-                        <Select
-                            options={programTypes}
-                            styles={selectComponentStyles}
-                            onChange={(selected) => setProgramType(selected.value)}
                         />
                     </FormControl>
                     <FormControl id="exercises">
@@ -209,12 +202,7 @@ function CreateProgramModal({ isOpen, onClose }) {
                     <Button
                         variant="ghost"
                         onClick={() => {
-                            setTitle('');
-                            setDescription('');
-                            setLocation('');
-                            setProgramType('');
-                            setExercises([]);
-                            onClose();
+                            onCloseReset();
                         }}
                     >
                         Cancel
@@ -254,14 +242,6 @@ function CreateProgramModal({ isOpen, onClose }) {
                                 type="number"
                                 focusBorderColor="purple.500"
                                 onChange={(e) => setExerciseReps(e.target.value)}
-                            />
-                        </FormControl>
-                        <FormControl id="exerciseMuscleGroup">
-                            <FormLabel>Muscle Group</FormLabel>
-                            <Select
-                                options={muscleGroups}
-                                styles={selectComponentStyles}
-                                onChange={(selected) => setExerciseMuscleGroup(selected.value)}
                             />
                         </FormControl>
                     </ModalBody>

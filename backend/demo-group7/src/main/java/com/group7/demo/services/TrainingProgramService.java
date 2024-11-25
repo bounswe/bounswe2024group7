@@ -187,7 +187,7 @@ public class TrainingProgramService {
         User user = userService.getUserByUsername(username);
 
         // Fetch the list of training programs the user has joined
-        List<UserTrainingProgram> userTrainingPrograms = userTrainingProgramRepository.findByUser(user);
+        List<UserTrainingProgram> userTrainingPrograms = userTrainingProgramRepository.findByUserAndStatusNot(user, UserTrainingProgramStatus.LEFT);
 
         // Map the list of UserTrainingProgram entities to UserTrainingProgramResponse DTOs
         return userTrainingPrograms.stream()

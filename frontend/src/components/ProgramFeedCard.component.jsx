@@ -18,7 +18,8 @@ import {
     useToast,
     Textarea,
     useColorModeValue,
-    useColorMode
+    useColorMode,
+    Tooltip
 } from '@chakra-ui/react'
 import {
     ChatIcon,
@@ -48,14 +49,18 @@ function ProgramFeedCard({
     const {
         followers,
         following,
-        user
+        user,
     } = useContext(UserContext)
 
     const [isProgramOwnerFollowed, setIsProgramOwnerFollowed] = useState(
         user && following && following.includes(program.trainerUsername)
     )
     const [isUserJoined, setIsUserJoined] = useState(
-        user && user.joinedPrograms && user.joinedPrograms.map((joinedProgram) => joinedProgram.id).includes(program.id)
+        user && user.joinedPrograms && user.joinedPrograms
+            .filter(
+                (joinedProgram) => joinedProgram.status !== 'LEFT'
+            )
+            .map((joinedProgram) => joinedProgram.id).includes(program.id)
     )
 
     useEffect(() => {
@@ -66,7 +71,11 @@ function ProgramFeedCard({
 
     useEffect(() => {
         if (user && user.joinedPrograms) {
-            setIsUserJoined(user.joinedPrograms.map((joinedProgram) => joinedProgram.id).includes(program.id))
+            setIsUserJoined(user.joinedPrograms
+                .filter(
+                    (joinedProgram) => joinedProgram.status !== 'LEFT'
+                )
+                .map((joinedProgram) => joinedProgram.id).includes(program.id))
         }
     }, [user])
 
@@ -191,7 +200,7 @@ function ProgramFeedCard({
     const { mutate: unjoinProgram } = useMutation(
         {
             mutationFn: async (postId) => {
-                const response = await apiInstance(sessionToken).delete(`api/training-programs/leave?programId=${postId}`)
+                const response = await apiInstance(sessionToken).delete(`api/training-programs/${postId}/leave`)
 
                 toast({
                     title: 'Unjoined to the program',
@@ -246,20 +255,24 @@ function ProgramFeedCard({
                             !isProgramOwnerFollowed ? (
                                 <Button
                                     variant='ghost'
+                                    size={"sm"}
                                     colorScheme='purple'
                                     leftIcon={<PlusIcon />}
-                                    display={user && program.trainerUsername === user.username ? 'none' : 'block'}
+                                    display={user && program.trainerUsername === user.username ? 'none' : 'flex'}
+                                    alignItems='center'
                                     onClick={() => {
                                         if (user) {
                                             followUser(program.trainerUsername)
                                         }
                                     }}
+                                    disabled={followUser.isLoading}
                                 >
                                     Follow
                                 </Button>
                             ) : (
                                 <Button
                                     variant='ghost'
+                                    size={"sm"}
                                     colorScheme='gray'
                                     display={user && program.trainerUsername === user.username ? 'none' : 'block'}
                                     onClick={() => {
@@ -267,6 +280,7 @@ function ProgramFeedCard({
                                             unfollowUser(program.trainerUsername)
                                         }
                                     }}
+                                    disabled={unfollowUser.isLoading}
                                 >
                                     Unfollow
                                 </Button>
@@ -284,29 +298,24 @@ function ProgramFeedCard({
                     flexDirection='column'
                     gap='4'
                 >
-                    <Text>
-                        Title: {program.title}
+                    <Text
+                        fontSize={"xl"}
+                        fontWeight={"bold"}
+                    >
+                        {program.title}
                     </Text>
 
                     <Text>
-                        Description: {program.description}
+                        {program.description}
                     </Text>
 
-                    <Text>
-                        Location Type: {program.locationType.toLowerCase()}
-                    </Text>
-
-                    <Text>
-                        Program Type: {program.programType.toLowerCase()}
-                    </Text>
-
-                    <Text>
+                    {/* <Text>
                         {program.exercises.map((exercise) => (
                             <li key={exercise.id}>
                                 {exercise.name} - {exercise.exerciseDetail.sets} sets of {exercise.exerciseDetail.repetitions} reps for {exercise.muscleGroup.toLowerCase()}
                             </li>
                         ))}
-                    </Text>
+                    </Text> */}
                 </CardBody>
 
 
@@ -319,97 +328,48 @@ function ProgramFeedCard({
                         },
                     }}
                 >
-                    <Button flex='1' variant='ghost' leftIcon={
-                        isUserJoined ? null : <PlusIcon />
-                    }
-                        colorScheme='purple'
-                        onClick={() => {
-                            if (user) {
-                                if (!isUserJoined) {
-                                    joinProgram(program.id)
-                                } else {
-                                    unjoinProgram(program.id)
-                                }
-                            } else {
-                                toast({
-                                    title: 'You need to login to join a program',
-                                    status: 'error',
-                                    duration: 3000,
-                                    isClosable: true,
-                                })
-                            }
-                        }
-                        }
-                        disabled={
-                            user && program.trainerUsername === user.username
-                        }
-                    >
-                        {
-                            user && program.trainerUsername === user.username ? 'You are the trainer' : (
-                                isUserJoined ? 'Joined' : 'Join'
+                    <Tooltip
+                        label={
+                            user && program.trainerUsername === user.username ? null : (
+                                isUserJoined ? 'Leave the program' : 'Join the program'
                             )
                         }
-                    </Button>
-                </CardFooter>
-                {/* <Box px="4" py="2">
-                    <Heading size="sm" mb="4">Comments</Heading>
-                    {
-                        post.comments && post.comments.map((comment) => (
-                            <Box key={comment.id} mb="2"
-                                p="2"
-                            >
-                                <Flex alignItems="center" mb="1"
-                                    gap={2}
-                                >
-                                    {
-                                        comment.user.user_picture ? (
-                                            <Avatar
-                                                size="xs"
-                                                src={comment.user.user_picture}
-                                            />
-                                        ) : (
-                                            <Avatar
-                                                size="xs"
-                                                name={comment.user.username}
-                                            />
-                                        )
+                    >
+                        <Button flex='1' variant='ghost' leftIcon={
+                            isUserJoined ? null : <PlusIcon />
+                        }
+                            colorScheme='purple'
+                            onClick={() => {
+                                if (user) {
+                                    if (!isUserJoined) {
+                                        joinProgram(program.id)
+                                    } else {
+                                        unjoinProgram(program.id)
                                     }
-                                    <Text fontWeight="bold" mr="2">{comment.user.username}</Text>
-                                    <Text fontSize="xs" color="gray.500">
-                                        {new Date(comment.created_at).toLocaleDateString('tr-TR', {
-                                            month: 'long',
-                                            day: 'numeric',
-                                            year: 'numeric',
-                                        }) +
-                                            ' at ' +
-                                            new Date(comment.created_at).toLocaleTimeString('tr-TR', {
-                                                hour: 'numeric',
-                                                minute: 'numeric',
-                                            })}
-                                    </Text>
-                                </Flex>
-                                <Text>{comment.content}</Text>
-                            </Box>
-                        ))
-                    }
-
-                    <Box mt="4">
-                        <Textarea
-                            placeholder="Add a comment..."
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            mb="2"
-                        />
-                        <Button
-                            size={"sm"}
-                            colorScheme="purple"
-                            onClick={() => addComment({ postId: post.id, comment: newComment })}
-                            isDisabled={!newComment.trim()}
+                                } else {
+                                    toast({
+                                        title: 'You need to login to join a program',
+                                        status: 'error',
+                                        duration: 3000,
+                                        isClosable: true,
+                                    })
+                                }
+                            }
+                            }
+                            disabled={
+                                user && program.trainerUsername === user.username
+                                || joinProgram.isLoading
+                                || unjoinProgram.isLoading
+                            }
                         >
-                            Post Comment
+                            {
+                                user && program.trainerUsername === user.username ? 'You are the trainer' : (
+                                    isUserJoined ? 'Joined' : 'Join'
+                                )
+                            }
                         </Button>
-                    </Box>
-                </Box> */}
+                    </Tooltip>
+                </CardFooter>
             </Card>
         </>
 

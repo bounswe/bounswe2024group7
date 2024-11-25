@@ -177,7 +177,7 @@ export default function NavigationResponsive() {
                         <DesktopNav />
                     </Flex>
                 </Flex>
-                {/* <SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading={setLoading} loading={loading} />*/ }
+                {/* <SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading={setLoading} loading={loading} />*/}
                 <Stack
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
@@ -302,6 +302,7 @@ export default function NavigationResponsive() {
                 }}
                 gap={2}
                 w={"auto"}
+                zIndex={100}
             >
                 <PlusIcon />
                 Create New Post
@@ -331,6 +332,7 @@ export default function NavigationResponsive() {
                         }}
                         gap={2}
                         w={"auto"}
+                        zIndex={100}
                     >
                         <PlusIcon />
                         Create New Program
