@@ -12,7 +12,7 @@ export const progressRoute = createRoute({
 function Progress() {
     return (
         <UserContextProvider>
-            <ProgressBoard currentProgress={90} />
+            <ProgressBoard />
         </UserContextProvider>
     )
 }

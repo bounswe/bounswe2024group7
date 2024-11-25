@@ -1,8 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { CircularProgress, CircularProgressLabel, Box, Text, HStack, VStack, Button } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
-function ProgressBoard({ currentProgress }) {
+import { UserContext } from '../context/UserContext';
+
+const calculateProgress = (joinedPrograms) => {
+    let done = 0;
+    let undone = 0;
+
+    // Iterate through each program and its exercises
+    joinedPrograms.forEach((program) => {
+        program.exercises.forEach((exercise) => {
+            if (exercise.completed) {
+                done++;
+            } else {
+                undone++;
+            }
+        });
+    });
+
+    // Calculate the current progress percentage
+    const total = done + undone;
+    const progress = total > 0 ? (done * 100) / total : 0;  // Prevent division by zero
+
+    return progress.toFixed(2);
+};
+function ProgressBoard() {
+    const { joinedPrograms } = useContext(UserContext);
+    const currentProgress = calculateProgress(joinedPrograms);
     const [progress, setProgress] = useState(0); // Initialize progress to 0
+
+    // MockData
+    const daysOfWeek = ['Sat', 'Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri'];
+    const active = [1, 1, 1, 0, 0, 0, 0]; // Active array
+    const progress_days = [50, 100, 70, 0, 0, 0, 0]; // Progress days array
 
     useEffect(() => {
         // Increment progress by 10% every 80ms until it reaches currentProgress
@@ -20,30 +50,34 @@ function ProgressBoard({ currentProgress }) {
         return () => clearInterval(interval); // Cleanup the interval on component unmount
     }, [currentProgress]);
 
-    const daysOfWeek = ['Sat', 'Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri'];
-    const active = [1, 1, 1, 0, 0, 0, 0]; // Active array
-    const progress_days = [50, 100, 70, 0, 0, 0, 0]; // Progress days array
+
 
     return (
         <Box
             display="flex"
             justifyContent="center"
-            alignItems="center"
-            height="100vh"
-            width="100vw"
+            // alignItems="flex-start"  // Align items at the top of the screen
+            // height="100vh"
+            // width="100vw"
             bg="gray.50"
+            // overflow="hidden" // Prevent horizontal scroll
+            sx={{
+                boxSizing: 'border-box', // Ensure no extra spacing issues
+                marginTop: 0, // Remove any default margin
+            }}
         >
-
             <Box
                 position="relative"
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
-                width="600px" // Make the box wider
+                maxWidth="600px" // Ensure it's responsive
+                width="100%" // Ensure it fits within the screen
                 bg="white"
                 boxShadow="lg"
                 borderRadius="md"
-                p={10} // Add padding for spacing
+                p={10} // Padding for spacing inside the box
+                mb={0} // Ensure no margin at the bottom
             >
                 <Text fontSize="lg" fontWeight="bold" color="gray.900" mb={4}>
                     Your Fitness Story: Chapter This Week
@@ -57,14 +91,13 @@ function ProgressBoard({ currentProgress }) {
                 >
                     <CircularProgress
                         value={progress}
-                        color="#9F7AEA" // Updated progress bar color
+                        color="teal" // Updated progress bar color
                         trackColor="gray.200"
                         size="240px"
                         thickness="3px"
                         capIsRound
                         sx={{
                             '& circle': {
-                                // transform: 'rotate(180deg)', // Rotate the circle
                                 transformOrigin: 'center', // Ensure rotation happens around the center
                             },
                         }}
@@ -76,7 +109,6 @@ function ProgressBoard({ currentProgress }) {
                         transform="translate(-50%, -50%)"
                         textAlign="center"
                     >
-
                     </Box>
                     <Box
                         position="absolute"
@@ -90,14 +122,13 @@ function ProgressBoard({ currentProgress }) {
                         </Text>
                         {currentProgress === 100 ? (
                             progress === 100 ? (
-                                <StarIcon boxSize={12} color="gold" />
+                                <StarIcon boxSize={12} color="teal" />
                             ) : null
                         ) : (
-                            <Button bg="#9F7AEA" color="white" _hover={{ bg: '#805AD5' }} size="sm">
+                            <Button bg="teal" color="white" _hover={{ bg: 'teal' }} size="sm">
                                 Nail It !
                             </Button>
                         )}
-
                     </Box>
                 </Box>
 
@@ -123,7 +154,7 @@ function ProgressBoard({ currentProgress }) {
                                 ) : (
                                     <CircularProgress
                                         value={progress_days[i]}
-                                        color="gold"
+                                        color="teal"
                                         trackColor="gray.200"
                                         size="50px"
                                         thickness="7px"
@@ -139,6 +170,7 @@ function ProgressBoard({ currentProgress }) {
                 </Box>
             </Box>
         </Box>
+
     );
 }
 

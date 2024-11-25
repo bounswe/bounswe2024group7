@@ -133,13 +133,10 @@ public class TrainingProgramService {
         TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
                 .orElseThrow(() -> new EntityNotFoundException("Training Program not found with id: " + trainingProgramId));
 
-        // Check for all past participations
-        List<UserTrainingProgram> pastEntries = userTrainingProgramRepository.findAllByUserAndTrainingProgramId(user, trainingProgramId);
+        // Check if the user is already actively participating in this training program
+        boolean hasOngoingProgram = userTrainingProgramRepository.existsByUserAndTrainingProgramIdAndStatus(user, trainingProgramId, UserTrainingProgramStatus.ONGOING);
 
-        boolean hasOngoingEntry = pastEntries.stream()
-                .anyMatch(entry -> entry.getStatus() == UserTrainingProgramStatus.ONGOING);
-
-        if (hasOngoingEntry) {
+        if (hasOngoingProgram) {
             throw new IllegalStateException("User is already actively participating in this training program.");
         }
 
@@ -190,7 +187,7 @@ public class TrainingProgramService {
         User user = userService.getUserByUsername(username);
 
         // Fetch the list of training programs the user has joined
-        List<UserTrainingProgram> userTrainingPrograms = userTrainingProgramRepository.findByUser(user);
+        List<UserTrainingProgram> userTrainingPrograms = userTrainingProgramRepository.findByUserAndStatusNot(user, UserTrainingProgramStatus.LEFT);
 
         // Map the list of UserTrainingProgram entities to UserTrainingProgramResponse DTOs
         return userTrainingPrograms.stream()
@@ -199,12 +196,15 @@ public class TrainingProgramService {
     }
 
     private UserTrainingProgram getOngoingUserTrainingProgram(User user, Long trainingProgramId) {
-        // Fetch all entries and filter the ongoing one
-        return userTrainingProgramRepository.findAllByUserAndTrainingProgramId(user, trainingProgramId)
-                .stream()
-                .filter(entry -> entry.getStatus() == UserTrainingProgramStatus.ONGOING)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No ongoing training program found."));
+        List<UserTrainingProgram> ongoingPrograms = userTrainingProgramRepository.findByUserAndTrainingProgramIdAndStatus(user, trainingProgramId, UserTrainingProgramStatus.ONGOING);
+
+        if (ongoingPrograms.isEmpty()) {
+            throw new IllegalStateException("No ongoing training program found.");
+        }
+
+        // Return the first ongoing program if available
+        return ongoingPrograms.get(0);
+
     }
 
     @Transactional

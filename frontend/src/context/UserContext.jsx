@@ -10,6 +10,8 @@ export const UserContext = createContext({
     following: [],
     posts: [],
     programs: [],
+    joinedPrograms: [],
+    exerciseProgress: {},
 })
 
 export const UserContextProvider = ({ children }) => {
@@ -18,6 +20,8 @@ export const UserContextProvider = ({ children }) => {
     const [following, setFollowing] = useState([])
     const [posts, setPosts] = useState([])
     const [programs, setPrograms] = useState([])
+    const [joinedPrograms, setJoinedPrograms] = useState([])
+    const [exerciseProgress, setExerciseProgress] = useState({})
 
     const sessionToken = useSelector(userSessionToken)
     const username = useSelector(userName)
@@ -30,11 +34,63 @@ export const UserContextProvider = ({ children }) => {
         queryKey: ['user'],
         queryFn: async () => {
             const response = await apiInstance(sessionToken).get(`api/user/${username}`);
-
             return response.data;
         },
         refetchOnWindowFocus: false,
     });
+
+    // New query for joined programs
+    const {
+        data: joinedProgramsData,
+        isFetching: joinedProgramsIsFetching,
+        isLoading: joinedProgramsIsLoading,
+    } = useQuery({
+        queryKey: ['joinedPrograms'],
+        queryFn: async () => {
+            try {
+                const response = await apiInstance(sessionToken).get(`api/training-programs/joined/${username}`);
+
+                // Process the response to include exercise progress
+                const programsWithProgress = response.data.map(program => ({
+                    ...program,
+                    exercises: program.exercises.map(exercise => ({
+                        ...exercise,
+                        completed: exercise.completed || false
+                    }))
+                }));
+
+                // Build exercise progress map
+                const progressMap = {};
+                programsWithProgress.forEach(program => {
+                    progressMap[program.id] = program.exercises.reduce((acc, exercise) => {
+                        acc[exercise.id] = exercise.completed;
+                        return acc;
+                    }, {});
+                });
+
+                setExerciseProgress(progressMap);
+                return programsWithProgress;
+            } catch (error) {
+                console.error('Error fetching joined programs:', error);
+                return [];
+            }
+        },
+        refetchOnWindowFocus: false,
+    });
+    // previous
+    // const {
+    //     data: profileData,
+    //     isFetching: profileIsFetching,
+    //     isLoading: profileIsLoading,
+    // } = useQuery({
+    //     queryKey: ['user'],
+    //     queryFn: async () => {
+    //         const response = await apiInstance(sessionToken).get(`api/user/${username}`);
+
+    //         return response.data;
+    //     },
+    //     refetchOnWindowFocus: false,
+    // });
 
     const {
         data: followersData,
@@ -140,6 +196,34 @@ export const UserContextProvider = ({ children }) => {
         }
     }, [profileData, profileIsFetching])
 
+    // New useEffect for joined programs
+    useEffect(() => {
+        if (joinedProgramsData && !joinedProgramsIsFetching) {
+            setJoinedPrograms(joinedProgramsData);
+        }
+    }, [joinedProgramsData, joinedProgramsIsFetching]);
+
+    // Function to update exercise completion status
+    const updateExerciseCompletion = async (programId, exerciseId, completed) => {
+        try {
+            // Update the backend
+            await apiInstance(sessionToken).put(`api/training-programs/${programId}/exercises/${exerciseId}`, {
+                completed
+            });
+
+            // Update local state
+            setExerciseProgress(prev => ({
+                ...prev,
+                [programId]: {
+                    ...prev[programId],
+                    [exerciseId]: completed
+                }
+            }));
+        } catch (error) {
+            console.error('Error updating exercise completion:', error);
+        }
+    };
+
     return (
         <UserContext.Provider value={{
             user,
@@ -147,6 +231,9 @@ export const UserContextProvider = ({ children }) => {
             following,
             posts,
             programs,
+            joinedPrograms,
+            exerciseProgress,
+            updateExerciseCompletion,
         }}>
             {children}
         </UserContext.Provider>
