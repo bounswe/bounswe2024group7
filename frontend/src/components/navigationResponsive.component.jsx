@@ -177,7 +177,7 @@ export default function NavigationResponsive() {
                         <DesktopNav />
                     </Flex>
                 </Flex>
-                {/* <SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading={setLoading} loading={loading} />*/}
+                {<SearchBar screen="desktop" setSearchResults={setSearchResults} setLoading={setLoading} loading={loading} />}
                 <Stack
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
@@ -450,7 +450,7 @@ const MobileNav = () => {
                     <MobileNavItem key={navItem.label} {...navItem} />
                 ))}
             </Stack>
-            {/* <SearchBar screen={"mobile"} /> */}
+            { <SearchBar screen={"mobile"} /> }
         </>
 
     )

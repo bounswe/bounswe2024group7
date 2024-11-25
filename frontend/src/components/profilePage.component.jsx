@@ -10,9 +10,11 @@ import {
     Stack,
     Divider,
     Button,
+    Center,
 } from '@chakra-ui/react';
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
+import { PostContext } from "../context/PostContext";
 import PostFeedCard from "./PostFeedCard.component.jsx";
 import ProgramFeedCard from "./ProgramFeedCard.component.jsx";
 import ProgressBoard from "./ProgressBoard.component.jsx";
@@ -22,7 +24,8 @@ export default function ProfilePage() {
     const profile = useSelector(userProfile);
     const { colorMode, toggleColorMode } = useColorMode();
     const { user, followers, following, posts, programs } = useContext(UserContext);
-    const [view, setView] = useState('posts'); // Toggle between 'posts', 'joinedPrograms', and 'createdPrograms', 'MyProgress"
+    const { bookmarkedPosts, isLoadingBookmarks } = useContext(PostContext);
+    const [view, setView] = useState('posts');
 
     return (
         <Box p={6} maxW="1200px" mx="auto" borderRadius="md">
@@ -52,6 +55,10 @@ export default function ProfilePage() {
                         <Text fontSize="sm" color="gray.600">Posts</Text>
                         <Text fontSize="xl" color="teal.500">{posts.length || 0}</Text>
                     </Stack>
+                    <Stack textAlign="center">
+                        <Text fontSize="sm" color="gray.600">Bookmarks</Text>
+                        <Text fontSize="xl" color="teal.500">{bookmarkedPosts.length || 0}</Text>
+                    </Stack>
                 </Flex>
             </Flex>
 
@@ -65,6 +72,12 @@ export default function ProfilePage() {
                     Posts
                 </Button>
                 <Button
+                    colorScheme={view === 'bookmarks' ? 'teal' : 'gray'}
+                    onClick={() => setView('bookmarks')}
+                >
+                    Bookmarks
+                </Button>
+                <Button
                     colorScheme={view === 'joinedPrograms' ? 'teal' : 'gray'}
                     onClick={() => setView('joinedPrograms')}
                 >
@@ -76,7 +89,6 @@ export default function ProfilePage() {
                 >
                     My Progress
                 </Button>
-
                 {user.role === 'TRAINER' && (
                     <Button
                         colorScheme={view === 'createdPrograms' ? 'teal' : 'gray'}
@@ -88,45 +100,59 @@ export default function ProfilePage() {
             </Flex>
 
             <Box mt={8}>
-                {view === 'posts' && (
-                    <Stack spacing={4}>
-                        {posts.length > 0 ? (
-                            posts.map((post) => <PostFeedCard key={post.id} post={post} />)
-                        ) : (
-                            <Text color="gray.500" textAlign="center">No posts yet</Text>
-                        )}
-                    </Stack>
-                )}
-                {view === 'joinedPrograms' && (
-                    <Stack spacing={4}>
-                        {user.joinedPrograms && user.joinedPrograms.length > 0 ? (
-                            user.joinedPrograms.map((program) => (
-                                <ProgramFeedCard key={program.id} program={program} />
-                            ))
-                        ) : (
-                            <Text color="gray.500" textAlign="center">No joined programs</Text>
-                        )}
-                    </Stack>
-                )}
-                {view === 'MyProgress' && user.role === 'TRAINEE' && (
-                    user.joinedPrograms && user.joinedPrograms.length > 0 ? (
-                        <ProgressBoard />
-                    ) : (
-                        <Text color="gray.500" textAlign="center">No joined programs</Text>
-                    )
-                )}
-
-                {view === 'createdPrograms' && user.role === 'TRAINER' && (
-                    <Stack spacing={4}>
-                        {programs?.length > 0 ? (
-                            programs.map((program) => (
-                                <ProgramFeedCard key={program.id} program={program} />
-                            ))
-                        ) : (
-                            <Text color="gray.500" textAlign="center">No created programs yet</Text>
-                        )}
-                    </Stack>
-                )}
+                <Center>
+                    {view === 'posts' && (
+                        <Stack spacing={4} width="100%" maxW="800px">
+                            {posts.length > 0 ? (
+                                posts.map((post) => <PostFeedCard key={post.id} post={post} />)
+                            ) : (
+                                <Text color="gray.500" textAlign="center">No posts yet</Text>
+                            )}
+                        </Stack>
+                    )}
+                    {view === 'bookmarks' && (
+                        <Stack spacing={4} width="100%" maxW="800px">
+                            {isLoadingBookmarks ? (
+                                <Text color="gray.500" textAlign="center">Loading bookmarks...</Text>
+                            ) : bookmarkedPosts.length > 0 ? (
+                                bookmarkedPosts.map((post) => <PostFeedCard key={post.id} post={post} />)
+                            ) : (
+                                <Text color="gray.500" textAlign="center">No bookmarked posts</Text>
+                            )}
+                        </Stack>
+                    )}
+                    {view === 'joinedPrograms' && (
+                        <Stack spacing={4} width="100%" maxW="800px">
+                            {user.joinedPrograms && user.joinedPrograms.length > 0 ? (
+                                user.joinedPrograms.map((program) => (
+                                    <ProgramFeedCard key={program.id} program={program} />
+                                ))
+                            ) : (
+                                <Text color="gray.500" textAlign="center">No joined programs</Text>
+                            )}
+                        </Stack>
+                    )}
+                    {view === 'MyProgress' && user.role === 'TRAINEE' && (
+                        <Box width="100%" maxW="800px">
+                            {user.joinedPrograms && user.joinedPrograms.length > 0 ? (
+                                <ProgressBoard />
+                            ) : (
+                                <Text color="gray.500" textAlign="center">No joined programs</Text>
+                            )}
+                        </Box>
+                    )}
+                    {view === 'createdPrograms' && user.role === 'TRAINER' && (
+                        <Stack spacing={4} width="100%" maxW="800px">
+                            {programs?.length > 0 ? (
+                                programs.map((program) => (
+                                    <ProgramFeedCard key={program.id} program={program} />
+                                ))
+                            ) : (
+                                <Text color="gray.500" textAlign="center">No created programs yet</Text>
+                            )}
+                        </Stack>
+                    )}
+                </Center>
             </Box>
         </Box>
     );

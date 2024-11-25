@@ -4,22 +4,22 @@ import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { userProfile, userPassword, userSessionToken } from "../context/user";
 
-export const PostContext = createContext(
-    {
-        posts: [],
-        isLoadingPosts: false,
-        isFetchingPosts: false,
-        programs: [],
-        isLoadingPrograms: false,
-        isFetchingPrograms: false,
-    }
-)
+export const PostContext = createContext({
+    posts: [],
+    isLoadingPosts: false,
+    isFetchingPosts: false,
+    programs: [],
+    isLoadingPrograms: false,
+    isFetchingPrograms: false,
+    bookmarkedPosts: [],
+    isLoadingBookmarks: false,
+    isFetchingBookmarks: false,
+})
 
 export const PhaseContextProvider = ({ children }) => {
     const [posts, setPosts] = useState([])
     const [programs, setPrograms] = useState([])
-
-
+    const [bookmarkedPosts, setBookmarkedPosts] = useState([])
     const profile = useSelector(userProfile)
     const password = useSelector(userPassword)
     const sessionToken = useSelector(userSessionToken)
@@ -32,7 +32,19 @@ export const PhaseContextProvider = ({ children }) => {
         queryKey: ['posts'],
         queryFn: async () => {
             const response = await apiInstance().get('/api/posts/random')
+            return response.data
+        },
+        refetchOnWindowFocus: false,
+    })
 
+    const {
+        data: bookmarkedData,
+        isFetching: bookmarksIsFetching,
+        isLoading: bookmarksIsLoading,
+    } = useQuery({
+        queryKey: ['bookmarkedPosts'],
+        queryFn: async () => {
+            const response = await apiInstance().get('/api/posts/bookmarked')
             return response.data
         },
         refetchOnWindowFocus: false,
@@ -46,7 +58,6 @@ export const PhaseContextProvider = ({ children }) => {
         queryKey: ['training-programs'],
         queryFn: async () => {
             const response = await apiInstance().get('/api/training-programs')
-
             return response.data
         },
         refetchOnWindowFocus: false,
@@ -64,14 +75,23 @@ export const PhaseContextProvider = ({ children }) => {
         }
     }, [programsData, programsIsFetching])
 
+    useEffect(() => {
+        if (bookmarkedData && !bookmarksIsFetching) {
+            setBookmarkedPosts(bookmarkedData)
+        }
+    }, [bookmarkedData, bookmarksIsFetching])
+
     return (
         <PostContext.Provider value={{
-            posts: posts,
+            posts,
             isLoadingPosts: postsIsLoading,
             isFetchingPosts: postsIsFetching,
-            programs: programs,
+            programs,
             isLoadingPrograms: programsIsLoading,
             isFetchingPrograms: programsIsFetching,
+            bookmarkedPosts,
+            isLoadingBookmarks: bookmarksIsLoading,
+            isFetchingBookmarks: bookmarksIsFetching,
         }}>
             {children}
         </PostContext.Provider>
