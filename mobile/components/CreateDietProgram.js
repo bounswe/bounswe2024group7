@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // Import Picker
 
-const CreateDietProgram = ({ darkMode }) => {
+const CreateDietProgram = ({ darkMode, setSelectedPage }) => {
   const styles = darkMode ? darkStyles : lightStyles;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
