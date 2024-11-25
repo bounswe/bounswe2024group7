@@ -32,15 +32,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { PostContext } from '../context/PostContext'
 import { useSelector } from 'react-redux'
-import { userProfile, userPassword } from '../context/user'
+import { userSessionToken } from '../context/user'
 import apiInstance from '../instance/apiInstance'
 
 
 function PostFeedCard({
     post
 }) {
-    const profile = useSelector(userProfile)
-    const password = useSelector(userPassword)
+    console.log(post)
+    const sessionToken = useSelector(userSessionToken)
     const toast = useToast()
 
     const queryClient = useQueryClient()
@@ -51,9 +51,8 @@ function PostFeedCard({
         {
             mutationFn: async (postId) => {
                 const response = await apiInstance(
-                    profile.username,
-                    password
-                ).post(`/posts/${postId}/likes`)
+                    sessionToken
+                ).post(`/api/posts/${postId}/like`)
 
                 toast({
                     title: 'Post Liked',
@@ -85,12 +84,77 @@ function PostFeedCard({
         {
             mutationFn: async (postId) => {
                 const response = await apiInstance(
-                    profile.username,
-                    password
-                ).post(`/posts/${postId}/unlike`)
+                    sessionToken
+                ).delete(`/api/posts/${postId}/like`)
 
                 toast({
                     title: 'Post Unliked',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                })
+
+                return response.data
+            },
+            onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: ['posts'],
+                })
+            },
+            onError: (error) => {
+                console.log(error)
+                toast({
+                    title: 'An error occurred.',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            },
+        }
+    )
+
+    const { mutate: savePost } = useMutation(
+        {
+            mutationFn: async (postId) => {
+                const response = await apiInstance(
+                    sessionToken
+                ).post(`/api/posts/${postId}/bookmark`)
+
+                toast({
+                    title: 'Post Saved',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                })
+
+                return response.data
+            },
+            onSuccess: (data) => {
+                queryClient.invalidateQueries({
+                    queryKey: ['posts'],
+                })
+            },
+            onError: (error) => {
+                console.log(error)
+                toast({
+                    title: 'An error occurred.',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            },
+        }
+    )
+
+    const { mutate: unsavePost } = useMutation(
+        {
+            mutationFn: async (postId) => {
+                const response = await apiInstance(
+                    sessionToken
+                ).delete(`/api/posts/${postId}/bookmark`)
+
+                toast({
+                    title: 'Post Unsaved',
                     status: 'success',
                     duration: 3000,
                     isClosable: true,
@@ -212,17 +276,17 @@ function PostFeedCard({
                         },
                     }}
                 >
-                    {/* <Button flex='1' variant='ghost' leftIcon={
+                    <Button flex='1' variant='ghost' leftIcon={
                         <HeartIcon
                             fill={
-                                post.likes?.some(like => like.profile === profile.id) ?
+                                post.isLiked ?
                                     likeButtonColor : 'none'
                             }
                         />
                     }
                         colorScheme='purple'
                         onClick={() => {
-                            if (post.likes?.some(like => like.profile === profile.id)) {
+                            if (post.isLiked) {
                                 unlikePost(post.id)
                                 return
                             }
@@ -230,11 +294,26 @@ function PostFeedCard({
                             likePost(post.id)
                         }}
                     >
-                        {post.likes.length > 0 ? post.likes.length : 'Like'}
+                        {post.likeCount > 0 ? post.likeCount : 'Like'}
                     </Button>
-                    <Button flex='1' variant='ghost' leftIcon={<BookmarkAddIcon />}>
-                        Save
-                    </Button> */}
+                    <Button
+                        flex='1'
+                        variant='ghost'
+                        leftIcon={<BookmarkAddIcon />}
+                        onClick={() => {
+                            if (post.isSaved) {
+                                unsavePost(post.id)
+                                return
+                            }
+
+                            savePost(post.id)
+                        }}
+                    >
+                        {
+                            post.bookmarked ?
+                                'Unsave' : 'Save'
+                        }
+                    </Button>
                 </CardFooter>
             </Card>
         </>

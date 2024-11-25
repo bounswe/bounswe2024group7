@@ -17,8 +17,7 @@ import {
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import {
-    userProfile,
-    userPassword
+    userSessionToken,
 } from '../context/user'
 import Select from 'react-select'
 import axios from 'axios'
@@ -27,19 +26,20 @@ import { useToast } from '@chakra-ui/react'
 import { useDispatch } from 'react-redux'
 import { useContext } from 'react'
 import { PostContext } from '../context/PostContext'
+import { UserContext } from '../context/UserContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 function CreatePostModal({
     isOpen,
     onClose
 }) {
-    const { labels, isFetchingLabels } = useContext(PostContext)
-    const profile = useSelector(userProfile)
-    const password = useSelector(userPassword)
-    const [title, setTitle] = useState('')
+    const sessionToken = useSelector(userSessionToken)
     const [content, setContent] = useState('')
-    const [image, setImage] = useState('')
-    const [selectedLabels, setSelectedLabels] = useState([])
+    const [imageURL, setImageURL] = useState('')
+    const [selectedTags, setSelectedTags] = useState([])
+    const [selectedProgram, setSelectedProgram] = useState(null)
+    const { programs, isLoadingPrograms, tags, isLoadingTags } = useContext(PostContext)
+    const { user } = useContext(UserContext)
 
     const theme = useColorModeValue('light', 'dark')
     const selectComponentStyles = {
@@ -124,10 +124,10 @@ function CreatePostModal({
     const createPostMutation = useMutation(
         {
             mutationFn: async (post) => {
-                if (selectedLabels.length === 0) {
+                if (selectedTags.length === 0) {
                     toast({
-                        title: 'No labels selected.',
-                        description: 'Please select at least one label.',
+                        title: 'No tags selected.',
+                        description: 'Please select at least one tag.',
                         status: 'error',
                         duration: 9000,
                         isClosable: true,
@@ -135,7 +135,7 @@ function CreatePostModal({
                     return
                 }
 
-                if (!profile) {
+                if (!user) {
                     toast({
                         title: 'Not logged in.',
                         description: 'Please log in to create a post.',
@@ -146,30 +146,11 @@ function CreatePostModal({
                     return
                 }
 
-                console.log(post)
-
-                // First create image model and get the image id
-                if (post.image) {
-                    const imageResponse = await apiInstance(
-                        profile.username,
-                        password
-                    ).post('/images', {
-                        url: post.image,
-                    })
-
-                    post.image = imageResponse.data.id
-
-                    console.log(post)
-                } else {
-                    delete post.image
-                }
-
-                const response = await apiInstance(
-                    profile.username,
-                    password
-                ).post('/posts', {
-                    ...post,
-                    username: profile.username,
+                const response = await apiInstance(sessionToken).post('/api/posts', {
+                    content: post.content,
+                    tags: post.tags.map((tag) => tag.value),
+                    trainingProgramId: post.trainingProgramId,
+                    imageUrl: post.imageUrl,
                 })
 
                 toast({
@@ -183,6 +164,7 @@ function CreatePostModal({
                 return response.data
             },
             onError: (error) => {
+                console.error('Error creating post:', error)
                 toast({
                     title: 'An error occurred.',
                     description: error.message,
@@ -195,6 +177,11 @@ function CreatePostModal({
                 queryClient.invalidateQueries(
                     {
                         queryKey: ['posts']
+                    }
+                )
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['userPosts']
                     }
                 )
                 onClose()
@@ -219,13 +206,6 @@ function CreatePostModal({
                     flexDirection="column"
                     gap={4}
                 >
-                    <FormControl id="title">
-                        <FormLabel>Title</FormLabel>
-                        <Input type="text"
-                            focusBorderColor='purple.500'
-                            onChange={(e) => setTitle(e.target.value)}
-                        />
-                    </FormControl>
                     <FormControl id="content">
                         <FormLabel>Content</FormLabel>
                         <Textarea
@@ -243,12 +223,34 @@ function CreatePostModal({
                             onChange={(e) => setImage(e.target.value)}
                         />
                     </FormControl>
-                    <FormControl id="labels">
+                    <FormControl id="trainingProgram">
                         <FormLabel>
-                            Labels
+                            Attach a training program
                         </FormLabel>
                         {
-                            isFetchingLabels ?
+                            isLoadingPrograms ?
+                                <Select
+                                    isLoading
+                                    isDisabled
+                                />
+                                :
+                                <Select
+                                    styles={selectComponentStyles}
+                                    options={programs.map((program) => ({
+                                        value: program.id,
+                                        label: program.title
+                                    }))
+                                    }
+                                    onChange={(selected) => setSelectedProgram(selected)}
+                                />
+                        }
+                    </FormControl>
+                    <FormControl id="tags">
+                        <FormLabel>
+                            Tags
+                        </FormLabel>
+                        {
+                            isLoadingTags ?
                                 <Select
                                     isLoading
                                     isDisabled
@@ -257,11 +259,14 @@ function CreatePostModal({
                                 <Select
                                     styles={selectComponentStyles}
                                     isMulti
-                                    options={labels}
-                                    onChange={(selected) => setSelectedLabels(selected)}
+                                    options={tags.map((tag) => ({
+                                        value: tag,
+                                        label: tag
+                                    }))
+                                    }
+                                    onChange={(selected) => setSelectedTags(selected)}
                                 />
                         }
-
                     </FormControl>
                 </ModalBody>
 
@@ -269,10 +274,10 @@ function CreatePostModal({
                     <Button colorScheme="purple" mr={3}
                         onClick={() => {
                             createPostMutation.mutate({
-                                title: title,
                                 content: content,
-                                image: image,
-                                labels: selectedLabels.map(label => label.value),
+                                tags: selectedTags,
+                                imageUrl: imageURL,
+                                trainingProgramId: selectedProgram.value
                             })
                         }}
 
@@ -281,10 +286,10 @@ function CreatePostModal({
                     </Button>
                     <Button variant="ghost"
                         onClick={() => {
-                            setTitle('')
                             setContent('')
                             setImage('')
-                            setSelectedLabels([])
+                            setSelectedTags([])
+                            setSelectedProgram(null)
                             onClose()
                         }}
                     >Cancel</Button>

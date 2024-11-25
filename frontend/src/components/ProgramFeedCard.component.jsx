@@ -10,25 +10,10 @@ import {
     CardHeader,
     Flex,
     Heading,
-    IconButton,
-    Icon,
-    Image,
     Text,
-    Badge,
     useToast,
-    Textarea,
-    useColorModeValue,
-    useColorMode,
     Tooltip
 } from '@chakra-ui/react'
-import {
-    ChatIcon,
-} from '@chakra-ui/icons'
-import HeartIcon from '../icons/HeartIcon'
-import ThreeDotsIcon from '../icons/ThreeDotsIcon'
-import BookmarkAddIcon from '../icons/BookmarkAddIcon'
-import BookmarkCheckIcon from '../icons/BookmarkCheckIcon'
-import BookmarkRemoveIcon from '../icons/BookmarkRemoveIcon'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { useSelector } from 'react-redux'
@@ -36,7 +21,6 @@ import { userProfile, userPassword, userSessionToken } from '../context/user'
 import apiInstance from '../instance/apiInstance'
 import PlusIcon from '../icons/PlusIcon'
 import { UserContext } from '../context/UserContext'
-
 
 function ProgramFeedCard({
     program
@@ -231,6 +215,9 @@ function ProgramFeedCard({
         }
     )
 
+    const handleStartPracticing = (program_name) => {
+        console.log(program_name);
+    };
     return (
         <>
             <Card maxW='lg'>
@@ -328,47 +315,60 @@ function ProgramFeedCard({
                         },
                     }}
                 >
-                    <Tooltip
-                        label={
-                            user && program.trainerUsername === user.username ? null : (
-                                isUserJoined ? 'Leave the program' : 'Join the program'
-                            )
-                        }
-                    >
-                        <Button flex='1' variant='ghost' leftIcon={
-                            isUserJoined ? null : <PlusIcon />
-                        }
-                            colorScheme='purple'
-                            onClick={() => {
-                                if (user) {
-                                    if (!isUserJoined) {
-                                        joinProgram(program.id)
-                                    } else {
-                                        unjoinProgram(program.id)
-                                    }
-                                } else {
-                                    toast({
-                                        title: 'You need to login to join a program',
-                                        status: 'error',
-                                        duration: 3000,
-                                        isClosable: true,
-                                    })
-                                }
-                            }
-                            }
-                            disabled={
-                                user && program.trainerUsername === user.username
-                                || joinProgram.isLoading
-                                || unjoinProgram.isLoading
-                            }
-                        >
-                            {
-                                user && program.trainerUsername === user.username ? 'You are the trainer' : (
-                                    isUserJoined ? 'Joined' : 'Join'
+                    <Flex gap={2} width="full">
+                        <Tooltip
+                            label={
+                                user && program.trainerUsername === user.username ? null : (
+                                    isUserJoined ? 'Leave the program' : 'Join the program'
                                 )
                             }
-                        </Button>
-                    </Tooltip>
+                        >
+                            <Button
+                                flex='1'
+                                variant='ghost'
+                                leftIcon={isUserJoined ? null : <PlusIcon />}
+                                colorScheme='purple'
+                                onClick={() => {
+                                    if (user) {
+                                        if (!isUserJoined) {
+                                            joinProgram(program.id)
+                                        } else {
+                                            unjoinProgram(program.id)
+                                        }
+                                    } else {
+                                        toast({
+                                            title: 'You need to login to join a program',
+                                            status: 'error',
+                                            duration: 3000,
+                                            isClosable: true,
+                                        })
+                                    }
+                                }}
+                                disabled={
+                                    user && program.trainerUsername === user.username
+                                    || joinProgram.isLoading
+                                    || unjoinProgram.isLoading
+                                }
+                            >
+                                {
+                                    user && program.trainerUsername === user.username ? 'You are the trainer' : (
+                                        isUserJoined ? 'Joined' : 'Join'
+                                    )
+                                }
+                            </Button>
+                        </Tooltip>
+
+                        {isUserJoined && user && program.trainerUsername !== user.username && (
+                            <Button
+                                flex='1'
+                                variant='solid'
+                                colorScheme='green'
+                                onClick={() => handleStartPracticing(program.title)}
+                            >
+                                Start Practicing
+                            </Button>
+                        )}
+                    </Flex>
                 </CardFooter>
             </Card>
         </>

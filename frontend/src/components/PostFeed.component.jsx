@@ -6,11 +6,13 @@ import {
     Stack,
     Text,
     Spinner,
-    useBreakpointValue,
+    useBreakpointValue, VStack
 } from '@chakra-ui/react';
 import { PostContext } from '../context/PostContext';
 import PostFeedCard from './PostFeedCard.component';
 import ProgramFeedCard from './ProgramFeedCard.component';
+import ProfessToday from './ProgressToday.component';
+import ProgressToday from './ProgressToday.component';
 
 function PostFeed() {
     const { posts, isLoadingPosts, programs, isFetchingPrograms } = useContext(PostContext);
@@ -29,22 +31,40 @@ function PostFeed() {
             align="flex-start"
             gap={6} // Space between columns
         >
-            {/* Recommended Programs */}
-            <Box
-                flex={{ base: 'none', lg: '1' }} // Full width on small screens, smaller on large screens
-                w={{ base: '100%', lg: '30%' }} // Adjust width for different breakpoints
-                borderRadius="md"
-                p={4}
+            <VStack // Use VStack to stack components vertically
+                spacing={6} // Add space between the boxes
+                align="stretch" // Make children stretch to full width
+                w="40%" // Full width of the parent container
             >
-                <Heading size="lg" mb={4}>Recommended Programs</Heading>
-                {programs.length > 0 ? (
-                    programs.map((program) => (
-                        <ProgramFeedCard program={program} key={program.id} />
-                    ))
-                ) : (
-                    <Text>No programs to recommend right now.</Text>
+                {/* Today's Programs */}
+                {programs.length > 0 && (
+                    <Box
+                    // borderRadius="md"
+                    // p={4}
+                    // bg="gray.50"
+                    // boxShadow="sm"
+                    >
+                        <Heading size="lg" mb={4}>Your Progress Today</Heading>
+                        <ProgressToday />
+                    </Box>
                 )}
-            </Box>
+
+                {/* Recommended Programs */}
+                <Box
+                    borderRadius="md"
+                    p={4}
+                    boxShadow="sm"
+                >
+                    <Heading size="lg" mb={4}>Recommended Programs</Heading>
+                    {programs.length > 0 ? (
+                        programs.map((program) => (
+                            <ProgramFeedCard program={program} key={program.id} />
+                        ))
+                    ) : (
+                        <Text>No programs to recommend right now.</Text>
+                    )}
+                </Box>
+            </VStack>
 
             {/* Main Feed */}
             <Box

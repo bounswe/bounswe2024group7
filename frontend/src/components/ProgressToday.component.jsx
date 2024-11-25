@@ -24,15 +24,12 @@ const calculateProgress = (joinedPrograms) => {
 
     return progress.toFixed(2);
 };
-function ProgressBoard() {
+function ProgressToday() {
     const { joinedPrograms } = useContext(UserContext);
     const currentProgress = calculateProgress(joinedPrograms);
     const [progress, setProgress] = useState(0); // Initialize progress to 0
 
-    // MockData
-    const daysOfWeek = ['Sat', 'Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri'];
-    const active = [1, 1, 1, 0, 0, 0, 0];
-    const progress_days = [50, 100, 70, 0, 0, 0, 0];
+
 
     useEffect(() => {
         // Increment progress by 10% every 80ms until it reaches currentProgress
@@ -56,7 +53,7 @@ function ProgressBoard() {
         <Box
             display="flex"
             justifyContent="center"
-            bg="gray.50"
+            // bg="gray.50"
             sx={{
                 boxSizing: 'border-box',
                 marginTop: 0,
@@ -67,17 +64,17 @@ function ProgressBoard() {
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
-                maxWidth="600px"
-                width="100%"
+                width="380px"
+                height="260px"
                 bg="white"
-                boxShadow="lg"
+                boxShadow="md"
                 borderRadius="md"
-                p={10}
+                p={5}
                 mb={0}
             >
-                <Text fontSize="lg" fontWeight="bold" color="gray.900" mb={4}>
-                    Your Fitness Story: Chapter This Week
-                </Text>
+                {/* <Text fontSize="lg" fontWeight="bold" mb={2}>
+                    Your Progress Today
+                </Text> */}
                 <Box
                     position="relative"
                     display="flex"
@@ -87,7 +84,7 @@ function ProgressBoard() {
                 >
                     <CircularProgress
                         value={progress}
-                        color="teal"
+                        color='#805AD5'
                         trackColor="gray.200"
                         size="240px"
                         thickness="3px"
@@ -105,69 +102,26 @@ function ProgressBoard() {
                         transform="translate(-50%, -50%)"
                         textAlign="center"
                     >
-                    </Box>
-                    <Box
-                        position="absolute"
-                        top="50%"
-                        left="50%"
-                        transform="translate(-50%, -50%)"
-                        textAlign="center"
-                    >
                         <Text fontSize="lg" fontWeight="bold" color="gray.700" mb={4}>
-                            Today: {currentProgress}%
+                            {currentProgress}%
                         </Text>
                         {currentProgress === 100 ? (
                             progress === 100 ? (
-                                <StarIcon boxSize={12} color="teal" />
+                                <StarIcon boxSize={12} color='#805AD5' />
                             ) : null
                         ) : (
-                            <Button bg="teal" color="white" _hover={{ bg: 'teal' }} size="sm">
+                            <Button bg="#805AD5" color="white" _hover={{ bg: '#805AD5' }} size="sm">
                                 Nail It !
                             </Button>
                         )}
                     </Box>
                 </Box>
-
-                {/* Days of the week and circular progress bars */}
-                <Box textAlign="center">
-                    <HStack spacing={6} justifyContent="center" mb={2}>
-                        {daysOfWeek.map((day, i) => (
-                            <VStack key={day} spacing={2} alignItems="center">
-                                <Text
-                                    fontSize="sm"
-                                    fontWeight="medium"
-                                    color={active[i] === 0 ? 'gray.400' : 'gray.600'}
-                                >
-                                    {day}
-                                </Text>
-                                {active[i] === 0 ? (
-                                    <CircularProgress
-                                        value={0}
-                                        trackColor="gray.200"
-                                        size="50px"
-                                        thickness="6px"
-                                    />
-                                ) : (
-                                    <CircularProgress
-                                        value={progress_days[i]}
-                                        color="teal"
-                                        trackColor="gray.200"
-                                        size="50px"
-                                        thickness="7px"
-                                    >
-                                        <CircularProgressLabel fontSize="xs" color="gray.700">
-                                            {progress_days[i]}%
-                                        </CircularProgressLabel>
-                                    </CircularProgress>
-                                )}
-                            </VStack>
-                        ))}
-                    </HStack>
-                </Box>
             </Box>
         </Box>
+
+
 
     );
 }
 
-export default ProgressBoard;
+export default ProgressToday;

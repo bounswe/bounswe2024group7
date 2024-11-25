@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList } from 'react
 import { useNavigation } from '@react-navigation/native';
 import PostCard from './PostCard'; // Import your PostCard component
 import ProgramCard from './ProgramCard'; // Import your ProgramCard component
+import DietCard from './DietCard';
 
 const UserProfile = ({ route }) => {
   const navigation = useNavigation();
@@ -10,31 +11,98 @@ const UserProfile = ({ route }) => {
 
   // Static mock data for the user's profile
   const forumPosts = [
-    { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: username, labels: ['forum', 'discussion'], likeCount: 20 },
-    { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: username, labels: ['forum', 'diet'], likeCount: 15 },
-  ];
+      { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', date: '14.11.2024',commentList: [
+                                                                                                                                            { id: '1', user: 'jshine1337', text: 'Nope, that’s not a concept...' },
+                                                                                                                                            { id: '2', user: 'sqlpro23', text: 'You could try batching your statements!' },
+                                                                                                                                          ], labels: ['forum', 'discussion'], likeCount: 20 },
+      { id: 2, title: 'Forum Post 2', description: 'Best diet for muscle gain?', owner: 'jane_doe', labels: ['forum', 'diet'], date: '13.11.2024',commentList: [
+                                                                                                                                                                    { id: '1', user: 'jshine1337', text: 'Nope, that’s not a concept...' },
+                                                                                                                                                                    { id: '2', user: 'sqlpro23', text: 'You could try batching your statements!' },
+                                                                                                                                                                  ], likeCount: 15 },
+    ];
 
   const programs = [
-    { id: 1, title: 'Powerlifting Program', description: 'A 12-week strength program for powerlifting.', owner: username, followCount: 100, location: 'outdoor', muscle_list: ['chest', 'shoulder'], weeklySchedule: {
-        Monday: ['Push-ups', 'Squats', 'Plank'],
-        Tuesday: ['Pull-ups', 'Leg Press', 'Deadlift'],
-        Wednesday: ['Rest Day'],
-        Thursday: ['Bench Press', 'Rows', 'Bicep Curls'],
-        Friday: ['Overhead Press', 'Lunges', 'Lat Pulldown'],
-        Saturday: ['Cardio', 'Abs Workout'],
-        Sunday: ['Rest Day'],
-      }},
-    { id: 2, title: 'Hypertrophy Program', description: 'Gain muscle with this 6-week hypertrophy program.', owner: username, followCount: 85, location: 'gym', muscle_list: ['leg'], weeklySchedule: {
-        Monday: ['Push-ups', 'Squats', 'Plank'],
-        Tuesday: ['Pull-ups', 'Lunges', 'Deadlift'],
-        Wednesday: ['Rest Day'],
-        Thursday: ['Bench Press', 'Rows', 'Bicep Curls'],
-        Friday: ['Overhead Press', 'Leg Press', 'Lat Pulldown'],
-        Saturday: ['Cardio', 'Abs Workout'],
-        Sunday: ['Rest Day'],
-      }},
-  ];
+      { id: 1, title: "Full Body Workout",
+                   description: "This is a comprehensive program targeting all major muscle groups.",
+                   trainerUsername: "fitness_guru_123",
+                   exercises: [
+                     { exercise:{
+                       name: "Push-Up",
+                       gifUrl: "https://example.com/push-up.gif",
+                       bodyPart: "Chest",
+                       target: "Pectorals",
+                       equipment: "None",
+                       secondaryMuscles: "Triceps, Shoulders",
+                       instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
+                     },
+                     reps:10,
+                     sets:3
+                     },
+                     {
+                     exercise:{
+                       name: "Squat",
+                       gifUrl: "https://example.com/squat.gif",
+                       bodyPart: "Legs",
+                       target: "Quadriceps",
+                       equipment: "None",
+                       secondaryMuscles: "Glutes, Hamstrings",
+                       instructions: "Keep your back straight, bend your knees, and lower your hips.",
+                     },reps:8,
+                             sets:4
+                         }
+                   ]},
+       { id: 2, title: "Full Body Workout",
+                    description: "This is a comprehensive program targeting all major muscle groups.",
+                    trainerUsername: "fitness_guru_123",
+                    exercises: [
+                      { exercise:{
+                        name: "Push-Up",
+                        gifUrl: "https://example.com/push-up.gif",
+                        bodyPart: "Chest",
+                        target: "Pectorals",
+                        equipment: "None",
+                        secondaryMuscles: "Triceps, Shoulders",
+                        instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
+                      },
+                      reps:10,
+                      sets:3
+                      },
+                      {
+                      exercise:{
+                        name: "Squat",
+                        gifUrl: "https://example.com/squat.gif",
+                        bodyPart: "Legs",
+                        target: "Quadriceps",
+                        equipment: "None",
+                        secondaryMuscles: "Glutes, Hamstrings",
+                        instructions: "Keep your back straight, bend your knees, and lower your hips.",
+                      },reps:8,
+                              sets:4
+                          }
+                    ]}
 
+    ];
+
+const diet_programs = [
+        { id: 1, title: 'Gluten-free Diet Program', description: 'A protein based gluten-free diet.', owner: 'dietician_john', followCount: 100, category: 'gluten-free', nutrition_list: ['180 g fat', '300 g protein'], weeklySchedule: {
+      Monday: ['Egg', 'Squats', 'Turkey', 'Orange'],
+      Tuesday: ['Avocado Toast', 'Grilled Chicken', 'Deadlift', 'Kefir'],
+      Wednesday: ['Pancakes', 'Meatballs', 'Beef Steak', 'Pineapple'],
+      Thursday: ['Olive', 'Rice', 'Manti', 'Turkish Yoghurt'],
+      Friday: ['Kashar Cheese', 'Broccoli', 'Lentil', 'Apple'],
+      Saturday: ['Cottage Cheese', 'Pasta', 'Falafel', 'Banana'],
+      Sunday: ['Cucumber', 'Tuna Salad', 'Mushroom', 'Ayran']
+    }},
+        { id: 2, title: 'My Diet Program', description: 'Vitamin rich diet program.', owner: 'dietician_jane', followCount: 85, category: 'vitamin-rich', nutrition_list: ['120g protein', '200g fat', '230g carbonhydrate'], weeklySchedule: {
+          Monday: ['Egg', 'Squats', 'Turkey', 'Orange'],
+              Tuesday: ['Avocado Toast', 'Grilled Chicken', 'Deadlift', 'Kefir'],
+              Wednesday: ['Pancakes', 'Meatballs', 'Beef Steak', 'Pineapple'],
+              Thursday: ['Olive', 'Rice', 'Manti', 'Turkish Yoghurt'],
+              Friday: ['Kashar Cheese', 'Broccoli', 'Lentil', 'Apple'],
+              Saturday: ['Cottage Cheese', 'Pasta', 'Falafel', 'Banana'],
+              Sunday: ['Cucumber', 'Tuna Salad', 'Mushroom', 'Ayran']
+            }},
+      ];
   const [isFollowing, setIsFollowing] = useState(false);
   const [selectedTab, setSelectedTab] = useState('forum'); // To track the selected tab
 
@@ -55,6 +123,8 @@ const UserProfile = ({ route }) => {
               description={item.description}
               labels={item.labels}
               likeCount={item.likeCount}
+              commentList={item.commentList}
+              date={item.date}
               navigation={navigation}
             />
           )}
@@ -70,13 +140,10 @@ const UserProfile = ({ route }) => {
           renderItem={({ item }) => (
             <ProgramCard
               title={item.title}
-              owner={item.owner}
-              description={item.description}
-              followCount={item.followCount}
-              location={item.location}
-              muscle_list={item.muscle_list}
-              weeklySchedule={item.weeklySchedule}
-              navigation={navigation}
+                            description={item.description}
+                            trainerUsername={item.trainerUsername}
+                            exercises={item.exercises}
+                            navigation = {navigation}
             />
           )}
           style={styles.postList}
@@ -84,6 +151,27 @@ const UserProfile = ({ route }) => {
         />
       );
     }
+    else if (selectedTab === 'diet') {
+                  return (
+                    <FlatList
+                      data={diet_programs}
+                      keyExtractor={(item) => item.id.toString()}
+                      renderItem={({ item }) => (
+                        <DietCard
+                          title={item.title}
+                          description={item.description}
+                          owner={item.owner}
+                          followCount={item.followCount}
+                          category={item.category}
+                          nutrition_list={item.nutrition_list}
+                          weeklySchedule={item.weeklySchedule}
+                          navigation={navigation}
+                        />
+                      )}
+                      showsVerticalScrollIndicator={false}
+                    />
+                  );
+                }
   };
 
   return (
@@ -127,6 +215,12 @@ const UserProfile = ({ route }) => {
         >
           <Text style={[styles.tabText, selectedTab === 'programs' && styles.activeTabText]}>Programs</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+                          style={[styles.tabItem, selectedTab === 'diet' && styles.activeTab]}
+                          onPress={() => setSelectedTab('diet')}
+                        >
+                          <Text style={[styles.tabText, selectedTab === 'diet' && styles.activeTabText]}>Diet</Text>
+                        </TouchableOpacity>
       </View>
 
       {/* Display content based on selected tab */}
