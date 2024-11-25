@@ -7,11 +7,13 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Getter
+@Setter
 @EqualsAndHashCode(exclude = {"tags", "likedByUsers", "bookmarkedByUsers"})  // Avoid using tags in equals and hashCode to prevent recursion
 public class Post {
 
