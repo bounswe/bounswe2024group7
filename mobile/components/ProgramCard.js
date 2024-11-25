@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const ProgramCard = ({ trainerUsername, title, description, exercises, navigation }) => {
+const ProgramCard = ({ trainerUsername, title, description, exercises, date, participants, navigation }) => {
   return (
     <TouchableOpacity
           style={styles.card}
@@ -13,6 +13,7 @@ const ProgramCard = ({ trainerUsername, title, description, exercises, navigatio
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
       <Text style={styles.description}>Exercise count: {exercises.length}</Text>
+      <Text style={styles.description}>Participant count: {participants.length}</Text>
     </TouchableOpacity>
   );
 };

@@ -1,18 +1,25 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, Switch } from 'react-native';
 import { useAuth } from '../AuthContext';
+import { useUser } from '../UserContext';
+import { useSelector } from "react-redux";
 import ProfilePage from './ProfilePage';
 import Feed from './Feed';
 import CreatePost from './CreatePost';
 import CreateProgram from './CreateProgram';
 import Create from './Create';
 import SearchResults from './SearchResults';
+import { isLoggedIn } from '../user';
 
 
 
 
 const Home = ({ navigation }) => {
-  const { isLoggedIn, logout } = useAuth();
+  //const { isLoggedIn, logout } = useAuth();
+  const {logout} = useAuth();
+  //const {isLoggedIn} = useUser();
+  const LoggedIn = useSelector(isLoggedIn);
+  //const isLoggedIn = true;
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [selectedPage, setSelectedPage] = useState('Feed');
   const [darkMode, setDarkMode] = useState(false); // Dark mode state
@@ -42,7 +49,7 @@ const Home = ({ navigation }) => {
 
   return (
     <View style={currentStyles.appContainer}>
-      {!isLoggedIn && (
+      {!LoggedIn && (
         <View style={currentStyles.container}>
           <Text style={currentStyles.title}>Welcome to Fitness Fact !!</Text>
           <TouchableOpacity
@@ -60,7 +67,7 @@ const Home = ({ navigation }) => {
         </View>
       )}
 
-      {isLoggedIn && (
+      {LoggedIn && (
         <View style={currentStyles.appContainer}>
           {/* Header with Profile Picture and Dark Mode Toggle */}
           <View style={currentStyles.header}>

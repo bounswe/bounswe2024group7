@@ -1,15 +1,164 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect} from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../AuthContext';
 import PostCard from './PostCard';
 import ProgramCard from './ProgramCard';
 import DietCard from './DietCard';
+import { UserContext } from "../UserContext";
+import { useSelector } from 'react-redux';
+import { userName, userProfile, userSessionToken } from '../user.js';
+import { useQuery } from "@tanstack/react-query"
+import apiInstance from '../Api';
 
 const ProfilePage = ({ darkMode }) => {
+  const username = useSelector(userName);
+  const sessionToken = useSelector(userSessionToken);
+  console.log(sessionToken);
+  const profile = useSelector(userProfile);
+  const [user, setUser] = useState({})
+  const [posts, setPosts] = useState([]);
+  const [followers, setFollowers] = useState([]);
+
+  const [following, setFollowing] = useState([]);
+
+  
+  //const [programs, setPrograms] = useState([])
+  //const { user, followers, following, posts } = useContext(UserContext);
+  const {
+    data: profileData,
+    isFetching: profileIsFetching,
+    isLoading: profileIsLoading,
+} = useQuery({
+    queryKey: ['user',sessionToken],
+    queryFn: async () => {
+      try{
+        const response = await apiInstance(sessionToken).get(`api/user/${username}`);
+
+        return response.data;
+      }catch (error) {
+        console.error('Error fetching posts:', error);
+        throw error; // Re-throw the error to trigger error handling in useQuery
+      }
+
+    },
+    refetchOnWindowFocus: false,
+    refetchInterval:60000
+});
+
+const {
+  data: postsData,
+  isFetching: postsIsFetching,
+  isLoading: postsIsLoading,
+} = useQuery({
+  queryKey: ['posts',sessionToken],
+  queryFn: async () => {
+    try{
+      const response = await apiInstance(sessionToken).get(`api/posts/user/${username}`);
+
+      return response.data;
+    }catch (error) {
+      console.error('Error fetching posts:', error);
+      throw error; // Re-throw the error to trigger error handling in useQuery
+    }
+
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval:60000
+});
+const {
+  data: followersData,
+  isFetching: followersIsFetching,
+  isLoading: followersIsLoading,
+} = useQuery({
+  queryKey: ['followers'],
+  queryFn: async () => {
+      try {
+          const response = await apiInstance(sessionToken).get(`api/user/${username}/followers`)
+
+          return response.data
+      } catch (error) {
+          return []
+      }
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval:60000
+})
+
+const {
+  data: followingData,
+  isFetching: followingIsFetching,
+  isLoading: followingIsLoading,
+} = useQuery({
+  queryKey: ['following'],
+  queryFn: async () => {
+      try {
+          const response = await apiInstance(sessionToken).get(`api/user/${username}/following`)
+
+          return response.data
+      } catch (error) {
+          return []
+      }
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval:60000
+})
+/*const {
+  data: programsData,
+  isFetching: programsIsFetching,
+  isLoading: programsIsLoading,
+} = useQuery({
+  queryKey: ['programs'],
+  queryFn: async () => {
+      try {
+          const response = await apiInstance(token).get(`api/training-programs/trainer/${username}`)
+
+          return response.data
+      } catch (error) {
+          return []
+      }
+  },
+  refetchOnWindowFocus: false,
+})*/
+/*useEffect(() => {
+  if (programsData && !programsIsFetching) {
+      setPrograms(programsData)
+  }
+}, [programsData, programsIsFetching])*/
+
+useEffect(() => {
+  if (profileData && !profileIsFetching) {
+    const sanitizedProfile = JSON.parse(JSON.stringify(profileData)); // Deep clone to remove non-serializable values
+    setUser(sanitizedProfile);
+    console.log(user);
+
+  }
+}, [profileData, profileIsFetching])
+useEffect(() => {
+  if (postsData && !postsIsFetching) setPosts(postsData);
+  console.log(posts);
+
+}, [postsData, postsIsFetching]);
+useEffect(() => {
+  if (followersData && !followersIsFetching) setFollowers(followersData);
+  console.log(followers);
+}, [followersData, followersIsFetching]);
+
+useEffect(() => {
+  if (followingData && !followingIsFetching) setFollowing(followingData);
+  console.log(following);
+
+}, [followingData, followingIsFetching]);
+
+
+  console.log(username);
+  console.log(profile);
+  
+  
+
   const styles = darkMode ? darkStyles : lightStyles;
   const navigation = useNavigation();
-  const { user } = useAuth();
+  //const { user } = useAuth();
 
   // Mock data for posts
   const forumPosts = [
@@ -117,7 +266,7 @@ const ProfilePage = ({ darkMode }) => {
 
   const renderPosts = () => {
     if (selectedTab === 'forum') {
-      return (
+      /*return (
         <FlatList
           data={forumPosts}
           keyExtractor={(item) => item.id.toString()}
@@ -136,7 +285,25 @@ const ProfilePage = ({ darkMode }) => {
           style={styles.postList}
           showsVerticalScrollIndicator={false}
         />
-      );
+      );*/
+      return(<FlatList
+        data={posts}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <PostCard
+            title={item.title}
+            owner={item.username}
+            description={item.content}
+            labels={item.tags}
+            likeCount={item.likeCount}
+            commentList={forumPosts[0].commentList}
+            date={item.createdAt}
+            navigation={navigation}
+          />
+        )}
+        style={styles.postList}
+        showsVerticalScrollIndicator={false}
+      />);
     } else if (selectedTab === 'programs') {
       return (
         <FlatList
@@ -148,6 +315,8 @@ const ProfilePage = ({ darkMode }) => {
                 description={item.description}
                 trainerUsername={item.trainerUsername}
                 exercises={item.exercises}
+                participants= {item.participants}
+                date = {item.createdAt}
                 navigation = {navigation}
             />
           )}
@@ -187,15 +356,15 @@ const ProfilePage = ({ darkMode }) => {
           source={{ uri: 'https://via.placeholder.com/150' }} // Mock profile image
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>{user}</Text>
-        <Text style={styles.profileUsername}>@{user}</Text>
+        <Text style={styles.profileName}>{username}</Text>
+        <Text style={styles.profileUsername}>@{username}</Text>
         <View style={styles.badgesContainer}>
           <View style={styles.statContainer}>
-            <Text style={styles.statNumber}>150</Text>
+            <Text style={styles.statNumber}>{followers.length}</Text>
             <Text style={styles.statLabel}>Followers</Text>
           </View>
           <View style={styles.statContainer}>
-            <Text style={styles.statNumber}>200</Text>
+            <Text style={styles.statNumber}>{following.length}</Text>
             <Text style={styles.statLabel}>Following</Text>
           </View>
         </View>

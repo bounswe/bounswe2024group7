@@ -1,14 +1,78 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import PostCard from './PostCard';
 import DietCard from './DietCard';
 import ProgramCard from './ProgramCard';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import { userPassword, userProfile, userSessionToken } from '../user.js';
+import { useQuery } from "@tanstack/react-query"
+import apiInstance from '../Api';
+
+
 
 const FeedPage = ({ darkMode }) => {
   const styles = darkMode ? darkStyles : lightStyles;
   const navigation = useNavigation();
+  const [posts, setPosts] = useState([])
+  const [programs, setPrograms] = useState([])
 
+
+    const profile = useSelector(userProfile)
+    const password = useSelector(userPassword)
+    const sessionToken = useSelector(userSessionToken)
+
+
+    const {
+        data: postsData,
+        isFetching: postsIsFetching,
+        isLoading: postsIsLoading,
+    } = useQuery({
+        queryKey: ['posts'],
+        queryFn: async () => {
+          try{
+            const response = await apiInstance().get('api/posts/random')
+
+            return response.data
+          }
+            catch (error) {
+              console.error('Error fetching posts:', error);
+              throw error; // Re-throw the error to trigger error handling in useQuery
+            }
+        },
+        refetchOnWindowFocus:false,
+        refetchInterval:60000,
+    })
+
+    const {
+        data: programsData,
+        isFetching: programsIsFetching,
+        isLoading: programsIsLoading,
+    } = useQuery({
+        queryKey: ['training-programs'],
+        queryFn: async () => {
+            const response = await apiInstance().get('api/training-programs')
+
+            return response.data
+        },
+        refetchOnWindowFocus:false,
+        refetchInterval:60000,
+    })
+
+    useEffect(() => {
+        if (postsData && !postsIsFetching) {
+            setPosts(postsData)
+            console.log(posts);
+        }
+    }, [postsData, postsIsFetching])
+
+    useEffect(() => {
+        if (programsData && !programsIsFetching) {
+            setPrograms(programsData)
+            console.log(programs);
+
+        }
+    }, [programsData, programsIsFetching])
   // Mock data for forum posts and programs
   const forumPosts = [
     { id: 1, title: 'Forum Post 1', description: 'Discuss your workout routine.', owner: 'john_doe', date: '14.11.2024',commentList: [
@@ -21,7 +85,7 @@ const FeedPage = ({ darkMode }) => {
                                                                                                                                                                ], likeCount: 15 },
   ];
 
-  const programs = [
+  /*const programs = [
     { id: 1, title: "Full Body Workout",
                  description: "This is a comprehensive program targeting all major muscle groups.",
                  trainerUsername: "fitness_guru_123",
@@ -81,7 +145,7 @@ const FeedPage = ({ darkMode }) => {
                         }
                   ]}
 
-  ];
+  ];*/
 
   const diet_programs = [
       { id: 1, title: 'Gluten-free Diet Program', description: 'A protein based gluten-free diet.', owner: 'dietician_john', followCount: 100, category: 'gluten-free', nutrition_list: ['180 g fat', '300 g protein'], weeklySchedule: {
@@ -109,7 +173,7 @@ const FeedPage = ({ darkMode }) => {
   // Function to render posts or programs based on the selected tab
   const renderContent = () => {
     if (selectedTab === 'forum') {
-      return (
+      /*return (
         <FlatList
           data={forumPosts}
           keyExtractor={(item) => item.id.toString()}
@@ -128,8 +192,29 @@ const FeedPage = ({ darkMode }) => {
           )}
           showsVerticalScrollIndicator={false}
         />
-      );
-    } else if (selectedTab === 'training') {
+      );*/
+      return(
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <PostCard
+            title={item.title}
+            owner={item.username}
+            description={item.content}
+            labels={item.tags}
+            liked={item.liked}
+            likeCount={item.likeCount}
+            commentList={forumPosts[0].commentList}
+            date={item.createdAt}
+            navigation={navigation}
+          />
+        )}
+        style={styles.postList}
+        showsVerticalScrollIndicator={false}
+      />
+
+    );} else if (selectedTab === 'training') {
       return (
         <FlatList
           data={programs}
@@ -140,6 +225,8 @@ const FeedPage = ({ darkMode }) => {
               description={item.description}
               trainerUsername={item.trainerUsername}
               exercises={item.exercises}
+              participants = {item.participants}
+              date = {item.createdAt}
               navigation = {navigation}
 
             />
