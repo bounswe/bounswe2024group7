@@ -6,27 +6,27 @@ const programData = {
         {
             title: 'Step 1: Deadlift',
             description: 'Use the barbell for deadlifting. Ensure your feet are shoulder-width apart, grip the bar just outside your knees, and lift the bar while keeping your back straight.',
-            gif: 'https://v2.exercisedb.io/image/ogjzsJ3u4sUljM',
+            gif: 'https://gymvisual.com/img/p/4/7/3/1/4731.gif',
         },
         {
             title: 'Step 2: Squat',
             description: 'Set the barbell on your upper back. Lower your body by bending your knees and hips, keeping your chest up, until your thighs are parallel to the ground. Push back up to standing position.',
-            gif: 'https://v2.exercisedb.io/image/ogjzsJ3u4sUljM',
+            gif: 'https://gymvisual.com/img/p/4/7/3/1/4731.gif',
         },
         {
             title: 'Step 3: Bench Press',
             description: 'Lie flat on the bench, grip the barbell with both hands slightly wider than shoulder-width, and press the bar up and down, ensuring control and a full range of motion.',
-            gif: 'https://v2.exercisedb.io/image/ogjzsJ3u4sUljM',
+            gif: 'https://gymvisual.com/img/p/4/7/3/1/4731.gif',
         },
         {
             title: 'Step 4: Overhead Press',
             description: 'Stand with your feet shoulder-width apart, grip the barbell just outside your shoulders, and press the bar above your head while keeping your core tight.',
-            gif: 'https://v2.exercisedb.io/image/ogjzsJ3u4sUljM',
+            gif: 'https://gymvisual.com/img/p/4/7/3/1/4731.gif',
         },
         {
             title: 'Step 5: Pull-ups',
             description: 'Hang from a pull-up bar with your palms facing away from you. Pull your body upwards until your chin is above the bar, then slowly lower yourself back down.',
-            gif: 'https://v2.exercisedb.io/image/ogjzsJ3u4sUljM',
+            gif: 'https://gymvisual.com/img/p/4/7/3/1/4731.gif',
         },
     ],
 };

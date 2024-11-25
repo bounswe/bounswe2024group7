@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { CircularProgress, CircularProgressLabel, Box, Text, HStack, VStack, Button } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 import { UserContext } from '../context/UserContext';
+import { useNavigate } from '@tanstack/react-router'
 
 const calculateProgress = (joinedPrograms) => {
     let done = 0;
@@ -47,7 +48,14 @@ function ProgressToday() {
         return () => clearInterval(interval); // Cleanup the interval on component unmount
     }, [currentProgress]);
 
-
+    const navigate = useNavigate()
+    const handleStartPracticing = (program_name) => {
+        navigate(
+            {
+                to: "/program"
+            }
+        )
+    }
 
     return (
         <Box
@@ -110,7 +118,7 @@ function ProgressToday() {
                                 <StarIcon boxSize={12} color='#805AD5' />
                             ) : null
                         ) : (
-                            <Button bg="#805AD5" color="white" _hover={{ bg: '#805AD5' }} size="sm">
+                            <Button bg="#805AD5" color="white" _hover={{ bg: '#805AD5' }} size="sm" onClick={() => handleStartPracticing(joinedPrograms)}>
                                 Nail It !
                             </Button>
                         )}

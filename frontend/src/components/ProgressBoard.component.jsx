@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { CircularProgress, CircularProgressLabel, Box, Text, HStack, VStack, Button } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 import { UserContext } from '../context/UserContext';
-
+import { useNavigate } from '@tanstack/react-router'
 const calculateProgress = (joinedPrograms) => {
     let done = 0;
     let undone = 0;
@@ -24,6 +24,7 @@ const calculateProgress = (joinedPrograms) => {
 };
 
 const calculateWeeklyProgress = (joinedPrograms) => {
+
     const daysOfWeek = ['Sat', 'Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri'];
     const today = new Date();
     const active = [];
@@ -61,6 +62,14 @@ const calculateWeeklyProgress = (joinedPrograms) => {
 };
 
 function ProgressBoard() {
+    const navigate = useNavigate()
+    const handleStartPracticing = (program_name) => {
+        navigate(
+            {
+                to: "/program"
+            }
+        )
+    }
     const { joinedPrograms } = useContext(UserContext);
     const currentProgress = calculateProgress(joinedPrograms);
     const [progress, setProgress] = useState(0);
@@ -144,7 +153,7 @@ function ProgressBoard() {
                                 <StarIcon boxSize={12} color="teal" />
                             ) : null
                         ) : (
-                            <Button bg="teal" color="white" _hover={{ bg: 'teal' }} size="sm">
+                            <Button bg="teal" color="white" _hover={{ bg: 'teal' }} size="sm" onClick={() => handleStartPracticing(joinedPrograms)}>
                                 Nail It !
                             </Button>
                         )}
