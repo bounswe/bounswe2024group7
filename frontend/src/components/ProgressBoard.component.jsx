@@ -56,22 +56,28 @@ function ProgressBoard() {
         <Box
             display="flex"
             justifyContent="center"
-            alignItems="center"
-            height="100vh"
-            width="100vw"
+            // alignItems="flex-start"  // Align items at the top of the screen
+            // height="100vh"
+            // width="100vw"
             bg="gray.50"
+            // overflow="hidden" // Prevent horizontal scroll
+            sx={{
+                boxSizing: 'border-box', // Ensure no extra spacing issues
+                marginTop: 0, // Remove any default margin
+            }}
         >
-
             <Box
                 position="relative"
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
-                width="600px" // Make the box wider
+                maxWidth="600px" // Ensure it's responsive
+                width="100%" // Ensure it fits within the screen
                 bg="white"
                 boxShadow="lg"
                 borderRadius="md"
-                p={10} // Add padding for spacing
+                p={10} // Padding for spacing inside the box
+                mb={0} // Ensure no margin at the bottom
             >
                 <Text fontSize="lg" fontWeight="bold" color="gray.900" mb={4}>
                     Your Fitness Story: Chapter This Week
@@ -85,14 +91,13 @@ function ProgressBoard() {
                 >
                     <CircularProgress
                         value={progress}
-                        color="#9F7AEA" // Updated progress bar color
+                        color="teal" // Updated progress bar color
                         trackColor="gray.200"
                         size="240px"
                         thickness="3px"
                         capIsRound
                         sx={{
                             '& circle': {
-                                // transform: 'rotate(180deg)', // Rotate the circle
                                 transformOrigin: 'center', // Ensure rotation happens around the center
                             },
                         }}
@@ -104,7 +109,6 @@ function ProgressBoard() {
                         transform="translate(-50%, -50%)"
                         textAlign="center"
                     >
-
                     </Box>
                     <Box
                         position="absolute"
@@ -118,14 +122,13 @@ function ProgressBoard() {
                         </Text>
                         {currentProgress === 100 ? (
                             progress === 100 ? (
-                                <StarIcon boxSize={12} color="gold" />
+                                <StarIcon boxSize={12} color="teal" />
                             ) : null
                         ) : (
-                            <Button bg="#9F7AEA" color="white" _hover={{ bg: '#805AD5' }} size="sm">
+                            <Button bg="teal" color="white" _hover={{ bg: 'teal' }} size="sm">
                                 Nail It !
                             </Button>
                         )}
-
                     </Box>
                 </Box>
 
@@ -151,7 +154,7 @@ function ProgressBoard() {
                                 ) : (
                                     <CircularProgress
                                         value={progress_days[i]}
-                                        color="gold"
+                                        color="teal"
                                         trackColor="gray.200"
                                         size="50px"
                                         thickness="7px"
@@ -167,6 +170,7 @@ function ProgressBoard() {
                 </Box>
             </Box>
         </Box>
+
     );
 }
 

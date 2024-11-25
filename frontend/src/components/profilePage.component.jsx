@@ -15,13 +15,14 @@ import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
 import PostFeedCard from "./PostFeedCard.component.jsx";
 import ProgramFeedCard from "./ProgramFeedCard.component.jsx";
+import ProgressBoard from "./ProgressBoard.component.jsx";
 
 export default function ProfilePage() {
     const username = useSelector(userName);
     const profile = useSelector(userProfile);
     const { colorMode, toggleColorMode } = useColorMode();
     const { user, followers, following, posts, programs } = useContext(UserContext);
-    const [view, setView] = useState('posts'); // Toggle between 'posts', 'joinedPrograms', and 'createdPrograms'
+    const [view, setView] = useState('posts'); // Toggle between 'posts', 'joinedPrograms', and 'createdPrograms', 'MyProgress"
 
     return (
         <Box p={6} maxW="1200px" mx="auto" bg={colorMode === "light" ? "gray.50" : "gray.800"} borderRadius="md">
@@ -72,7 +73,15 @@ export default function ProfilePage() {
                     </Button>
 
                 )}
+                {user.role === 'TRAINEE' && (
+                    <Button
+                        colorScheme={view === 'MyProgress' ? 'teal' : 'gray'}
+                        onClick={() => setView('MyProgress')}
+                    >
+                        My Progress
+                    </Button>
 
+                )}
                 {user.role === 'TRAINER' && (
                     <Button
                         colorScheme={view === 'createdPrograms' ? 'teal' : 'gray'}
@@ -93,7 +102,7 @@ export default function ProfilePage() {
                         )}
                     </Stack>
                 )}
-                {view === 'joinedPrograms' && user.role === 'TRAINEE' &&(
+                {view === 'joinedPrograms' && user.role === 'TRAINEE' && (
                     <Stack spacing={4}>
                         {user.joinedPrograms && user.joinedPrograms.length > 0 ? (
                             user.joinedPrograms.map((program) => (
@@ -104,6 +113,14 @@ export default function ProfilePage() {
                         )}
                     </Stack>
                 )}
+                {view === 'MyProgress' && user.role === 'TRAINEE' && (
+                    user.joinedPrograms && user.joinedPrograms.length >= 0 ? (
+                        <ProgressBoard />
+                    ) : (
+                        <Text color="gray.500" textAlign="center">No joined programs</Text>
+                    )
+                )}
+
                 {view === 'createdPrograms' && user.role === 'TRAINER' && (
                     <Stack spacing={4}>
                         {programs?.length > 0 ? (
