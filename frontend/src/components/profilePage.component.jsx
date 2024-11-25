@@ -114,7 +114,7 @@ export default function ProfilePage() {
                     </Stack>
                 )}
                 {view === 'MyProgress' && user.role === 'TRAINEE' && (
-                    user.joinedPrograms && user.joinedPrograms.length >= 0 ? (
+                    user.joinedPrograms && user.joinedPrograms.length > 0 ? (
                         <ProgressBoard />
                     ) : (
                         <Text color="gray.500" textAlign="center">No joined programs</Text>
