@@ -11,11 +11,8 @@ import {
     Heading,
     List,
     ListItem,
-    Collapse,
-    Button,
     Stack,
     Badge,
-    useDisclosure,
 } from '@chakra-ui/react';
 import { AppContext } from '../context/AppContext';
 
@@ -23,7 +20,14 @@ const SearchPage = () => {
     const { colorMode } = useColorMode();
     const { exercises, isLoadingExercises } = useContext(AppContext);
     const [selectedMuscle, setSelectedMuscle] = useState(null);
-    const { isOpen, onToggle } = useDisclosure();
+
+    // Data for highlighting muscles
+    const highlightData = selectedMuscle ? [
+        {
+            name: "Selected Muscle",
+            muscles: [selectedMuscle.toLowerCase().replace(/\s+/g, '')]
+        }
+    ] : [];
 
     // Function to convert muscle name format
     const formatMuscleNameForComparison = (muscleName) => {
@@ -39,8 +43,10 @@ const SearchPage = () => {
                 .replace(/^./, str => str.toUpperCase())
                 .trim();
             
-            setSelectedMuscle(muscleName);
-            onToggle();
+            // Toggle selection if clicking the same muscle
+            setSelectedMuscle(prevMuscle => 
+                prevMuscle === muscleName ? null : muscleName
+            );
         }
     };
 
@@ -71,7 +77,7 @@ const SearchPage = () => {
                         templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
                         gap={4}
                         w="full"
-                        alignItems="center"
+                        alignItems="start"
                     >
                         <GridItem>
                             <VStack spacing={2}>
@@ -86,6 +92,8 @@ const SearchPage = () => {
                                 >
                                     <Model 
                                         onClick={handleMuscleClick}
+                                        data={highlightData}
+                                        highlightedColors={["#805AD5", "#6B46C1"]}
                                         style={{ 
                                             maxWidth: '100%',
                                             height: '100%',
@@ -110,6 +118,8 @@ const SearchPage = () => {
                                     <Model 
                                         type="posterior"
                                         onClick={handleMuscleClick}
+                                        data={highlightData}
+                                        highlightedColors={["#805AD5", "#6B46C1"]}
                                         style={{ 
                                             maxWidth: '100%',
                                             height: '100%',
@@ -122,73 +132,73 @@ const SearchPage = () => {
                     </Grid>
 
                     {selectedMuscle && (
-                        <Box w="full">
-                            <Button 
-                                onClick={onToggle} 
-                                colorScheme="teal" 
-                                width="full"
+                        <Box 
+                            w="full"
+                            bg={colorMode === "light" ? "white" : "gray.700"}
+                            borderRadius="md"
+                            shadow="md"
+                            p={4}
+                            mt={4}
+                        >
+                            <Text 
+                                fontSize="xl" 
+                                fontWeight="bold" 
                                 mb={4}
+                                color="purple.500"
                             >
-                                {isOpen ? 'Hide' : 'Show'} Exercises for {selectedMuscle}
-                            </Button>
+                                Exercises for {selectedMuscle}
+                            </Text>
                             
-                            <Collapse in={isOpen} animateOpacity>
-                                <Box 
-                                    p={4} 
-                                    bg={colorMode === "light" ? "white" : "gray.700"}
-                                    borderRadius="md"
-                                    shadow="md"
-                                >
-                                    {isLoadingExercises ? (
-                                        <Text textAlign="center">Loading exercises...</Text>
-                                    ) : filteredExercises.length > 0 ? (
-                                        <List spacing={3}>
-                                            {filteredExercises.map((exercise) => (
-                                                <ListItem 
-                                                    key={exercise.id}
-                                                    p={3}
-                                                    borderWidth="1px"
-                                                    borderRadius="md"
-                                                >
-                                                    <Stack>
-                                                        <Text fontWeight="bold">
-                                                            {exercise.name.charAt(0).toUpperCase() + exercise.name.slice(1)}
-                                                        </Text>
-                                                        <Stack direction="row" spacing={2}>
-                                                            <Badge colorScheme="blue">
-                                                                {exercise.equipment.replace(/_/g, ' ')}
-                                                            </Badge>
-                                                            <Badge colorScheme="green">
-                                                                {exercise.bodyPart.replace(/_/g, ' ')}
-                                                            </Badge>
-                                                        </Stack>
-                                                        <List styleType="disc" pl={4}>
-                                                            {exercise.instructions.map((instruction, idx) => (
-                                                                <ListItem key={idx} fontSize="sm">
-                                                                    {instruction}
-                                                                </ListItem>
-                                                            ))}
-                                                        </List>
-                                                    </Stack>
-                                                </ListItem>
-                                            ))}
-                                        </List>
-                                    ) : (
-                                        <Text textAlign="center">No exercises found for {selectedMuscle}</Text>
-                                    )}
-                                </Box>
-                            </Collapse>
+                            {isLoadingExercises ? (
+                                <Text textAlign="center">Loading exercises...</Text>
+                            ) : filteredExercises.length > 0 ? (
+                                <List spacing={3}>
+                                    {filteredExercises.map((exercise) => (
+                                        <ListItem 
+                                            key={exercise.id}
+                                            p={3}
+                                            borderWidth="1px"
+                                            borderRadius="md"
+                                        >
+                                            <Stack>
+                                                <Text fontWeight="bold">
+                                                    {exercise.name.charAt(0).toUpperCase() + exercise.name.slice(1)}
+                                                </Text>
+                                                <Stack direction="row" spacing={2}>
+                                                    <Badge colorScheme="purple">
+                                                        {exercise.equipment.replace(/_/g, ' ')}
+                                                    </Badge>
+                                                    <Badge colorScheme="purple" variant="outline">
+                                                        {exercise.bodyPart.replace(/_/g, ' ')}
+                                                    </Badge>
+                                                </Stack>
+                                                <List styleType="disc" pl={4}>
+                                                    {exercise.instructions.map((instruction, idx) => (
+                                                        <ListItem key={idx} fontSize="sm">
+                                                            {instruction}
+                                                        </ListItem>
+                                                    ))}
+                                                </List>
+                                            </Stack>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            ) : (
+                                <Text textAlign="center">No exercises found for {selectedMuscle}</Text>
+                            )}
                         </Box>
                     )}
 
-                    <Text 
-                        color="gray.500" 
-                        textAlign="center"
-                        mt={2}
-                        fontSize="sm"
-                    >
-                        Click on any muscle to see related exercises
-                    </Text>
+                    {!selectedMuscle && (
+                        <Text 
+                            color="gray.500" 
+                            textAlign="center"
+                            mt={2}
+                            fontSize="sm"
+                        >
+                            Click on any muscle to see related exercises
+                        </Text>
+                    )}
                 </VStack>
             </Container>
         </Box>
