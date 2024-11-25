@@ -1,22 +1,107 @@
 import apiInstance from '../Api';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Toast from 'react-native-toast-message';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity  } from 'react-native';
 import { useAuth } from '../AuthContext';
-
+import { useDispatch } from "react-redux";
+import { userActions } from '../user.js'
+//import Cookies from "js-cookie"
+import { useQuery } from "@tanstack/react-query"
 
 const Login = ({ navigation })=>{
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useAuth();
+  //const { login } = useAuth();
+  const dispatch = useDispatch();
+  const [sessionToken, setSessionToken] = useState(null);
+  const {
+    data: profileData,
+    isFetching: profileIsFetching,
+    isLoading: profileIsLoading,
+} = useQuery({
+    queryKey: ['profile', sessionToken],
+    queryFn: async () => {
+        const response = await apiInstance(sessionToken).get(`api/user/${username}`);
 
+        return response.data;
+    },
+    refetchOnWindowFocus: false,
+    enabled: !!sessionToken,
+});
+
+
+useEffect(() => {
+  if (profileData && !profileIsFetching) {
+      const sanitizedProfile = JSON.parse(JSON.stringify(profileData)); // Deep clone to remove non-serializable values
+
+      dispatch(
+          userActions.saveProfile({
+              profile: sanitizedProfile,
+          })
+      );
+
+      goHome();
+  }
+}, [profileData, profileIsFetching, dispatch]);
   const goHome = () => navigation.navigate('Home');
+  //const goHome = () => navigation.navigate('NewPostDetail');
 
   const goSignup = () => navigation.navigate('Register');
 
   const checkDatabase = async (username, password) => {
-   // goHome();   // TODO: Open the comment after connecting the database. 
-     try {
+    try {
+      const response = await apiInstance().post(
+          "auth/login",
+          {
+              username,
+              password
+          }
+      )
+
+      if (response.status === 200) {
+
+          const token = response.data.sessionToken;
+          console.log(token);
+          setSessionToken(token);
+
+          dispatch(
+              userActions.login({
+                  userName: username,
+                  password,
+                  sessionToken: token,
+              })
+          );
+
+          //Cookies.set("username", username)
+      } else {
+        Toast.show({
+          type: 'error',
+          position: 'bottom',
+          text1: 'Login Error',
+          text2: 'There was an error while logging in. Please try again.',
+          visibilityTime: 2000,
+          autoHide: true,
+          topOffset: 30,
+          bottomOffset: 40
+        });
+      }
+
+  } catch (e) {
+      console.log(e)
+      Toast.show({
+        type: 'error',
+        position: 'bottom',
+        text1: 'Login Error',
+        text2: 'There was an error while logging in. Please try again.',
+        visibilityTime: 2000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40
+      });
+  }
+    //goHome();   // TODO: Open the comment after connecting the database.
+
+     /*try {
         const response = await apiInstance().post(
             "login",
             {
@@ -46,7 +131,7 @@ const Login = ({ navigation })=>{
           topOffset: 30,
           bottomOffset: 40
         });
-    } 
+    } */
   };
 
   return (

@@ -5,6 +5,9 @@ import Toast from 'react-native-toast-message';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // Import Picker
 import { useAuth } from '../AuthContext';
+import { useDispatch } from "react-redux";
+import { userActions, userProfile } from '../user.js'
+//import Cookies from "js-cookie"
 
 const Signup = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
@@ -12,7 +15,8 @@ const Signup = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState('TRAINEE'); // Default role
-  const { login } = useAuth();
+  //const { login } = useAuth();
+  const dispatch = useDispatch();
 
   const goHome = () => navigation.navigate('Home');
 
@@ -20,8 +24,8 @@ const Signup = ({ navigation }) => {
 
   const checkDatabase = async (fullName, username, email, password, role) => {
     console.log({ fullName, username, email, password, role });
-    goHome();
-    try {
+    //goHome();
+    /*try {
       const response = await apiInstance().post("register", { fullName, username, email, password, role });
 
       // Successful login
@@ -29,7 +33,35 @@ const Signup = ({ navigation }) => {
         login({ username, password });
         goHome();
       }
-    } catch (e) {
+    }*/try {
+      const response = await apiInstance().post(
+        "auth/register",
+        {
+            username,
+            fullName,
+            email,
+            password,
+            role
+        }
+    )
+
+    if (response.status === 201) {
+
+        const token = response.data
+
+        dispatch(
+            userActions.login({
+                userName: username,
+                password: password,
+                sessionToken: token
+            })
+        )
+
+        //Cookies.set("username", username)
+
+        goHome();
+    }
+} catch (e) {
       console.log(e);
       Toast.show({
         type: 'error',
