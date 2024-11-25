@@ -4,6 +4,7 @@ import com.group7.demo.dtos.TrainingProgramRequest;
 import com.group7.demo.dtos.TrainingProgramResponse;
 import com.group7.demo.dtos.UserTrainingProgramResponse;
 import com.group7.demo.services.TrainingProgramService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -61,14 +62,22 @@ public class TrainingProgramController {
 
     @PostMapping("/{programId}/join")
     public ResponseEntity<UserTrainingProgramResponse> joinTrainingProgram(@PathVariable Long programId , HttpServletRequest request) {
-        UserTrainingProgramResponse response = trainingProgramService.joinTrainingProgram(programId ,request);
-        return ResponseEntity.ok(response);
+        try {
+            UserTrainingProgramResponse response = trainingProgramService.joinTrainingProgram(programId ,request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException | EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @DeleteMapping("/{programId}/leave")
     public ResponseEntity<UserTrainingProgramResponse> leaveProgram(@PathVariable Long programId, HttpServletRequest request) {
-        UserTrainingProgramResponse response = trainingProgramService.leaveTrainingProgram(programId, request);
-        return ResponseEntity.ok(response);
+        try {
+            UserTrainingProgramResponse response = trainingProgramService.leaveTrainingProgram(programId, request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/{programId}/participants")
@@ -90,8 +99,12 @@ public class TrainingProgramController {
             @PathVariable Long exerciseId,
             HttpServletRequest request
     ) {
-        UserTrainingProgramResponse response = trainingProgramService.markExerciseAsCompleted(trainingProgramId, exerciseId, request);
-        return ResponseEntity.ok(response);
+        try{
+            UserTrainingProgramResponse response = trainingProgramService.markExerciseAsCompleted(trainingProgramId, exerciseId, request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PostMapping("/{trainingProgramId}/exercises/{exerciseId}/uncomplete")
@@ -99,8 +112,12 @@ public class TrainingProgramController {
             @PathVariable Long trainingProgramId,
             @PathVariable Long exerciseId,
             HttpServletRequest request) {
-        UserTrainingProgramResponse response = trainingProgramService.unmarkExerciseAsCompleted(trainingProgramId, exerciseId, request);
-        return ResponseEntity.ok(response);
+        try{
+            UserTrainingProgramResponse response = trainingProgramService.unmarkExerciseAsCompleted(trainingProgramId, exerciseId, request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @PostMapping("/{trainingProgramId}/complete")
@@ -108,8 +125,12 @@ public class TrainingProgramController {
             @PathVariable Long trainingProgramId,
             HttpServletRequest request
     ) {
-        UserTrainingProgramResponse response = trainingProgramService.markTrainingProgramAsCompleted(trainingProgramId, request);
-        return ResponseEntity.ok(response);
+        try {
+            UserTrainingProgramResponse response = trainingProgramService.markTrainingProgramAsCompleted(trainingProgramId, request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping("/joined/{username}")
