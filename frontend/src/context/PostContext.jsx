@@ -14,18 +14,19 @@ export const PostContext = createContext(
         isFetchingPrograms: false,
         tags: [],
         isLoadingTags: false,
-        isFetchingTags: false
+        isFetchingTags: false,
+        bookmarkedPosts: [],
+        isLoadingBookmarks: false,
+        isFetchingBookmarks: false,
     }
 )
 
 export const PhaseContextProvider = ({ children }) => {
     const [posts, setPosts] = useState([])
     const [programs, setPrograms] = useState([])
+    const [bookmarkedPosts, setBookmarkedPosts] = useState([])
     const [tags, setTags] = useState([])
 
-
-    const profile = useSelector(userProfile)
-    const password = useSelector(userPassword)
     const sessionToken = useSelector(userSessionToken)
 
     const {
@@ -43,6 +44,19 @@ export const PhaseContextProvider = ({ children }) => {
     })
 
     const {
+        data: bookmarkedData,
+        isFetching: bookmarksIsFetching,
+        isLoading: bookmarksIsLoading,
+    } = useQuery({
+        queryKey: ['bookmarkedPosts'],
+        queryFn: async () => {
+            const response = await apiInstance(sessionToken).get('/api/posts/bookmarked')
+            return response.data
+        },
+        refetchOnWindowFocus: false,
+    })
+
+    const {
         data: programsData,
         isFetching: programsIsFetching,
         isLoading: programsIsLoading,
@@ -50,7 +64,6 @@ export const PhaseContextProvider = ({ children }) => {
         queryKey: ['training-programs'],
         queryFn: async () => {
             const response = await apiInstance().get('/api/training-programs')
-
             return response.data
         },
         refetchOnWindowFocus: false,
@@ -84,6 +97,12 @@ export const PhaseContextProvider = ({ children }) => {
     }, [programsData, programsIsFetching])
 
     useEffect(() => {
+        if (bookmarkedData && !bookmarksIsFetching) {
+            setBookmarkedPosts(bookmarkedData)
+        }
+    }, [bookmarkedData, bookmarksIsFetching])
+
+    useEffect(() => {
         if (tagsData && !tagsIsFetching) {
             setTags(tagsData)
         }
@@ -91,12 +110,15 @@ export const PhaseContextProvider = ({ children }) => {
 
     return (
         <PostContext.Provider value={{
-            posts: posts,
+            posts,
             isLoadingPosts: postsIsLoading,
             isFetchingPosts: postsIsFetching,
-            programs: programs,
+            programs,
             isLoadingPrograms: programsIsLoading,
             isFetchingPrograms: programsIsFetching,
+            bookmarkedPosts,
+            isLoadingBookmarks: bookmarksIsLoading,
+            isFetchingBookmarks: bookmarksIsFetching,
             tags: tags,
             isLoadingTags: tagsIsLoading,
             isFetchingTags: tagsIsFetching
