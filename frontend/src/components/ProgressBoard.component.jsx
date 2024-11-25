@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { CircularProgress, CircularProgressLabel, Box, Text, HStack, VStack, Button } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
+import { UserContext } from '../context/UserContext';
 function ProgressBoard({ currentProgress }) {
+    const { user, joinedPrograms, exerciseProgress } = useContext(UserContext);
     const [progress, setProgress] = useState(0); // Initialize progress to 0
 
     useEffect(() => {
