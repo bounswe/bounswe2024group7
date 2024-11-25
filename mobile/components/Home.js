@@ -138,7 +138,7 @@ const Home = ({ navigation }) => {
             {selectedPage === 'Feed' && <FeedPageContainer />}
             {selectedPage === 'Search' && <SearchPageContainer />}
 
-            {selectedPage === 'Create' && <Create darkMode={darkMode} />}
+            {selectedPage === 'Create' && <Create darkMode={darkMode} setSelectedPage={setSelectedPage} />}
           </View>
 
           {/* Floating "Create" Button */}
