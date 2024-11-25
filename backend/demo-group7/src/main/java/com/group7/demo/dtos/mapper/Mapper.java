@@ -31,6 +31,7 @@ public class Mapper {
                 .likeCount(post.getLikedByUsers() == null ? 0 : post.getLikedByUsers().size())
                 .isLiked(currentUser != null && post.getLikedByUsers() != null && post.getLikedByUsers().contains(currentUser))
                 .isBookmarked(currentUser != null && post.getBookmarkedByUsers() != null && post.getBookmarkedByUsers().contains(currentUser))
+                .imageUrl(post.getImageUrl())
                 .build();
     }
 

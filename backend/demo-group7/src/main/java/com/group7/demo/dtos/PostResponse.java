@@ -1,5 +1,6 @@
 package com.group7.demo.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +25,14 @@ public class PostResponse {
     private boolean isLiked;
     private boolean isBookmarked;
     private String imageUrl;
+
+    @JsonProperty("isLiked")  // Explicitly specify the field name for JSON serialization
+    public boolean getIsLiked() {
+        return isLiked;
+    }
+
+    @JsonProperty("isLiked")  // Explicitly specify the field name for JSON serialization
+    public boolean getIsBookmarked() {
+        return isBookmarked;
+    }
 }
