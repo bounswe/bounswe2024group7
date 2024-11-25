@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import CreatePost from './CreatePost';
 import CreateProgram from './CreateProgram';
+import CreateDietProgram from './CreateDietProgram';
 
 const Create = ({ darkMode }) => {
   const [activeTab, setActiveTab] = useState('CreatePost');
@@ -22,14 +23,20 @@ const Create = ({ darkMode }) => {
         >
           <Text style={[styles.tabText, activeTab === 'CreateProgram' && styles.activeTabText]}>Program</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+                  style={[styles.tabButton, activeTab === 'CreateDiet' && styles.activeTab]}
+                  onPress={() => setActiveTab('CreateDiet')}
+                >
+                  <Text style={[styles.tabText, activeTab === 'CreateDiet' && styles.activeTabText]}>Diet</Text>
+                </TouchableOpacity>
       </View>
 
       {/* Render the active component */}
       <View style={styles.content}>
         {activeTab === 'CreatePost' ? (
           <CreatePost darkMode={darkMode} />
-        ) : (
-          <CreateProgram darkMode={darkMode} />
+        ) : ((activeTab==='CreateProgram')?
+          <CreateProgram darkMode={darkMode} />:(<CreateDietProgram darkMode={darkMode} />)
         )}
       </View>
     </View>
