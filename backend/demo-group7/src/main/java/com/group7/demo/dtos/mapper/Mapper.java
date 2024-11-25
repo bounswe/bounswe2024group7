@@ -2,22 +2,32 @@ package com.group7.demo.dtos.mapper;
 
 import com.group7.demo.dtos.*;
 import com.group7.demo.models.*;
+import com.group7.demo.services.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class Mapper {
-    public PostResponse mapToPostResponse(Post post) {
-        return new PostResponse(
-                post.getId(),
-                post.getContent(),
-                post.getTags().stream().map(Tag::getName).collect(Collectors.toSet()),  // Only tag names
-                post.getCreatedAt(),
-                post.getUser().getUsername(),
-                post.getTrainingProgram() == null ? null : mapToTrainingProgramResponse(post.getTrainingProgram())
-        );
+    private final AuthenticationService authenticationService;
+    public PostResponse mapToPostResponse(Post post, HttpServletRequest request) {
+        User currentUser = authenticationService.getAuthenticatedUserInternal(request);
+
+        return PostResponse.builder()
+                .id(post.getId())
+                .content(post.getContent())
+                .tags(post.getTags().stream().map(Tag::getName).collect(Collectors.toSet()))
+                .createdAt(post.getCreatedAt())
+                .username(post.getUser().getUsername())
+                .trainingProgram(post.getTrainingProgram() == null ? null : mapToTrainingProgramResponse(post.getTrainingProgram()))
+                .likeCount(post.getLikedByUsers() == null ? 0 : post.getLikedByUsers().size())
+                .isLiked(currentUser != null && post.getLikedByUsers() != null && post.getLikedByUsers().contains(currentUser))
+                .isBookmarked(currentUser != null && post.getBookmarkedByUsers() != null && post.getBookmarkedByUsers().contains(currentUser))
+                .build();
     }
 
     public TrainingProgramResponse mapToTrainingProgramResponse(TrainingProgram program) {

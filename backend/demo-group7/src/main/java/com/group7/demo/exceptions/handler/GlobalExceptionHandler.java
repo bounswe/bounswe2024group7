@@ -1,6 +1,7 @@
 package com.group7.demo.exceptions.handler;
 
 import com.group7.demo.exceptions.ErrorResponse;
+import com.group7.demo.exceptions.UnauthorizedException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Object> handleUnauthorizedException(UnauthorizedException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", ex.getMessage());
 
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+    }
 
 }

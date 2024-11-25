@@ -32,7 +32,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfileResponse getUserProfile(String username) throws Exception {
+    public UserProfileResponse getUserProfile(String username, HttpServletRequest request) throws Exception {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new Exception("User not found"));
 
@@ -46,7 +46,7 @@ public class UserService {
                 .map(User::getUsername)
                 .collect(Collectors.toSet());
 
-        List<PostResponse> posts = postService.getPostsByUser(user.getUsername());
+        List<PostResponse> posts = postService.getPostsByUser(user.getUsername(), request);
         List<TrainingProgramResponse> trainingPrograms = trainingProgramService.getTrainingProgramByTrainer(user.getUsername());
         List<TrainingProgramResponse> joinedPrograms = trainingProgramService.getJoinedTrainingPrograms(user.getUsername());
 

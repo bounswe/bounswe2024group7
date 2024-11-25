@@ -18,9 +18,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{username}")
-    public ResponseEntity<UserProfileResponse> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<UserProfileResponse> getUserByUsername(@PathVariable String username, HttpServletRequest request) {
         try {
-            UserProfileResponse user = userService.getUserProfile(username);
+            UserProfileResponse user = userService.getUserProfile(username, request);
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
