@@ -1,6 +1,7 @@
 package com.group7.demo.controllers;
 
 import com.group7.demo.services.SearchService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,14 +38,14 @@ public class SearchController {
 //        return ResponseEntity.ok(results);
 //    }
     @GetMapping("/search")
-    public ResponseEntity<Map<String, Object>> search(@RequestParam("q") String query) {
+    public ResponseEntity<Map<String, Object>> search(@RequestParam("q") String query, HttpServletRequest request) {
 //        String[] keywords = query.split("\\s+");
 //        List<String> keywordList = Arrays.stream(keywords)
 //                .map(String::trim)
 //                .filter(k -> !k.isEmpty())
 //                .toList();
 
-        Map<String, Object> results = searchService.search(query);
+        Map<String, Object> results = searchService.search(query, request);
 
         return ResponseEntity.ok(results);
     }

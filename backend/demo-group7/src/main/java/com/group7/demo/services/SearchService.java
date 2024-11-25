@@ -9,6 +9,7 @@ import com.group7.demo.models.TrainingProgram;
 import com.group7.demo.repository.ExerciseRepository;
 import com.group7.demo.repository.PostRepository;
 import com.group7.demo.repository.TrainingProgramRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -82,7 +83,7 @@ public class SearchService {
 //
 //        return results;
 //    }
-public Map<String, Object> search(String query) {
+public Map<String, Object> search(String query, HttpServletRequest request) {
     // Split the query into individual keywords
     String[] keywords = query.trim().split("\\s+");
 
@@ -100,7 +101,7 @@ public Map<String, Object> search(String query) {
 
     // Map entities to DTOs
     List<PostResponse> postResponses = posts.stream()
-            .map(mapper::mapToPostResponse)
+            .map(post -> mapper.mapToPostResponse(post, request))
             .collect(Collectors.toList());
 
     List<Exercise> exerciseResponses = exercises.stream()
