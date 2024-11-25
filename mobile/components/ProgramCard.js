@@ -5,7 +5,7 @@ const ProgramCard = ({ trainerUsername, title, description, exercises, date, par
   return (
     <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('ProgramDetail', { trainerUsername, title, description, exercises, navigation })}
+          onPress={() => navigation.navigate('ProgramDetail', { trainerUsername, title, description, exercises, participants, date, navigation })}
         >
       <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { username: trainerUsername })}>
         <Text style={styles.owner}>{trainerUsername}</Text>
