@@ -14,6 +14,8 @@ import {
     useToast,
     Tooltip
 } from '@chakra-ui/react'
+// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { useSelector } from 'react-redux'
@@ -21,10 +23,13 @@ import { userProfile, userPassword, userSessionToken } from '../context/user'
 import apiInstance from '../instance/apiInstance'
 import PlusIcon from '../icons/PlusIcon'
 import { UserContext } from '../context/UserContext'
+// import { router } from '../main.jsx';
+
 
 function ProgramFeedCard({
     program
 }) {
+
     const password = useSelector(userPassword)
     const sessionToken = useSelector(userSessionToken)
     const toast = useToast()
@@ -215,9 +220,14 @@ function ProgramFeedCard({
         }
     )
 
+    const navigate = useNavigate()
     const handleStartPracticing = (program_name) => {
-        console.log(program_name);
-    };
+        navigate(
+            {
+                to: "/program"
+            }
+        )
+    }
     return (
         <>
             <Card maxW='lg'>
