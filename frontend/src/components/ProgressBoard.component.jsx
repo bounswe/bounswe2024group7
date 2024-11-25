@@ -1,10 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { CircularProgress, CircularProgressLabel, Box, Text, HStack, VStack, Button } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 import { UserContext } from '../context/UserContext';
-function ProgressBoard({ currentProgress }) {
-    const { user, joinedPrograms, exerciseProgress } = useContext(UserContext);
+
+const calculateProgress = (joinedPrograms) => {
+    let done = 0;
+    let undone = 0;
+
+    // Iterate through each program and its exercises
+    joinedPrograms.forEach((program) => {
+        program.exercises.forEach((exercise) => {
+            if (exercise.completed) {
+                done++;
+            } else {
+                undone++;
+            }
+        });
+    });
+
+    // Calculate the current progress percentage
+    const total = done + undone;
+    const progress = total > 0 ? (done * 100) / total : 0;  // Prevent division by zero
+
+    return progress.toFixed(2);
+};
+function ProgressBoard() {
+    const { joinedPrograms } = useContext(UserContext);
+    const currentProgress = calculateProgress(joinedPrograms);
     const [progress, setProgress] = useState(0); // Initialize progress to 0
+
+    // MockData
+    const daysOfWeek = ['Sat', 'Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri'];
+    const active = [1, 1, 1, 0, 0, 0, 0]; // Active array
+    const progress_days = [50, 100, 70, 0, 0, 0, 0]; // Progress days array
 
     useEffect(() => {
         // Increment progress by 10% every 80ms until it reaches currentProgress
@@ -22,9 +50,7 @@ function ProgressBoard({ currentProgress }) {
         return () => clearInterval(interval); // Cleanup the interval on component unmount
     }, [currentProgress]);
 
-    const daysOfWeek = ['Sat', 'Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri'];
-    const active = [1, 1, 1, 0, 0, 0, 0]; // Active array
-    const progress_days = [50, 100, 70, 0, 0, 0, 0]; // Progress days array
+
 
     return (
         <Box
