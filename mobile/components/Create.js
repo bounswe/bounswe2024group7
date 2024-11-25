@@ -4,7 +4,7 @@ import CreatePost from './CreatePost';
 import CreateProgram from './CreateProgram';
 import CreateDietProgram from './CreateDietProgram';
 
-const Create = ({ darkMode }) => {
+const Create = ({ darkMode , setSelectedPage}) => {
   const [activeTab, setActiveTab] = useState('CreatePost');
 
   return (
@@ -34,9 +34,9 @@ const Create = ({ darkMode }) => {
       {/* Render the active component */}
       <View style={styles.content}>
         {activeTab === 'CreatePost' ? (
-          <CreatePost darkMode={darkMode} />
+          <CreatePost darkMode={darkMode} setSelectedPage={setSelectedPage} />
         ) : ((activeTab==='CreateProgram')?
-          <CreateProgram darkMode={darkMode} />:(<CreateDietProgram darkMode={darkMode} />)
+          <CreateProgram darkMode={darkMode} setSelectedPage={setSelectedPage} />:(<CreateDietProgram darkMode={darkMode} setSelectedPage={setSelectedPage} />)
         )}
       </View>
     </View>

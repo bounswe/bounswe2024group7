@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 
-const CreateProgram = ({ darkMode }) => {
+const CreateProgram = ({ darkMode, setSelectedPage }) => {
   const styles = darkMode ? darkStyles : lightStyles;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');

@@ -1,18 +1,206 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useSelector } from 'react-redux'
+import Toast from 'react-native-toast-message';
+import apiInstance from '../Api'
+import {
+  userProfile,
+  userPassword,
+  userSessionToken
+} from '../user'
 
-const CreatePost = ({ darkMode }) => {
+const CreatePost = ({ darkMode, setSelectedPage }) => {
   const styles = darkMode ? darkStyles : lightStyles;
   const [title, setTitle] = useState('');
+  const [post, setPost] = useState({});
   const [description, setDescription] = useState('');
   const [labels, setLabels] = useState([]);
+  const [image, setImage] = useState('')
   const [labelText, setLabelText] = useState('');
+  const profile = useSelector(userProfile)
+  const password = useSelector(userPassword)
+  const sessionToken = useSelector(userSessionToken)
 
-  const handlePost = () => {
-    const newPost = { title, description, labels };
-    console.log('Creating post:', newPost);
+  const goHome = () => navigation.navigate('Home');
+  const goFeed = () => setSelectedPage('Feed');
+  const handlePost = async () => {
+    /*const newPost = { title, description, labels };
+    console.log('Creating post:', newPost);*/
+    if (labels.length === 0) {
+      Toast.show({
+        type: 'error',
+        position: 'bottom',
+        text1: 'Create Error',
+        text2: 'No labels selected',
+        visibilityTime: 2000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40
+      });
+        return
+    }
+
+    if (!profile) {
+      Toast.show({
+        type: 'error',
+        position: 'bottom',
+        text1: 'Create Error',
+        text2: 'Not logged in',
+        visibilityTime: 2000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40
+      });
+        return
+    }
+
+    console.log(post)
+
+    // First create image model and get the image id
+    if (post.image) {
+        const imageResponse = await apiInstance(
+            profile.username,
+            password
+        ).post('/images', {
+            url: post.image,
+        })
+
+        post.image = imageResponse.data.id
+
+        console.log(post)
+    } else {
+        delete post.image
+    }
+    console.log(post)
+    const response = await apiInstance(sessionToken).post(`api/posts`, {
+      ...post,
+      username: profile.username,
+  })
+    console.log(post)
+    console.log(response)
+
+  if (response.status === 200) {
+
+    Toast.show({
+      type: 'success',
+      position: 'bottom',
+      text1: 'Post Created',
+      text2: 'Your post has been created successfully.',
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 30,
+      bottomOffset: 40
+    });
+    //goHome();
+    goFeed();
+
+    //Cookies.set("username", username)
+} else {
+  Toast.show({
+    type: 'error',
+    position: 'bottom',
+    text1: 'Login Error',
+    text2: 'There was an error creating post. Please try again.',
+    visibilityTime: 2000,
+    autoHide: true,
+    topOffset: 30,
+    bottomOffset: 40
+  });
+}
+
+
     // Add your logic to handle post submission
   };
+
+  /*const createPostMutation = useMutation(
+    {
+        mutationFn: async (post) => {
+            if (labels.length === 0) {
+              Toast.show({
+                type: 'error',
+                position: 'bottom',
+                text1: 'Create Error',
+                text2: 'No labels selected',
+                visibilityTime: 2000,
+                autoHide: true,
+                topOffset: 30,
+                bottomOffset: 40
+              });
+                return
+            }
+
+            if (!profile) {
+              Toast.show({
+                type: 'error',
+                position: 'bottom',
+                text1: 'Create Error',
+                text2: 'Not logged in',
+                visibilityTime: 2000,
+                autoHide: true,
+                topOffset: 30,
+                bottomOffset: 40
+              });
+                return
+            }
+
+            console.log(post)
+
+            // First create image model and get the image id
+            if (post.image) {
+                const imageResponse = await apiInstance(
+                    profile.username,
+                    password
+                ).post('/images', {
+                    url: post.image,
+                })
+
+                post.image = imageResponse.data.id
+
+                console.log(post)
+            } else {
+                delete post.image
+            }
+            console.log(post)
+
+            const response = await apiInstance().post(`api/posts/user/${profile.username}`, {
+                ...post,
+                username: profile.username,
+            })
+            console.log(post)
+
+            Toast.show({
+              type: 'success',
+              position: 'bottom',
+              text1: 'Post Created',
+              text2: 'Your post has been created successfully.',
+              visibilityTime: 3000,
+              autoHide: true,
+              topOffset: 30,
+              bottomOffset: 40
+            });
+            return response.data
+        },
+        onError: (error) => {
+            toast({
+                title: 'An error occurred.',
+                description: error.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            })
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries(
+                {
+                    queryKey: ['posts']
+                }
+            )
+            goHome();
+        }
+
+    }
+)*/
 
   const addLabel = () => {
     if (labelText.trim()) {
@@ -46,6 +234,14 @@ const CreatePost = ({ darkMode }) => {
         onChangeText={setDescription}
       />
 
+      <TextInput
+        style={[styles.input, styles.descriptionInput]}
+        placeholder="Image"
+        placeholderTextColor={styles.placeholderColor}
+        value={image}
+        onChangeText={setImage}
+      />
+
       <View style={styles.labelContainer}>
         <TextInput
           style={styles.labelInput}
@@ -74,7 +270,21 @@ const CreatePost = ({ darkMode }) => {
         showsHorizontalScrollIndicator={false}
       />
 
-      <TouchableOpacity style={styles.postButton} onPress={handlePost}>
+      <TouchableOpacity style={styles.postButton} onPress={() => {
+                            /*createPostMutation.mutate({
+                                title: title,
+                                content: description,
+                                image: image,
+                                labels: labels,
+                            })*/
+                           setPost({
+                            title: title,
+                            content: description,
+                            image: image,
+                            tags: labels
+                        });
+                           handlePost();
+                        }}>
         <Text style={styles.postButtonText}>Post</Text>
       </TouchableOpacity>
     </View>
