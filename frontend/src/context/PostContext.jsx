@@ -12,12 +12,16 @@ export const PostContext = createContext(
         programs: [],
         isLoadingPrograms: false,
         isFetchingPrograms: false,
+        tags: [],
+        isLoadingTags: false,
+        isFetchingTags: false
     }
 )
 
 export const PhaseContextProvider = ({ children }) => {
     const [posts, setPosts] = useState([])
     const [programs, setPrograms] = useState([])
+    const [tags, setTags] = useState([])
 
 
     const profile = useSelector(userProfile)
@@ -31,7 +35,7 @@ export const PhaseContextProvider = ({ children }) => {
     } = useQuery({
         queryKey: ['posts'],
         queryFn: async () => {
-            const response = await apiInstance().get('/api/posts/random')
+            const response = await apiInstance().get('/api/posts')
 
             return response.data
         },
@@ -52,9 +56,24 @@ export const PhaseContextProvider = ({ children }) => {
         refetchOnWindowFocus: false,
     })
 
+    const {
+        data: tagsData,
+        isFetching: tagsIsFetching,
+        isLoading: tagsIsLoading
+    } = useQuery({
+        queryKey: ['tags'],
+        queryFn: async () => {
+            const response = await apiInstance().get("/api/tags")
+
+            return response.data
+        },
+        refetchOnWindowFocus: false
+    })
+
     useEffect(() => {
         if (postsData && !postsIsFetching) {
-            setPosts(postsData)
+            // Order posts by createdAt date
+            setPosts(postsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
         }
     }, [postsData, postsIsFetching])
 
@@ -64,6 +83,12 @@ export const PhaseContextProvider = ({ children }) => {
         }
     }, [programsData, programsIsFetching])
 
+    useEffect(() => {
+        if (tagsData && !tagsIsFetching) {
+            setTags(tagsData)
+        }
+    }, [tagsData, tagsIsFetching])
+
     return (
         <PostContext.Provider value={{
             posts: posts,
@@ -72,6 +97,9 @@ export const PhaseContextProvider = ({ children }) => {
             programs: programs,
             isLoadingPrograms: programsIsLoading,
             isFetchingPrograms: programsIsFetching,
+            tags: tags,
+            isLoadingTags: tagsIsLoading,
+            isFetchingTags: tagsIsFetching
         }}>
             {children}
         </PostContext.Provider>
