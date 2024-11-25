@@ -1,5 +1,5 @@
 import { createRoute } from '@tanstack/react-router'
-import ProgramCard from '../components/programCard.component'
+import ProgramCard from '../components/ProgramCard.component'
 import { rootRoute } from './__root'
 import { UserContextProvider } from '../context/UserContext'
 
