@@ -19,7 +19,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
+//    @Lob
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -54,4 +54,7 @@ public class Post {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> bookmarkedByUsers = new HashSet<>();
+
+    @Column(nullable = true)
+    private String imageUrl;
 }

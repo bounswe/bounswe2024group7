@@ -62,6 +62,7 @@ public class PostService {
                 .tags(tags)
                 .user(user)  // Associate the post with the user
                 .trainingProgram(trainingProgram)
+                .imageUrl(postRequest.getImageUrl())
                 .build();
 
         Post savedPost = postRepository.save(post);

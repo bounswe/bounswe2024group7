@@ -23,4 +23,5 @@ public class PostResponse {
     private int likeCount;
     private boolean isLiked;
     private boolean isBookmarked;
+    private String imageUrl;
 }

@@ -17,4 +17,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByBookmarkedByUsersContaining(User user);
 
+    @Query("SELECT p FROM Post p " +
+            "LEFT JOIN p.tags t " +
+            "LEFT JOIN p.trainingProgram tp " +
+            "WHERE " +
+            "LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(t.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(tp.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(p.user.username) LIKE LOWER(CONCAT('%', :query, '%'))")
+    List<Post> search(@Param("query") String query);
 }

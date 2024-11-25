@@ -2,6 +2,7 @@ package com.group7.demo.controllers;
 
 import com.group7.demo.dtos.TrainingProgramRequest;
 import com.group7.demo.dtos.TrainingProgramResponse;
+import com.group7.demo.dtos.UserTrainingProgramResponse;
 import com.group7.demo.services.TrainingProgramService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/training-programs")
@@ -57,20 +60,20 @@ public class TrainingProgramController {
 
 
     @PostMapping("/{programId}/join")
-    public ResponseEntity<String> joinTrainingProgram(@PathVariable Long programId , HttpServletRequest request) {
-        trainingProgramService.joinTrainingProgram(programId ,request);
-        return ResponseEntity.ok("User has successfully joined the training program.");
+    public ResponseEntity<UserTrainingProgramResponse> joinTrainingProgram(@PathVariable Long programId , HttpServletRequest request) {
+        UserTrainingProgramResponse response = trainingProgramService.joinTrainingProgram(programId ,request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{programId}/leave")
-    public ResponseEntity<String> leaveProgram(@PathVariable Long programId, HttpServletRequest request) {
-        trainingProgramService.leaveTrainingProgram(programId, request);
-        return ResponseEntity.ok("Successfully left the training program.");
+    public ResponseEntity<UserTrainingProgramResponse> leaveProgram(@PathVariable Long programId, HttpServletRequest request) {
+        UserTrainingProgramResponse response = trainingProgramService.leaveTrainingProgram(programId, request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{programId}/participants")
-    public ResponseEntity<List<String>> getRegisteredUsernames(@PathVariable Long programId) {
-        List<String> usernames = trainingProgramService.getRegisteredUsernames(programId);
+    public ResponseEntity<Set<String>> getRegisteredUsernames(@PathVariable Long programId) {
+        Set<String> usernames = trainingProgramService.getRegisteredUsernames(programId);
         return ResponseEntity.ok(usernames);
     }
 
@@ -81,4 +84,42 @@ public class TrainingProgramController {
         return ResponseEntity.ok(trainingPrograms);
     }
 
+    @PostMapping("/{trainingProgramId}/exercises/{exerciseId}/complete")
+    public ResponseEntity<UserTrainingProgramResponse> markExerciseAsCompleted(
+            @PathVariable Long trainingProgramId,
+            @PathVariable Long exerciseId,
+            HttpServletRequest request
+    ) {
+        UserTrainingProgramResponse response = trainingProgramService.markExerciseAsCompleted(trainingProgramId, exerciseId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{trainingProgramId}/exercises/{exerciseId}/uncomplete")
+    public ResponseEntity<UserTrainingProgramResponse> unmarkExerciseAsCompleted(
+            @PathVariable Long trainingProgramId,
+            @PathVariable Long exerciseId,
+            HttpServletRequest request) {
+        UserTrainingProgramResponse response = trainingProgramService.unmarkExerciseAsCompleted(trainingProgramId, exerciseId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{trainingProgramId}/complete")
+    public ResponseEntity<UserTrainingProgramResponse> markTrainingProgramAsCompleted(
+            @PathVariable Long trainingProgramId,
+            HttpServletRequest request
+    ) {
+        UserTrainingProgramResponse response = trainingProgramService.markTrainingProgramAsCompleted(trainingProgramId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/joined/{username}")
+    public ResponseEntity<List<UserTrainingProgramResponse>> getJoinedTrainingPrograms(@PathVariable String username) {
+        try {
+            List<UserTrainingProgramResponse> responses = trainingProgramService.getJoinedTrainingPrograms(username);
+            return ResponseEntity.ok(responses);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.emptyList());
+        }
+    }
 }
