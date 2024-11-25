@@ -20,5 +20,6 @@ public class UserTrainingProgramResponse {
     private String trainerUsername;
     private Set<String> participants;
     private UserTrainingProgramStatus status;
-    private LocalDateTime createdAt;
+    private LocalDateTime joinedAt;
+    private LocalDateTime completedAt;
 }

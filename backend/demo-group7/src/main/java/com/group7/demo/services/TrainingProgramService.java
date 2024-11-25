@@ -2,6 +2,7 @@ package com.group7.demo.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.group7.demo.dtos.*;
 import com.group7.demo.dtos.mapper.Mapper;
 import com.group7.demo.models.*;
@@ -17,6 +18,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -127,7 +129,7 @@ public class TrainingProgramService {
     }
 
     @Transactional
-    public UserTrainingProgramResponse joinTrainingProgram(Long trainingProgramId , HttpServletRequest request) {
+    public UserTrainingProgramResponse joinTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
         TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
@@ -142,10 +144,10 @@ public class TrainingProgramService {
 
         // Initialize the progress JSON object
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<Long, Boolean> exerciseProgress = trainingProgram.getExercises().stream()
+        Map<Long, ExerciseProgress> exerciseProgress = trainingProgram.getExercises().stream()
                 .collect(Collectors.toMap(
                         TrainingProgramExercise::getId, // Exercise ID
-                        TrainingProgramExercise -> false // Not completed yet
+                        exercise -> new ExerciseProgress(false, null)
                 ));
 
         String progressJson;
@@ -162,11 +164,13 @@ public class TrainingProgramService {
                 .joinedAt(LocalDateTime.now())
                 .status(UserTrainingProgramStatus.ONGOING)
                 .exerciseProgress(progressJson)
+                .completedAt(null)
                 .build();
 
         // Save the UserTrainingProgram entity
         return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
+
 
     @Transactional
     public Set<String> getRegisteredUsernames(Long trainingProgramId) {
@@ -214,22 +218,28 @@ public class TrainingProgramService {
         UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
 
         // Get the current progress map
-        Map<Long, Boolean> exerciseProgress = userTrainingProgram.getExerciseProgress();
+        Map<Long, ExerciseProgress> exerciseProgress = userTrainingProgram.getExerciseProgress();
 
         // Mark the exercise as completed
-        exerciseProgress.put(exerciseId, true);
+        ExerciseProgress progress = exerciseProgress.getOrDefault(exerciseId, new ExerciseProgress(false, null));
+        progress.setCompleted(true);
+        progress.setCompletedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        exerciseProgress.put(exerciseId, progress);
 
         // Serialize the updated exercise progress map back to JSON
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
         try {
             String updatedProgressJson = objectMapper.writeValueAsString(exerciseProgress);
             userTrainingProgram.setExerciseProgress(updatedProgressJson); // Save the updated JSON string
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             throw new IllegalStateException("Failed to update exercise progress JSON", e);
         }
 
         return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
+
+
 
 
 
@@ -239,11 +249,13 @@ public class TrainingProgramService {
 
         UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
 
-        // Get the current progress map from the serialized exerciseProgress
-        Map<Long, Boolean> exerciseProgress = userTrainingProgram.getExerciseProgress();
+        Map<Long, ExerciseProgress> exerciseProgress = userTrainingProgram.getExerciseProgress();
 
-        // Mark the exercise as incomplete (unmark)
-        exerciseProgress.put(exerciseId, false);
+        // Update the progress for the specified exercise
+        ExerciseProgress progress = exerciseProgress.getOrDefault(exerciseId, new ExerciseProgress(false, null));
+        progress.setCompleted(false); // Mark as incomplete
+        progress.setCompletedAt(null); // Remove the completion time
+        exerciseProgress.put(exerciseId, progress);
 
         // Serialize the updated progress map back to JSON
         ObjectMapper objectMapper = new ObjectMapper();
@@ -257,6 +269,7 @@ public class TrainingProgramService {
         return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
 
+
     @Transactional
     public UserTrainingProgramResponse markTrainingProgramAsCompleted(Long trainingProgramId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
@@ -265,6 +278,7 @@ public class TrainingProgramService {
 
         // Mark the entire training program as completed
         userTrainingProgram.setStatus(UserTrainingProgramStatus.COMPLETED);
+        userTrainingProgram.setCompletedAt(LocalDateTime.now());
 
         return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
@@ -278,6 +292,7 @@ public class TrainingProgramService {
 
         // Mark the training program as left
         userTrainingProgram.setStatus(UserTrainingProgramStatus.LEFT);
+        userTrainingProgram.setCompletedAt(LocalDateTime.now());
 
         return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
