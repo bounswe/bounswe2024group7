@@ -70,6 +70,13 @@ export default function ProfilePage() {
                 >
                     Joined Programs
                 </Button>
+                <Button
+                    colorScheme={view === 'MyProgress' ? 'teal' : 'gray'}
+                    onClick={() => setView('MyProgress')}
+                >
+                    My Progress
+                </Button>
+
                 {user.role === 'TRAINER' && (
                     <Button
                         colorScheme={view === 'createdPrograms' ? 'teal' : 'gray'}
