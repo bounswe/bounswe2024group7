@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { CircularProgress, CircularProgressLabel, Box, Text, HStack, VStack, Button } from '@chakra-ui/react';
+import { CircularProgress, CircularProgressLabel, Box, Text, HStack, VStack, Button, useToast } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 import { UserContext } from '../context/UserContext';
 import { useNavigate } from '@tanstack/react-router'
@@ -29,6 +29,7 @@ function ProgressToday() {
     const { joinedPrograms } = useContext(UserContext);
     const currentProgress = calculateProgress(joinedPrograms);
     const [progress, setProgress] = useState(0); // Initialize progress to 0
+    const toast = useToast()
 
 
 
@@ -49,10 +50,10 @@ function ProgressToday() {
     }, [currentProgress]);
 
     const navigate = useNavigate()
-    const handleStartPracticing = (program_name) => {
+    const handleStartPracticing = (program) => {
         navigate(
             {
-                to: "/program"
+                to: `/program?programId=${program.id}`,
             }
         )
     }
@@ -118,8 +119,36 @@ function ProgressToday() {
                                 <StarIcon boxSize={12} color='#805AD5' />
                             ) : null
                         ) : (
-                            <Button bg="#805AD5" color="white" _hover={{ bg: '#805AD5' }} size="sm" onClick={() => handleStartPracticing(joinedPrograms)}>
-                                Nail It !
+                            <Button bg="#805AD5" color="white" _hover={{ bg: '#805AD5' }} size="sm" onClick={
+                                () => {
+                                    if (joinedPrograms.length > 0 && progress !== 100) {
+                                        handleStartPracticing(joinedPrograms[0])
+                                    }
+
+                                    if (joinedPrograms.length === 0) {
+                                        toast({
+                                            title: 'No programs joined',
+                                            description: 'You need to join a program to start practicing',
+                                            status: 'info',
+                                            duration: 5000,
+                                            isClosable: true,
+                                        })
+                                    }
+
+                                    if (progress === 100) {
+                                        toast({
+                                            title: 'Congratulations!',
+                                            description: 'You have completed all exercises for today',
+                                            status: 'success',
+                                            duration: 5000,
+                                            isClosable: true,
+                                        })
+                                    }
+                                }
+                            }>
+                                {
+                                    progress === 100 ? 'You did it!' : 'Start Practicing'
+                                }
                             </Button>
                         )}
                     </Box>

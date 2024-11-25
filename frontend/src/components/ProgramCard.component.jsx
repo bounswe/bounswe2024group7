@@ -106,7 +106,7 @@ const ProgramCard = () => {
     // Handle complete exercise
     const { mutate: completeExercise } = useMutation({
         mutationFn: async (exerciseId) => {
-            const response = await apiInstance().post(`/api/training-programs/${programId}/exercises/${exerciseId}/complete`);
+            const response = await apiInstance(sessionToken).post(`/api/training-programs/${programId}/exercises/${exerciseId}/complete`);
 
             return response.data;
         },
