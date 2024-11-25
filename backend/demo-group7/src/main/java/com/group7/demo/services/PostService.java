@@ -3,6 +3,7 @@ package com.group7.demo.services;
 import com.group7.demo.dtos.PostRequest;
 import com.group7.demo.dtos.PostResponse;
 import com.group7.demo.dtos.mapper.Mapper;
+import com.group7.demo.exceptions.UnauthorizedException;
 import com.group7.demo.models.*;
 import com.group7.demo.repository.PostRepository;
 import com.group7.demo.repository.TagRepository;
@@ -12,6 +13,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -64,27 +67,27 @@ public class PostService {
 
         Post savedPost = postRepository.save(post);
 
-        return mapper.mapToPostResponse(savedPost);
+        return mapper.mapToPostResponse(savedPost, request);
     }
 
     @Transactional
-    public List<PostResponse> getAllPosts() {
+    public List<PostResponse> getAllPosts(HttpServletRequest request) {
         List<Post> posts = postRepository.findAll();
 
         return posts.stream()
-                .map(mapper::mapToPostResponse)
+                .map(post -> mapper.mapToPostResponse(post, request))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public List<PostResponse> getPostsByUser(String username) {
+    public List<PostResponse> getPostsByUser(String username, HttpServletRequest request) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
 
         List<Post> posts = postRepository.findByUser(user);
 
         return posts.stream()
-                .map(mapper::mapToPostResponse)
+                .map(post -> mapper.mapToPostResponse(post, request))
                 .collect(Collectors.toList());
     }
 
@@ -116,20 +119,80 @@ public class PostService {
     }
 
     @Transactional
-    public List<PostResponse> getPostsByTags(Set<String> tagNames) {
+    public List<PostResponse> getPostsByTags(Set<String> tagNames, HttpServletRequest request) {
         List<Post> posts = postRepository.findPostsByTags(tagNames);
         return posts.stream()
-                .map(mapper::mapToPostResponse)
+                .map(post -> mapper.mapToPostResponse(post, request))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public List<PostResponse> getRandomPosts(int count) {
+    public List<PostResponse> getRandomPosts(int count, HttpServletRequest request) {
         List<Post> allPosts = postRepository.findAll();
         Collections.shuffle(allPosts);
         return allPosts.stream()
                 .limit(count)
-                .map(mapper::mapToPostResponse)
+                .map(post -> mapper.mapToPostResponse(post, request))
+                .collect(Collectors.toList());
+    }
+
+    private User validateAuthenticatedUser(HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+        if (user == null) {
+            throw new UnauthorizedException("You must be logged in to perform this action");
+        }
+        return user;
+    }
+
+    @Transactional
+    public void likePost(Long postId, HttpServletRequest request) {
+        User user = validateAuthenticatedUser(request);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+        if (!post.getLikedByUsers().contains(user)) {
+            post.getLikedByUsers().add(user);
+            postRepository.save(post);
+        }
+    }
+
+    @Transactional
+    public void unlikePost(Long postId, HttpServletRequest request) {
+        User user = validateAuthenticatedUser(request);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+        post.getLikedByUsers().remove(user);
+        postRepository.save(post);
+    }
+
+    @Transactional
+    public void bookmarkPost(Long postId, HttpServletRequest request) {
+        User user = validateAuthenticatedUser(request);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+        if (!post.getBookmarkedByUsers().contains(user)) {
+            post.getBookmarkedByUsers().add(user);
+            postRepository.save(post);
+        }
+    }
+
+    @Transactional
+    public void unbookmarkPost(Long postId, HttpServletRequest request) {
+        User user = validateAuthenticatedUser(request);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+        post.getBookmarkedByUsers().remove(user);
+        postRepository.save(post);
+    }
+
+    @Transactional
+    public List<PostResponse> getBookmarkedPosts(HttpServletRequest request) {
+        User user = validateAuthenticatedUser(request);
+        return postRepository.findByBookmarkedByUsersContaining(user).stream()
+                .map(post -> mapper.mapToPostResponse(post, request))
                 .collect(Collectors.toList());
     }
 }
