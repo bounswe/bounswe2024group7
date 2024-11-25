@@ -84,7 +84,7 @@ function ProgressToday() {
                 >
                     <CircularProgress
                         value={progress}
-                        color="teal"
+                        color='#805AD5'
                         trackColor="gray.200"
                         size="240px"
                         thickness="3px"
@@ -107,10 +107,10 @@ function ProgressToday() {
                         </Text>
                         {currentProgress === 100 ? (
                             progress === 100 ? (
-                                <StarIcon boxSize={12} color="teal" />
+                                <StarIcon boxSize={12} color='#805AD5' />
                             ) : null
                         ) : (
-                            <Button bg="teal" color="white" _hover={{ bg: 'teal' }} size="sm">
+                            <Button bg="#805AD5" color="white" _hover={{ bg: '#805AD5' }} size="sm">
                                 Nail It !
                             </Button>
                         )}
