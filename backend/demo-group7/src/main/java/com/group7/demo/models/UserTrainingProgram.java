@@ -42,6 +42,8 @@ public class UserTrainingProgram {
 
     private LocalDateTime joinedAt;
 
+    private LocalDateTime completedAt;
+
     // Deserialize the JSON string into a Map
     public Map<Long, Boolean> getExerciseProgress() {
         if (exerciseProgress == null) {

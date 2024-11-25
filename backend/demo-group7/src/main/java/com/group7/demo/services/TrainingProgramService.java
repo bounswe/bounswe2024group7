@@ -162,6 +162,7 @@ public class TrainingProgramService {
                 .joinedAt(LocalDateTime.now())
                 .status(UserTrainingProgramStatus.ONGOING)
                 .exerciseProgress(progressJson)
+                .completedAt(null)
                 .build();
 
         // Save the UserTrainingProgram entity
@@ -265,6 +266,7 @@ public class TrainingProgramService {
 
         // Mark the entire training program as completed
         userTrainingProgram.setStatus(UserTrainingProgramStatus.COMPLETED);
+        userTrainingProgram.setCompletedAt(LocalDateTime.now());
 
         return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
@@ -278,6 +280,7 @@ public class TrainingProgramService {
 
         // Mark the training program as left
         userTrainingProgram.setStatus(UserTrainingProgramStatus.LEFT);
+        userTrainingProgram.setCompletedAt(LocalDateTime.now());
 
         return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }

@@ -84,7 +84,8 @@ public class Mapper {
                         .collect(Collectors.toSet()))
                 .exercises(exerciseDetails)
                 .status(userTrainingProgram.getStatus())
-                .createdAt(program.getCreatedAt())
+                .joinedAt(userTrainingProgram.getJoinedAt())
+                .completedAt(userTrainingProgram.getCompletedAt())
                 .build();
     }
 
