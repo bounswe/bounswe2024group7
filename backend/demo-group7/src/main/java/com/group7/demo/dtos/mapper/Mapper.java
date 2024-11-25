@@ -2,6 +2,7 @@ package com.group7.demo.dtos.mapper;
 
 import com.group7.demo.dtos.*;
 import com.group7.demo.models.*;
+import com.group7.demo.models.enums.UserTrainingProgramStatus;
 import com.group7.demo.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,7 @@ public class Mapper {
                 .participants(program.getParticipants() == null ?
                         Set.of() :
                         program.getParticipants().stream()
+                                .filter(participant -> participant.getStatus() == UserTrainingProgramStatus.ONGOING)
                                 .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
                                 .collect(Collectors.toSet()))
                 .build();
@@ -77,6 +79,7 @@ public class Mapper {
                 .description(program.getDescription())
                 .trainerUsername(program.getTrainer().getUsername())
                 .participants(program.getParticipants().stream()
+                        .filter(participant -> participant.getStatus() == UserTrainingProgramStatus.ONGOING)
                         .map(participant -> participant.getUser().getUsername())
                         .collect(Collectors.toSet()))
                 .exercises(exerciseDetails)

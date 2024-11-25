@@ -24,7 +24,7 @@ export default function ProfilePage() {
     const [view, setView] = useState('posts'); // Toggle between 'posts', 'joinedPrograms', and 'createdPrograms'
 
     return (
-        <Box p={6} maxW="1200px" mx="auto" bg={colorMode === "light" ? "gray.50" : "gray.800"} borderRadius="md">
+        <Box p={6} maxW="1200px" mx="auto" borderRadius="md">
             <Flex direction="column" align="center">
                 <Avatar
                     size="2xl"
@@ -63,16 +63,12 @@ export default function ProfilePage() {
                 >
                     Posts
                 </Button>
-                {user.role === 'TRAINEE' && (
-                    <Button
-                        colorScheme={view === 'joinedPrograms' ? 'teal' : 'gray'}
-                        onClick={() => setView('joinedPrograms')}
-                    >
-                        Joined Programs
-                    </Button>
-
-                )}
-
+                <Button
+                    colorScheme={view === 'joinedPrograms' ? 'teal' : 'gray'}
+                    onClick={() => setView('joinedPrograms')}
+                >
+                    Joined Programs
+                </Button>
                 {user.role === 'TRAINER' && (
                     <Button
                         colorScheme={view === 'createdPrograms' ? 'teal' : 'gray'}
@@ -93,7 +89,7 @@ export default function ProfilePage() {
                         )}
                     </Stack>
                 )}
-                {view === 'joinedPrograms' && user.role === 'TRAINEE' &&(
+                {view === 'joinedPrograms' && (
                     <Stack spacing={4}>
                         {user.joinedPrograms && user.joinedPrograms.length > 0 ? (
                             user.joinedPrograms.map((program) => (

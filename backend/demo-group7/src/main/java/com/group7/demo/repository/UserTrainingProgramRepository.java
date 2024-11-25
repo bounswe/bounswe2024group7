@@ -11,5 +11,6 @@ public interface UserTrainingProgramRepository extends JpaRepository<UserTrainin
     boolean existsByUserAndTrainingProgramIdAndStatus(User user, Long trainingProgramId, UserTrainingProgramStatus status);
     List<UserTrainingProgram> findByUserAndTrainingProgramIdAndStatus(User user, Long trainingProgramId, UserTrainingProgramStatus status);
     List<UserTrainingProgram> findByUser(User user);
+    List<UserTrainingProgram> findByUserAndStatusNot(User user, UserTrainingProgramStatus status);
 
 }

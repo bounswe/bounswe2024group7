@@ -10,6 +10,7 @@ export const UserContext = createContext({
     following: [],
     posts: [],
     programs: [],
+    joinedPrograms: [],
 })
 
 export const UserContextProvider = ({ children }) => {
@@ -18,6 +19,7 @@ export const UserContextProvider = ({ children }) => {
     const [following, setFollowing] = useState([])
     const [posts, setPosts] = useState([])
     const [programs, setPrograms] = useState([])
+    const [joinedPrograms, setJoinedPrograms] = useState([])
 
     const sessionToken = useSelector(userSessionToken)
     const username = useSelector(userName)
@@ -110,6 +112,25 @@ export const UserContextProvider = ({ children }) => {
         refetchOnWindowFocus: false,
     })
 
+    // Get joined programs
+    const {
+        data: joinedProgramsData,
+        isFetching: joinedProgramsIsFetching,
+        isLoading: joinedProgramsIsLoading,
+    } = useQuery({
+        queryKey: ['joinedPrograms'],
+        queryFn: async () => {
+            try {
+                const response = await apiInstance(sessionToken).get(`api/training-programs/joined/${username}`)
+
+                return response.data
+            } catch (error) {
+                return []
+            }
+        },
+        refetchOnWindowFocus: false,
+    })
+
     useEffect(() => {
         if (followersData && !followersIsFetching) {
             setFollowers(followersData)
@@ -140,6 +161,12 @@ export const UserContextProvider = ({ children }) => {
         }
     }, [profileData, profileIsFetching])
 
+    useEffect(() => {
+        if (joinedProgramsData && !joinedProgramsIsFetching) {
+            setJoinedPrograms(joinedProgramsData)
+        }
+    }, [joinedProgramsData, joinedProgramsIsFetching])
+
     return (
         <UserContext.Provider value={{
             user,
@@ -147,6 +174,7 @@ export const UserContextProvider = ({ children }) => {
             following,
             posts,
             programs,
+            joinedPrograms,
         }}>
             {children}
         </UserContext.Provider>
