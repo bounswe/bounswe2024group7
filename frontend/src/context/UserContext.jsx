@@ -77,20 +77,6 @@ export const UserContextProvider = ({ children }) => {
         },
         refetchOnWindowFocus: false,
     });
-    // previous
-    // const {
-    //     data: profileData,
-    //     isFetching: profileIsFetching,
-    //     isLoading: profileIsLoading,
-    // } = useQuery({
-    //     queryKey: ['user'],
-    //     queryFn: async () => {
-    //         const response = await apiInstance(sessionToken).get(`api/user/${username}`);
-
-    //         return response.data;
-    //     },
-    //     refetchOnWindowFocus: false,
-    // });
 
     const {
         data: followersData,
@@ -134,7 +120,7 @@ export const UserContextProvider = ({ children }) => {
         isFetching: postsIsFetching,
         isLoading: postsIsLoading,
     } = useQuery({
-        queryKey: ['posts'],
+        queryKey: ['userPosts'],
         queryFn: async () => {
             try {
                 const response = await apiInstance(sessionToken).get(`api/posts/user/${username}`)
