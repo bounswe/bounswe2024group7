@@ -65,11 +65,11 @@ public class Mapper {
 
     public UserTrainingProgramResponse mapToUserTrainingProgramResponse(UserTrainingProgram userTrainingProgram) {
         TrainingProgram program = userTrainingProgram.getTrainingProgram();
-        Map<Long, Boolean> completedExercises = userTrainingProgram.getExerciseProgress(); // Now returns Map<Long, Boolean>
+        Map<Long, ExerciseProgress> exerciseProgress = userTrainingProgram.getExerciseProgress(); // Now returns Map<Long, Boolean>
 
         // Use the new mapper function for exercises
         List<UserExerciseDetail> exerciseDetails = program.getExercises().stream()
-                .map(exercise -> mapToUserExerciseDetailResponse(exercise, completedExercises))
+                .map(exercise -> mapToUserExerciseDetailResponse(exercise, exerciseProgress))
                 .sorted(Comparator.comparing(UserExerciseDetail::getId))
                 .collect(Collectors.toList());
 
@@ -89,13 +89,16 @@ public class Mapper {
                 .build();
     }
 
-    public UserExerciseDetail mapToUserExerciseDetailResponse(TrainingProgramExercise trainingProgramExercise, Map<Long, Boolean> completedExercises) {
+    public UserExerciseDetail mapToUserExerciseDetailResponse(TrainingProgramExercise trainingProgramExercise, Map<Long, ExerciseProgress> exerciseProgress) {
+        ExerciseProgress progress = exerciseProgress.getOrDefault(trainingProgramExercise.getId(), new ExerciseProgress(false, null));
         return UserExerciseDetail.builder()
                 .id(trainingProgramExercise.getId())
                 .exercise(trainingProgramExercise.getExercise())
                 .repetitions(trainingProgramExercise.getRepetitions())
                 .sets(trainingProgramExercise.getSets())
-                .completed(completedExercises.getOrDefault(trainingProgramExercise.getId(), false)) // Use `getOrDefault` to handle missing keys
+                .completed(progress.isCompleted())
+                .completedAt(progress.getCompletedAt())
                 .build();
     }
+
 }

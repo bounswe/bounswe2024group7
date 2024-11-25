@@ -2,6 +2,7 @@ package com.group7.demo.models;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.group7.demo.dtos.ExerciseProgress;
 import com.group7.demo.models.enums.UserTrainingProgramStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -45,14 +46,14 @@ public class UserTrainingProgram {
     private LocalDateTime completedAt;
 
     // Deserialize the JSON string into a Map
-    public Map<Long, Boolean> getExerciseProgress() {
+    public Map<Long, ExerciseProgress> getExerciseProgress() {
         if (exerciseProgress == null) {
             return new HashMap<>(); // return empty map if no progress is available
         }
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(exerciseProgress, new TypeReference<Map<Long, Boolean>>() {});
+            return objectMapper.readValue(exerciseProgress, new TypeReference<Map<Long, ExerciseProgress>>() {});
         } catch (Exception e) {
             e.printStackTrace();
             return new HashMap<>(); // return empty map on error
