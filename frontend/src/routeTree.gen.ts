@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as SearchImport } from './routes/search'
 import { Route as RegisterImport } from './routes/register'
+import { Route as ProgressTodayImport } from './routes/progressToday'
 import { Route as ProgressImport } from './routes/progress'
 import { Route as ProgramImport } from './routes/program'
 import { Route as ProfileImport } from './routes/profile'
@@ -30,6 +31,12 @@ const SearchRoute = SearchImport.update({
 const RegisterRoute = RegisterImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProgressTodayRoute = ProgressTodayImport.update({
+  id: '/progressToday',
+  path: '/progressToday',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -102,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgressImport
       parentRoute: typeof rootRoute
     }
+    '/progressToday': {
+      id: '/progressToday'
+      path: '/progressToday'
+      fullPath: '/progressToday'
+      preLoaderRoute: typeof ProgressTodayImport
+      parentRoute: typeof rootRoute
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -127,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/program': typeof ProgramRoute
   '/progress': typeof ProgressRoute
+  '/progressToday': typeof ProgressTodayRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
 }
@@ -137,6 +152,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/program': typeof ProgramRoute
   '/progress': typeof ProgressRoute
+  '/progressToday': typeof ProgressTodayRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
 }
@@ -148,6 +164,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/program': typeof ProgramRoute
   '/progress': typeof ProgressRoute
+  '/progressToday': typeof ProgressTodayRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
 }
@@ -160,6 +177,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/program'
     | '/progress'
+    | '/progressToday'
     | '/register'
     | '/search'
   fileRoutesByTo: FileRoutesByTo
@@ -169,6 +187,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/program'
     | '/progress'
+    | '/progressToday'
     | '/register'
     | '/search'
   id:
@@ -178,6 +197,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/program'
     | '/progress'
+    | '/progressToday'
     | '/register'
     | '/search'
   fileRoutesById: FileRoutesById
@@ -189,6 +209,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ProgramRoute: typeof ProgramRoute
   ProgressRoute: typeof ProgressRoute
+  ProgressTodayRoute: typeof ProgressTodayRoute
   RegisterRoute: typeof RegisterRoute
   SearchRoute: typeof SearchRoute
 }
@@ -199,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ProgramRoute: ProgramRoute,
   ProgressRoute: ProgressRoute,
+  ProgressTodayRoute: ProgressTodayRoute,
   RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
 }
@@ -218,6 +240,7 @@ export const routeTree = rootRoute
         "/profile",
         "/program",
         "/progress",
+        "/progressToday",
         "/register",
         "/search"
       ]
@@ -236,6 +259,9 @@ export const routeTree = rootRoute
     },
     "/progress": {
       "filePath": "progress.jsx"
+    },
+    "/progressToday": {
+      "filePath": "progressToday.jsx"
     },
     "/register": {
       "filePath": "register.jsx"
