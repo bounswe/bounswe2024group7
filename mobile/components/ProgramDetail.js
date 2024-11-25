@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 const ProgramDetail = ({ route }) => {
-  const { title, description, trainerUsername, exercises } = route.params;
+  const { trainerUsername, title, description, exercises, date, participants, navigation  } = route.params;
   /*const {title, description, trainerUsername, exercises} = {
     title: "Full Body Workout",
     description: "This is a comprehensive program targeting all major muscle groups.",
@@ -43,11 +43,19 @@ const ProgramDetail = ({ route }) => {
           }
     ],
   }*/
+  console.log(participants);
   const [expandedExercise, setExpandedExercise] = useState(null);
 
   const toggleExerciseDetails = (index) => {
     setExpandedExercise(expandedExercise === index ? null : index);
   };
+  const renderParticipant = ({ item, index }) => {
+    return(
+      <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { username: item })}>
+                    <Text style={styles.owner}>{item}</Text>
+                  </TouchableOpacity>
+    );
+  }
 
   const renderExercise = ({ item, index }) => {
     const isExpanded = expandedExercise === index;
@@ -100,11 +108,21 @@ const ProgramDetail = ({ route }) => {
   return (
   <ScrollView contentContainerStyle={styles.container}>
     <View style={styles.postContainer}>
-      {/* Program Info */}
+      {/* Participant Info */}
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.owner}>{trainerUsername}</Text>
       <Text style={styles.description}>{description}</Text>
     </View>
+    <View style={styles.participantsContainer}>
+      <Text style={styles.participantListTitle}>Participants:</Text>
+      <FlatList
+        data={participants}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={renderParticipant}
+        contentContainerStyle={styles.participantsList}
+      />
+      </View>
+
       {/* Exercises List */}
       <View style={styles.exercisesContainer}>
       <Text style={styles.exerciseListTitle}>Exercises:</Text>
@@ -185,7 +203,26 @@ container: {
       shadowColor: '#000',
       shadowOpacity: 0.1,
       shadowRadius: 5,
-      marginBottom: 20},
+      marginBottom: 20
+    },
+      participantListTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 10,
+      },
+      participantsList: {
+        paddingBottom: 20,
+      },
+      participantsContainer:{
+          backgroundColor: '#FFFFFF',
+          borderRadius: 12,
+          padding: 15,
+          shadowColor: '#000',
+          shadowOpacity: 0.1,
+          shadowRadius: 5,
+          marginBottom: 20
+        },
   exerciseContainer: {
     backgroundColor: '#f9f9f9',
     borderRadius: 10,
@@ -196,6 +233,7 @@ container: {
     shadowRadius: 5,
     elevation: 2,
   },
+
   exerciseHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
