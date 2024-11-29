@@ -175,7 +175,14 @@ useEffect(() => {
   const programs = [
       { id: 1, title: "Full Body Workout",
                    description: "This is a comprehensive program targeting all major muscle groups.",
-                   trainerUsername: "fitness_guru_123",
+                   trainerUsername: "sametalan",
+                   participants:[
+                    "sametalan2",
+                    "Hanaaa",
+                    "deno",
+                    "fit_deniz"
+                   ],
+                   createdAt:'2024-11-25T13:52:56.512941',
                    exercises: [
                      { exercise:{
                        name: "Push-Up",
@@ -204,7 +211,14 @@ useEffect(() => {
                    ]},
        { id: 2, title: "Full Body Workout",
                     description: "This is a comprehensive program targeting all major muscle groups.",
-                    trainerUsername: "fitness_guru_123",
+                    trainerUsername: "fit_deniz",
+                    participants:[
+                      "sametalan2",
+                      "Hanaaa",
+                      "deno",
+                      "fit_deniz"
+                     ],
+                     createdAt:'2024-11-25T13:52:56.512941',
                     exercises: [
                       { exercise:{
                         name: "Push-Up",
@@ -353,7 +367,7 @@ useEffect(() => {
       {/* Profile Header */}
       <View style={styles.header}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/150' }} // Mock profile image
+          source={{ uri: 'https://example.com/push-up.gif' }} // Mock profile image
           style={styles.profileImage}
         />
         <Text style={styles.profileName}>{username}</Text>

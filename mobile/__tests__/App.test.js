@@ -53,13 +53,18 @@ test('Renders Search Result Page Correctly', () => {
     expect(tree).toMatchSnapshot();
 });
 
-test('Searches Correctly', async () => {    /* TODO: Change the endpoints */
+test('Searches Correctly', async () => {
     const mockTitle = jest.fn();
     const mockImage = jest.fn();
-    const mockCreator = jest.fn();
-    const mockType = jest.fn();
+    const mockExercies = jest.fn();
+    const mockName = jest.fn();
+    const mockEquipment = jest.fn();
+    const mockBodyPart = jest.fn();
+    const mockInstruction = jest.fn();
+    const mockTargetMuscle = jest.fn();
+    const mockSecondaryMuscles = jest.fn();
 
-    const response  = await apiInstance().post("search", { mockTitle, mockImage, mockCreator, mockType });
+    const response  = await apiInstance().post("search", { mockTitle, mockImage, mockExercies, mockName, mockEquipment, mockBodyPart, mockInstruction, mockTargetMuscle, mockSecondaryMuscles });
     expect(response).toBe( /* TODO: The Object That Returns */ );
 });
 
@@ -72,11 +77,16 @@ test('Renders Create Post Page Correctly', () => {
 
 test('Create Post Correctly', async () => { 
   const mockTitle = jest.fn();
+  const mockPost = jest.fn();
   const mockDescription = jest.fn();
+  const mockImage = jest.fn();
   const mockLabels = jest.fn();
   const mockLabelTest = jest.fn();
+  const mockProfile = jest.fn();
+  const mockPassword = jest.fn();
+  const mockSessionToken = jest.fn();
 
-  const response  = await apiInstance().post("createPost", { mockTitle, mockDescription, mockLabels, mockLabelTest });
+  const response  = await apiInstance().post("createPost", { mockTitle, mockPost, mockDescription, mockImage, mockLabels, mockLabelTest, mockProfile, mockPassword, mockSessionToken });
   expect(response).toBe( /* TODO: The Object That Returns */ );
 });
 
