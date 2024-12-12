@@ -1,6 +1,6 @@
 package com.group7.demo.models.enums;
 
-public enum UserTrainingProgramStatus {
+public enum TrainingProgramWithTrackingStatus {
     ONGOING,
     LEFT,
     COMPLETED

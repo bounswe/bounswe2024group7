@@ -29,5 +29,5 @@ public class Workout {
 
     @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<WorkoutExercise> exercises;
+    private List<WorkoutExercise> workoutExercises;
 }

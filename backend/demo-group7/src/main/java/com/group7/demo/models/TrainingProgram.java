@@ -52,5 +52,5 @@ public class TrainingProgram {
 
     @OneToMany(mappedBy = "trainingProgram", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("trainingProgram")
-    private Set<UserTrainingProgram> participants = new HashSet<>();
+    private Set<TrainingProgramWithTracking> participants = new HashSet<>();
 }
