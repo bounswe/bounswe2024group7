@@ -9,6 +9,7 @@ import { indexRoute } from './routes/index'
 import { loginRoute } from './routes/login'
 import { profileRoute } from './routes/profile'
 import { programRoute } from './routes/program'
+import { trainingRoute } from './routes/training'
 import { progressRoute } from './routes/progress'
 import { progressTodayRoute } from './routes/progressToday'
 import { searchRoute } from './routes/search'
@@ -28,6 +29,7 @@ const routeTree = rootRoute.addChildren([
   registerRoute,
   profileRoute,
   programRoute,
+  trainingRoute,
   progressRoute,
   progressTodayRoute,
   searchRoute

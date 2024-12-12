@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as TrainingImport } from './routes/training'
 import { Route as SearchImport } from './routes/search'
 import { Route as RegisterImport } from './routes/register'
 import { Route as ProgressTodayImport } from './routes/progressToday'
@@ -21,6 +22,12 @@ import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const TrainingRoute = TrainingImport.update({
+  id: '/training',
+  path: '/training',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const SearchRoute = SearchImport.update({
   id: '/search',
@@ -130,6 +137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchImport
       parentRoute: typeof rootRoute
     }
+    '/training': {
+      id: '/training'
+      path: '/training'
+      fullPath: '/training'
+      preLoaderRoute: typeof TrainingImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -144,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/progressToday': typeof ProgressTodayRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/training': typeof TrainingRoute
 }
 
 export interface FileRoutesByTo {
@@ -155,6 +170,7 @@ export interface FileRoutesByTo {
   '/progressToday': typeof ProgressTodayRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/training': typeof TrainingRoute
 }
 
 export interface FileRoutesById {
@@ -167,6 +183,7 @@ export interface FileRoutesById {
   '/progressToday': typeof ProgressTodayRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/training': typeof TrainingRoute
 }
 
 export interface FileRouteTypes {
@@ -180,6 +197,7 @@ export interface FileRouteTypes {
     | '/progressToday'
     | '/register'
     | '/search'
+    | '/training'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -190,6 +208,7 @@ export interface FileRouteTypes {
     | '/progressToday'
     | '/register'
     | '/search'
+    | '/training'
   id:
     | '__root__'
     | '/'
@@ -200,6 +219,7 @@ export interface FileRouteTypes {
     | '/progressToday'
     | '/register'
     | '/search'
+    | '/training'
   fileRoutesById: FileRoutesById
 }
 
@@ -212,6 +232,7 @@ export interface RootRouteChildren {
   ProgressTodayRoute: typeof ProgressTodayRoute
   RegisterRoute: typeof RegisterRoute
   SearchRoute: typeof SearchRoute
+  TrainingRoute: typeof TrainingRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -223,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProgressTodayRoute: ProgressTodayRoute,
   RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
+  TrainingRoute: TrainingRoute,
 }
 
 export const routeTree = rootRoute
@@ -242,7 +264,8 @@ export const routeTree = rootRoute
         "/progress",
         "/progressToday",
         "/register",
-        "/search"
+        "/search",
+        "/training"
       ]
     },
     "/": {
@@ -268,6 +291,9 @@ export const routeTree = rootRoute
     },
     "/search": {
       "filePath": "search.jsx"
+    },
+    "/training": {
+      "filePath": "training.jsx"
     }
   }
 }
