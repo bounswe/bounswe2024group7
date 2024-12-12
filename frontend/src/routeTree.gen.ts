@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as WeekImport } from './routes/week'
 import { Route as TrainingImport } from './routes/training'
 import { Route as SearchImport } from './routes/search'
 import { Route as RegisterImport } from './routes/register'
@@ -22,6 +23,12 @@ import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const WeekRoute = WeekImport.update({
+  id: '/week',
+  path: '/week',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const TrainingRoute = TrainingImport.update({
   id: '/training',
@@ -144,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TrainingImport
       parentRoute: typeof rootRoute
     }
+    '/week': {
+      id: '/week'
+      path: '/week'
+      fullPath: '/week'
+      preLoaderRoute: typeof WeekImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -159,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/training': typeof TrainingRoute
+  '/week': typeof WeekRoute
 }
 
 export interface FileRoutesByTo {
@@ -171,6 +186,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/training': typeof TrainingRoute
+  '/week': typeof WeekRoute
 }
 
 export interface FileRoutesById {
@@ -184,6 +200,7 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/training': typeof TrainingRoute
+  '/week': typeof WeekRoute
 }
 
 export interface FileRouteTypes {
@@ -198,6 +215,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/search'
     | '/training'
+    | '/week'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -209,6 +227,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/search'
     | '/training'
+    | '/week'
   id:
     | '__root__'
     | '/'
@@ -220,6 +239,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/search'
     | '/training'
+    | '/week'
   fileRoutesById: FileRoutesById
 }
 
@@ -233,6 +253,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   SearchRoute: typeof SearchRoute
   TrainingRoute: typeof TrainingRoute
+  WeekRoute: typeof WeekRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -245,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
   TrainingRoute: TrainingRoute,
+  WeekRoute: WeekRoute,
 }
 
 export const routeTree = rootRoute
@@ -265,7 +287,8 @@ export const routeTree = rootRoute
         "/progressToday",
         "/register",
         "/search",
-        "/training"
+        "/training",
+        "/week"
       ]
     },
     "/": {
@@ -294,6 +317,9 @@ export const routeTree = rootRoute
     },
     "/training": {
       "filePath": "training.jsx"
+    },
+    "/week": {
+      "filePath": "week.jsx"
     }
   }
 }

@@ -15,6 +15,7 @@ import { progressTodayRoute } from './routes/progressToday'
 import { searchRoute } from './routes/search'
 import React from 'react'
 import { registerRoute } from './routes/register'
+import { weekRoute } from './routes/week'
 import {
   QueryClient,
   QueryClientProvider
@@ -30,6 +31,7 @@ const routeTree = rootRoute.addChildren([
   profileRoute,
   programRoute,
   trainingRoute,
+  weekRoute,
   progressRoute,
   progressTodayRoute,
   searchRoute

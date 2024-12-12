@@ -161,7 +161,7 @@ const TrainingCard = () => {
                                     </td>
                                     <td className="p-4">
                                         <button className="
-                                            px-3 py-1.5 
+                                            px-4 py-2.5 
                                             bg-gradient-to-r from-blue-500 to-blue-600 
                                             text-white 
                                             rounded-full 
@@ -176,7 +176,7 @@ const TrainingCard = () => {
                                             focus:ring-opacity-50
                                             text-xs
                                         ">
-                                            Start Workout
+                                            Start
                                         </button>
                                     </td>
                                     <td className="p-4 text-center">
