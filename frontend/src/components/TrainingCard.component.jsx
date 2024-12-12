@@ -216,7 +216,7 @@ const TrainingCard = () => {
             <button onClick={onOpen} className="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors text-sm">
                 Show Detailed Description
             </button>
-            <Detailed_Training_Modal isOpen={isOpen} onClose={onClose} />
+            <Detailed_Training_Modal isOpen={isOpen} onClose={onClose} data={data} />
         </div>
     );
 };
