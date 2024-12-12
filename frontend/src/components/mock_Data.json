@@ -1,0 +1,311 @@
+{
+    "id": 6,
+    "title": "Full Body Strength Program",
+    "description": "A comprehensive full-body strength training program for intermediate level.",
+    "trainer": "oguzhekim1",
+    "type": "BODY_BUILDING",
+    "level": "INTERMEDIATE",
+    "interval": 2,
+    "rating": 0.0,
+    "ratingCount": 0,
+    "createdAt": "2024-12-11T21:26:51.415811",
+    "weeks": [
+        {
+            "id": 16,
+            "weekNumber": 1,
+            "workouts": [
+                {
+                    "id": 26,
+                    "name": "Workout 1: Upper Body Strength",
+                    "workoutNumber": 1,
+                    "workoutExercises": [
+                        {
+                            "id": 51,
+                            "exerciseNumber": 1,
+                            "exercise": {
+                                "id": 2,
+                                "name": "45° side bend",
+                                "gifUrl": "https://v2.exercisedb.io/image/usfnYRysExe8jp",
+                                "bodyPart": "WAIST",
+                                "targetMuscle": "ABS",
+                                "equipment": "BODY_WEIGHT",
+                                "instructions": [
+                                    "Stand with your feet shoulder-width apart and your arms extended straight down by your sides.",
+                                    "Keeping your back straight and your core engaged, slowly bend your torso to one side, lowering your hand towards your knee.",
+                                    "Pause for a moment at the bottom, then slowly return to the starting position.",
+                                    "Repeat on the other side.",
+                                    "Continue alternating sides for the desired number of repetitions."
+                                ],
+                                "secondaryMuscles": [
+                                    "OBLIQUES"
+                                ]
+                            },
+                            "repetitions": 10,
+                            "sets": 3
+                        },
+                        {
+                            "id": 52,
+                            "exerciseNumber": 2,
+                            "exercise": {
+                                "id": 1,
+                                "name": "3/4 sit-up",
+                                "gifUrl": "https://v2.exercisedb.io/image/nQklfZWwLUXvO5",
+                                "bodyPart": "WAIST",
+                                "targetMuscle": "ABS",
+                                "equipment": "BODY_WEIGHT",
+                                "instructions": [
+                                    "Lie flat on your back with your knees bent and feet flat on the ground.",
+                                    "Place your hands behind your head with your elbows pointing outwards.",
+                                    "Engaging your abs, slowly lift your upper body off the ground, curling forward until your torso is at a 45-degree angle.",
+                                    "Pause for a moment at the top, then slowly lower your upper body back down to the starting position.",
+                                    "Repeat for the desired number of repetitions."
+                                ],
+                                "secondaryMuscles": [
+                                    "HIP_FLEXORS",
+                                    "LOWER_BACK"
+                                ]
+                            },
+                            "repetitions": 12,
+                            "sets": 3
+                        }
+                    ]
+                },
+                {
+                    "id": 27,
+                    "name": "Workout 2: Lower Body Strength",
+                    "workoutNumber": 2,
+                    "workoutExercises": [
+                        {
+                            "id": 53,
+                            "exerciseNumber": 1,
+                            "exercise": {
+                                "id": 6,
+                                "name": "alternate heel touchers",
+                                "gifUrl": "https://v2.exercisedb.io/image/oEDks76vGn0yTF",
+                                "bodyPart": "WAIST",
+                                "targetMuscle": "ABS",
+                                "equipment": "BODY_WEIGHT",
+                                "instructions": [
+                                    "Lie flat on your back with your knees bent and feet flat on the ground.",
+                                    "Extend your arms straight out to the sides, parallel to the ground.",
+                                    "Engaging your abs, lift your shoulders off the ground and reach your right hand towards your right heel.",
+                                    "Return to the starting position and repeat on the left side, reaching your left hand towards your left heel.",
+                                    "Continue alternating sides for the desired number of repetitions."
+                                ],
+                                "secondaryMuscles": [
+                                    "OBLIQUES"
+                                ]
+                            },
+                            "repetitions": 8,
+                            "sets": 4
+                        },
+                        {
+                            "id": 54,
+                            "exerciseNumber": 2,
+                            "exercise": {
+                                "id": 3,
+                                "name": "air bike",
+                                "gifUrl": "https://v2.exercisedb.io/image/RR9eTwaBWnpbJ8",
+                                "bodyPart": "WAIST",
+                                "targetMuscle": "ABS",
+                                "equipment": "BODY_WEIGHT",
+                                "instructions": [
+                                    "Lie flat on your back with your hands placed behind your head.",
+                                    "Lift your legs off the ground and bend your knees at a 90-degree angle.",
+                                    "Bring your right elbow towards your left knee while simultaneously straightening your right leg.",
+                                    "Return to the starting position and repeat the movement on the opposite side, bringing your left elbow towards your right knee while straightening your left leg.",
+                                    "Continue alternating sides in a pedaling motion for the desired number of repetitions."
+                                ],
+                                "secondaryMuscles": [
+                                    "HIP_FLEXORS"
+                                ]
+                            },
+                            "repetitions": 10,
+                            "sets": 4
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 17,
+            "weekNumber": 2,
+            "workouts": [
+                {
+                    "id": 28,
+                    "name": "Workout 3: Core and Stability",
+                    "workoutNumber": 1,
+                    "workoutExercises": [
+                        {
+                            "id": 55,
+                            "exerciseNumber": 1,
+                            "exercise": {
+                                "id": 3,
+                                "name": "air bike",
+                                "gifUrl": "https://v2.exercisedb.io/image/RR9eTwaBWnpbJ8",
+                                "bodyPart": "WAIST",
+                                "targetMuscle": "ABS",
+                                "equipment": "BODY_WEIGHT",
+                                "instructions": [
+                                    "Lie flat on your back with your hands placed behind your head.",
+                                    "Lift your legs off the ground and bend your knees at a 90-degree angle.",
+                                    "Bring your right elbow towards your left knee while simultaneously straightening your right leg.",
+                                    "Return to the starting position and repeat the movement on the opposite side, bringing your left elbow towards your right knee while straightening your left leg.",
+                                    "Continue alternating sides in a pedaling motion for the desired number of repetitions."
+                                ],
+                                "secondaryMuscles": [
+                                    "HIP_FLEXORS"
+                                ]
+                            },
+                            "repetitions": 15,
+                            "sets": 3
+                        },
+                        {
+                            "id": 56,
+                            "exerciseNumber": 2,
+                            "exercise": {
+                                "id": 6,
+                                "name": "alternate heel touchers",
+                                "gifUrl": "https://v2.exercisedb.io/image/oEDks76vGn0yTF",
+                                "bodyPart": "WAIST",
+                                "targetMuscle": "ABS",
+                                "equipment": "BODY_WEIGHT",
+                                "instructions": [
+                                    "Lie flat on your back with your knees bent and feet flat on the ground.",
+                                    "Extend your arms straight out to the sides, parallel to the ground.",
+                                    "Engaging your abs, lift your shoulders off the ground and reach your right hand towards your right heel.",
+                                    "Return to the starting position and repeat on the left side, reaching your left hand towards your left heel.",
+                                    "Continue alternating sides for the desired number of repetitions."
+                                ],
+                                "secondaryMuscles": [
+                                    "OBLIQUES"
+                                ]
+                            },
+                            "repetitions": 12,
+                            "sets": 3
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 18,
+            "weekNumber": 3,
+            "workouts": [
+                {
+                    "id": 29,
+                    "name": "Workout 4: Full Body Conditioning",
+                    "workoutNumber": 1,
+                    "workoutExercises": [
+                        {
+                            "id": 57,
+                            "exerciseNumber": 1,
+                            "exercise": {
+                                "id": 7,
+                                "name": "alternate lateral pulldown",
+                                "gifUrl": "https://v2.exercisedb.io/image/5K6Uanh2SAJddw",
+                                "bodyPart": "BACK",
+                                "targetMuscle": "LATS",
+                                "equipment": "CABLE",
+                                "instructions": [
+                                    "Sit on the cable machine with your back straight and feet flat on the ground.",
+                                    "Grasp the handles with an overhand grip, slightly wider than shoulder-width apart.",
+                                    "Lean back slightly and pull the handles towards your chest, squeezing your shoulder blades together.",
+                                    "Pause for a moment at the peak of the movement, then slowly release the handles back to the starting position.",
+                                    "Repeat for the desired number of repetitions."
+                                ],
+                                "secondaryMuscles": [
+                                    "BICEPS",
+                                    "RHOMBOIDS"
+                                ]
+                            },
+                            "repetitions": 12,
+                            "sets": 3
+                        },
+                        {
+                            "id": 58,
+                            "exerciseNumber": 2,
+                            "exercise": {
+                                "id": 6,
+                                "name": "alternate heel touchers",
+                                "gifUrl": "https://v2.exercisedb.io/image/oEDks76vGn0yTF",
+                                "bodyPart": "WAIST",
+                                "targetMuscle": "ABS",
+                                "equipment": "BODY_WEIGHT",
+                                "instructions": [
+                                    "Lie flat on your back with your knees bent and feet flat on the ground.",
+                                    "Extend your arms straight out to the sides, parallel to the ground.",
+                                    "Engaging your abs, lift your shoulders off the ground and reach your right hand towards your right heel.",
+                                    "Return to the starting position and repeat on the left side, reaching your left hand towards your left heel.",
+                                    "Continue alternating sides for the desired number of repetitions."
+                                ],
+                                "secondaryMuscles": [
+                                    "OBLIQUES"
+                                ]
+                            },
+                            "repetitions": 10,
+                            "sets": 4
+                        }
+                    ]
+                },
+                {
+                    "id": 30,
+                    "name": "Workout 5: Upper Body Conditioning",
+                    "workoutNumber": 2,
+                    "workoutExercises": [
+                        {
+                            "id": 59,
+                            "exerciseNumber": 1,
+                            "exercise": {
+                                "id": 9,
+                                "name": "assisted chest dip (kneeling)",
+                                "gifUrl": "https://v2.exercisedb.io/image/V0SgCK65wSBo84",
+                                "bodyPart": "CHEST",
+                                "targetMuscle": "PECTORALS",
+                                "equipment": "LEVERAGE_MACHINE",
+                                "instructions": [
+                                    "Adjust the machine to your desired height and secure your knees on the pad.",
+                                    "Grasp the handles with your palms facing down and your arms fully extended.",
+                                    "Lower your body by bending your elbows until your upper arms are parallel to the floor.",
+                                    "Pause for a moment, then push yourself back up to the starting position.",
+                                    "Repeat for the desired number of repetitions."
+                                ],
+                                "secondaryMuscles": [
+                                    "TRICEPS",
+                                    "SHOULDERS"
+                                ]
+                            },
+                            "repetitions": 10,
+                            "sets": 4
+                        },
+                        {
+                            "id": 60,
+                            "exerciseNumber": 2,
+                            "exercise": {
+                                "id": 10,
+                                "name": "assisted hanging knee raise with throw down",
+                                "gifUrl": "https://v2.exercisedb.io/image/s9eA2edjkfGPev",
+                                "bodyPart": "WAIST",
+                                "targetMuscle": "ABS",
+                                "equipment": "ASSISTED",
+                                "instructions": [
+                                    "Hang from a pull-up bar with your arms fully extended and your palms facing away from you.",
+                                    "Engage your core and lift your knees towards your chest, keeping your legs together.",
+                                    "Once your knees are at chest level, explosively throw your legs down towards the ground, extending them fully.",
+                                    "Allow your legs to swing back up and repeat the movement for the desired number of repetitions."
+                                ],
+                                "secondaryMuscles": [
+                                    "HIP_FLEXORS",
+                                    "LOWER_BACK"
+                                ]
+                            },
+                            "repetitions": 8,
+                            "sets": 3
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "participants": []
+}

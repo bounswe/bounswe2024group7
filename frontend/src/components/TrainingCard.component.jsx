@@ -1,100 +1,222 @@
 import React from 'react';
-import { StarIcon } from '@chakra-ui/icons';
+import { StarIcon, AtSignIcon } from '@chakra-ui/icons';
+import { Icon } from '@chakra-ui/react';
+import Detailed_Training_Modal from './Detailed_Training_Modal.components.jsx';
+import { useDisclosure } from '@chakra-ui/react';
+import data from "./mock_Data.json";
 
 const TrainingCard = () => {
-    const program = {
-        title: "Full Body Strength",
-        description: "A comprehensive workout plan to build strength and muscle.",
-        rating: 4,
-        type: "Strength Training",
-        level: "Intermediate",
-        weeks: [
-            { week: "Week 1", workouts: ["Squats", "Deadlifts", "Push-ups"], progress: 40 },
-            { week: "Week 2", workouts: ["Pull-ups", "Lunges", "Dips", "Bench Press"], progress: 30 },
-            { week: "Week 3", workouts: ["Squats", "Deadlifts", "Pull-ups"], progress: 50 },
-            { week: "Week 4", workouts: ["Leg Press", "Chest Fly", "Push-ups", "Planks"], progress: 20 },
-            { week: "Week 5", workouts: ["Squats", "Lunges", "Pull-ups", "Dips"], progress: 10 }
-        ],
-        trainer: "John Doe"
-    };
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const renderRatingStars = (rating) => {
-        return Array.from({ length: 5 }, (_, i) => (
-            <StarIcon
-                key={i}
-                className={`h-5 w-5 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                fill={i < rating ? 'currentColor' : 'none'}
-            />
-        ));
+        return (
+            <div className="flex items-center justify-center space-x-4">
+                <div className="flex items-center">
+                    {Array.from({ length: 5 }, (_, i) => (
+                        <StarIcon
+                            key={i}
+                            className={`h-4 w-4 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                            fill={i < rating ? 'currentColor' : 'none'}
+                        />
+                    ))}
+                    <span className="ml-2 text-sm text-gray-600">({rating}/5)</span>
+                </div>
+                <span className="text-sm text-gray-500">
+                    {data.ratingCount} ratings
+                </span>
+            </div>
+        );
     };
 
     const renderLevelTag = (level) => {
         const colorSchemes = {
-            "Beginner": "bg-green-100 text-green-800",
-            "Intermediate": "bg-orange-100 text-orange-800",
-            "Advanced": "bg-red-100 text-red-800"
+            "BEGINNER": "bg-green-50 text-green-600",
+            "INTERMEDIATE": "bg-orange-50 text-orange-600",
+            "ADVANCED": "bg-red-50 text-red-600"
         };
         return (
-            <span className={`px-2 py-1 rounded text-xs font-medium ${colorSchemes[level] || 'bg-gray-100 text-gray-800'}`}>
+            <span className={`
+                px-2 py-1 
+                rounded-full 
+                text-xs 
+                font-semibold 
+                inline-flex 
+                items-center 
+                ${colorSchemes[level.toUpperCase()] || 'bg-gray-100 text-gray-600'}
+            `}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 Level: {level}
             </span>
         );
     };
 
     return (
-        <div className="max-w-md mx-auto p-4 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold text-center mb-4">{program.title}</h1>
+        <div className="max-w-xl mx-auto p-4 bg-white shadow-lg rounded-lg text-sm">
+            {/* Title */}
+            <h1 className="
+                text-2xl 
+                font-extrabold 
+                text-center 
+                mb-6 
+                text-gray-800 
+                tracking-tight
+                text-[#805AD5]
+            ">
+                {data.title}
+            </h1>
 
-            {/* Tags */}
-            <div className="flex justify-center space-x-2 mb-4">
-                {renderLevelTag(program.level)}
-                <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
-                    Type: {program.type}
+            {/* Line Under Title */}
+            <hr className="mb-4 border-gray-300" />
+
+
+            <div className=" flex-wrap items-center space-x-2 space-y-2 mb-3">
+                {renderLevelTag(data.level)}
+
+                <span className="
+                    px-2 py-1 
+                    bg-blue-50 
+                    text-blue-600 
+                    rounded-full 
+                    text-xs 
+                    font-semibold 
+                    inline-flex 
+                    items-center
+                ">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                    Type: {data.type}
                 </span>
-                <div className="flex items-center px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-medium">
-                    <img
-                        src="/api/placeholder/24/24"
-                        alt={program.trainer}
-                        className="w-6 h-6 rounded-full mr-2"
-                    />
-                    {program.trainer}
-                </div>
+
+                <span className="
+                    px-2 py-1 
+                    bg-gray-50 
+                    text-gray-600 
+                    rounded-full 
+                    text-xs 
+                    font-semibold 
+                    inline-flex 
+                    items-center
+                ">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                    Created @ {data.createdAt.split('T')[0]}
+                </span>
+
+                <span className="
+                    inline-flex 
+                    items-center 
+                    px-2 
+                    py-1
+                    bg-red-50 
+                    text-red-600 
+                    rounded-full 
+                    text-xs 
+                    font-semibold
+                ">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Trainer: {data.trainer}
+                </span>
+
+
             </div>
 
             {/* Description */}
-            <p className="text-center text-sm text-gray-600 mb-4">{program.description}</p>
+            <p className="
+                text-center 
+                text-xs 
+                text-gray-600 
+                mb-6 
+                max-w-2xl 
+                mx-auto 
+                leading-relaxed
+            ">
+                {data.description}
+            </p>
 
             {/* Rating */}
-            <div className="flex justify-center mb-4">
-                {renderRatingStars(program.rating)}
+            <div className="flex justify-center mb-6">
+                {renderRatingStars(data.rating)}
             </div>
 
-            {/* Weeks and Workouts Table */}
-            <table className="w-full mb-4 border-collapse">
-                <tbody>
-                    {program.weeks.map((week, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
-                            <td className="border p-2">{week.week}</td>
-                            <td className="border p-2">{week.workouts.join(", ")}</td>
-                            <td className="border p-2 text-right">
-                                <button className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600">
-                                    Start
-                                </button>
-                            </td>
-                            <td className="border p-2 text-center">
-                                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100">
-                                    <span className="text-green-600 font-bold">{week.progress}%</span>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {/* Weeks Table and Commit Button - Unchanged */}
+            <div className="bg-white shadow-md rounded-lg overflow-hidden mb-4">
+                <table className="w-full">
+                    <tbody>
+                        {data.weeks.map((week, index) => (
+                            <React.Fragment key={index}>
+                                <tr className="transition-colors duration-200 hover:bg-blue-50 border-b border-gray-200">
+                                    <td className="p-4">
+                                        <h2 className="text-sm font-semibold text-gray-800">
+                                            Week {week.weekNumber || index + 1}
+                                        </h2>
+                                        <p className="text-xs text-gray-500">
+                                            {week.workouts ? week.workouts.length : 0} Workouts
+                                        </p>
+                                    </td>
+                                    <td className="p-4">
+                                        <button className="
+                                            px-3 py-1.5 
+                                            bg-gradient-to-r from-blue-500 to-blue-600 
+                                            text-white 
+                                            rounded-full 
+                                            shadow-md 
+                                            hover:shadow-lg 
+                                            transform hover:-translate-y-0.5 
+                                            transition-all 
+                                            duration-300 
+                                            focus:outline-none 
+                                            focus:ring-2 
+                                            focus:ring-blue-400 
+                                            focus:ring-opacity-50
+                                            text-xs
+                                        ">
+                                            Start Workout
+                                        </button>
+                                    </td>
+                                    <td className="p-4 text-center">
+                                        <div className="
+                                            w-12 
+                                            h-12 
+                                            rounded-full 
+                                            bg-green-100 
+                                            flex 
+                                            items-center 
+                                            justify-center 
+                                            mx-auto 
+                                            shadow-inner
+                                        ">
+                                            <span className="
+                                                text-green-600 
+                                                font-bold 
+                                                text-sm
+                                            ">
+                                                0%
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </React.Fragment>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {/* Commit to Program Button */}
-            <button className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition-colors">
+            <button className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors text-sm mb-4">
                 Commit to Program
             </button>
+
+            {/* Show Detailed Description Button */}
+            <button onClick={onOpen} className="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors text-sm">
+                Show Detailed Description
+            </button>
+            <Detailed_Training_Modal isOpen={isOpen} onClose={onClose} />
         </div>
     );
 };
