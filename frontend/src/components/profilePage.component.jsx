@@ -18,6 +18,7 @@ import { PostContext } from "../context/PostContext";
 import PostFeedCard from "./PostFeedCard.component.jsx";
 import ProgramFeedCard from "./ProgramFeedCard.component.jsx";
 import ProgressBoard from "./ProgressBoard.component.jsx";
+import ProgressGraph from "./ProgressGraph.component.jsx";
 
 export default function ProfilePage() {
     const username = useSelector(userName);
@@ -135,7 +136,7 @@ export default function ProfilePage() {
                     {view === 'MyProgress' && user.role === 'TRAINEE' && (
                         <Box width="100%" maxW="800px">
                             {user.joinedPrograms && user.joinedPrograms.length > 0 ? (
-                                <ProgressBoard />
+                                <ProgressGraph />
                             ) : (
                                 <Text color="gray.500" textAlign="center">No joined programs</Text>
                             )}

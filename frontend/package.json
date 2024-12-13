@@ -14,7 +14,7 @@
     "template"
   ],
   "scripts": {
-  "test:watch": "jest --watch",
+    "test:watch": "jest --watch",
     "dev": "vite",
     "build": "vite build --emptyOutDir",
     "serve": "vite preview",
@@ -36,11 +36,13 @@
     "@tanstack/router-vite-plugin": "^1.30.0",
     "@vitejs/plugin-react": "^2.0.1",
     "axios": "^1.6.8",
+    "chart.js": "^4.4.7",
     "framer-motion": "^11.11.17",
     "js-cookie": "^3.0.5",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-body-highlighter": "^2.0.5",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^3.1.4",
     "react-lazy-load": "^4.0.1",
@@ -92,6 +94,5 @@
     "tailwindcss": "^3.1.8",
     "typescript": "^4.8.2",
     "webpack": "^5.74.0"
-
   }
 }
