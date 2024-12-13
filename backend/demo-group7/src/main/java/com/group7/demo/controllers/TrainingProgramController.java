@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -88,4 +89,13 @@ public class TrainingProgramController {
         TrainingProgramWithTrackingResponse response = trainingProgramService.completeExercise(programId, workoutExerciseId, request, completedSets);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{programId}/completion-rates")
+    public ResponseEntity<Map<Long, Double>> getCompletionRates(@PathVariable Long programId) {
+        Map<Long, Double> completionRates = trainingProgramService.getCompletionRatesForProgram(programId);
+        return ResponseEntity.ok(completionRates);
+    }
+
+
+
 }
