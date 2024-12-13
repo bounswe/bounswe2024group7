@@ -1,4 +1,4 @@
-package com.group7.demo.models;
+package com.group7.demo.models.enums;
 
 public enum Role {
     TRAINEE,
