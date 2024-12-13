@@ -9,9 +9,8 @@ import java.util.List;
 @Data
 @Builder
 public class SurveyResponse {
-
     private Long id;
     private String username;
     private List<String> fitnessGoals; // List of tag names
-    private ProgramLevel fitnessLevel;
+    private String fitnessLevel; // Beginner, Intermediate, Advanced
 }
