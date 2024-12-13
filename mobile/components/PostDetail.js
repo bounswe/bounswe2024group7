@@ -9,10 +9,15 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // For icons
+import { useSelector } from 'react-redux';
+import { userName, userProfile, userSessionToken } from '../user.js';
+import { useQuery } from "@tanstack/react-query"
+import apiInstance from '../Api';
+import Toast from 'react-native-toast-message';
 
 const PostDetail = ({route}) => {
   // Post data
-  const {title, description, owner, date, likeCount, commentList, navigation} = route.params;
+  const {title, description, owner, post_id, date, likeCount, liked, commentList, navigation} = route.params;
   const [likes, setLikes] = useState(likeCount);
   /*const [comments, setComments] = useState([
     { id: '1', user: 'jshine1337', text: 'Nope, that’s not a concept...' },
@@ -21,7 +26,11 @@ const PostDetail = ({route}) => {
   const [comments, setComments] = useState(commentList)
   const [newComment, setNewComment] = useState('');
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(liked);
+  const username = useSelector(userName);
+  const sessionToken = useSelector(userSessionToken);
+  console.log(sessionToken);
+  const profile = useSelector(userProfile);
   const handleLike = () => {
   isLiked?setLikes(likes-1):setLikes(likes + 1);
   setIsLiked(!isLiked);
@@ -34,69 +43,179 @@ const PostDetail = ({route}) => {
     }
   };
 
- /* return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.postContainer}>
-        <Text style={styles.title}>Help with Trigger: Executing Action Only After All Inserts Are Complete</Text>
-        <View style={styles.tagContainer}>
-          <Text style={styles.tag}>SQL Server</Text>
-        </View>
-        <Text style={styles.postDescription}>
-          Hi all, I'm losing my mind trying to figure this out, and any help would be greatly appreciated!{'\n\n'}
-          I'm working on configuring an AFTER INSERT trigger on a table "A"...{'\n\n'}
-          Thanks in advance for any guidance or suggestions!
-        </Text>
-      </View>
+  /*const {
+        data: ownFollowingData,
+        isFetching: ownFollowingIsFetching,
+        isLoading: ownFollowingIsLoading,
+      } = useQuery({
+        queryKey: ['ownfollowing'],
+        queryFn: async () => {
+            try {
+                const response = await apiInstance(sessionToken).get(`api/user/${ownUsername}/following`)
+
+                return response.data
+            } catch (error) {
+                return []
+            }
+        },
+        refetchOnWindowFocus: false
+      })
+      useEffect(() => {
+        if (ownFollowingData && !ownFollowingIsFetching) {
+          ownFollowingData.includes(username)?setIsFollowing(true):setIsFollowing(false);
+        }
 
 
-      <View style={styles.interactionContainer}>
-        <TouchableOpacity style={styles.interactionButton} onPress={handleLike}>
-          <Icon name="heart" size={20} color="#FF4500" />
-          <Text style={styles.interactionText}>{likes} Likes</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.interactionButton}>
-          <Icon name="chatbubble-ellipses" size={20} color="#1E90FF" />
-          <Text style={styles.interactionText}>{comments.length} Comments</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.interactionButton}
-          onPress={() => setIsBookmarked(!isBookmarked)}
-        >
-          <Icon name={isBookmarked ? 'bookmark' : 'bookmark-outline'} size={20} color="#FFD700" />
-          <Text style={styles.interactionText}>Bookmark</Text>
-        </TouchableOpacity>
-      </View>
+      }, [ownFollowingData, ownFollowingIsFetching]);*/
+
+ const handleLikeToggle = async() => {
+       const response = await apiInstance(sessionToken).post(`api/posts/${post_id}/like`, {
+
+         })
+           console.log(response)
+
+         if (response.status === 200) {
+
+           Toast.show({
+             type: 'success',
+             position: 'bottom',
+             text1: 'Post Liked',
+             text2: 'Post liked successfully.',
+             visibilityTime: 3000,
+             autoHide: true,
+             topOffset: 30,
+             bottomOffset: 40
+           });
+           //goHome();
+
+           //Cookies.set("username", username)
+       } else {
+         Toast.show({
+           type: 'error',
+           position: 'bottom',
+           text1: 'Like Error',
+           text2: 'There was an error liking the post. Please try again.',
+           visibilityTime: 2000,
+           autoHide: true,
+           topOffset: 30,
+           bottomOffset: 40
+         });
+       }
+       setIsLiked(true);
+       setLikes(likes+1);
+
+     };
+     const handleUnlikeToggle = async() => {
+            const response = await apiInstance(sessionToken).delete(`api/posts/${post_id}/like`, {
+
+              })
+                console.log(response)
+
+              if (response.status === 200) {
+
+                Toast.show({
+                  type: 'success',
+                  position: 'bottom',
+                  text1: 'Post Unliked',
+                  text2: 'Post Unliked successfully.',
+                  visibilityTime: 3000,
+                  autoHide: true,
+                  topOffset: 30,
+                  bottomOffset: 40
+                });
+                //goHome();
+
+                //Cookies.set("username", username)
+            } else {
+              Toast.show({
+                type: 'error',
+                position: 'bottom',
+                text1: 'Unlike Error',
+                text2: 'There was an error unliking the post. Please try again.',
+                visibilityTime: 2000,
+                autoHide: true,
+                topOffset: 30,
+                bottomOffset: 40
+              });
+            }
+            setIsLiked(false);
+            setLikes(likes-1);
+
+          };
+          const handleBookmarkToggle = async() => {
+                 const response = await apiInstance(sessionToken).post(`api/posts/${post_id}/bookmark`, {
+
+                   })
+                     console.log(response)
+
+                   if (response.status === 200) {
+
+                     Toast.show({
+                       type: 'success',
+                       position: 'bottom',
+                       text1: 'Post Bookmarked',
+                       text2: 'Post bookmarked successfully.',
+                       visibilityTime: 3000,
+                       autoHide: true,
+                       topOffset: 30,
+                       bottomOffset: 40
+                     });
+                     //goHome();
+
+                     //Cookies.set("username", username)
+                 } else {
+                   Toast.show({
+                     type: 'error',
+                     position: 'bottom',
+                     text1: 'Bookmark Error',
+                     text2: 'There was an error bookmarking the post. Please try again.',
+                     visibilityTime: 2000,
+                     autoHide: true,
+                     topOffset: 30,
+                     bottomOffset: 40
+                   });
+                 }
+                 setIsBookmarked(true);
+
+               };
+               const handleUnbookmarkToggle = async() => {
+                      const response = await apiInstance(sessionToken).delete(`api/posts/${post_id}/bookmark`, {
+
+                        })
+                          console.log(response)
+
+                        if (response.status === 200) {
+
+                          Toast.show({
+                            type: 'success',
+                            position: 'bottom',
+                            text1: 'Post Unbookmarked',
+                            text2: 'Post Unbookmarked successfully.',
+                            visibilityTime: 3000,
+                            autoHide: true,
+                            topOffset: 30,
+                            bottomOffset: 40
+                          });
+                          //goHome();
+
+                          //Cookies.set("username", username)
+                      } else {
+                        Toast.show({
+                          type: 'error',
+                          position: 'bottom',
+                          text1: 'Unbookmark Error',
+                          text2: 'There was an error unbookmarking the post. Please try again.',
+                          visibilityTime: 2000,
+                          autoHide: true,
+                          topOffset: 30,
+                          bottomOffset: 40
+                        });
+                      }
+                      setIsBookmarked(false);
+
+                    };
 
 
-      <View style={styles.commentsSection}>
-        <Text style={styles.commentsTitle}>Comments</Text>
-        <FlatList
-          data={comments}
-          nestedScrollEnable
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.commentItem}>
-              <Text style={styles.commentUser}>{item.user}</Text>
-              <Text style={styles.commentText}>{item.text}</Text>
-            </View>
-          )}
-        />
-      </View>
-
-
-      <View style={styles.commentInputContainer}>
-        <TextInput
-          style={styles.commentInput}
-          placeholder="Write a comment..."
-          value={newComment}
-          onChangeText={setNewComment}
-        />
-        <TouchableOpacity style={styles.submitButton} onPress={handleCommentSubmit}>
-          <Icon name="send" size={20} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
-  ); */
 
   return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -110,7 +229,7 @@ const PostDetail = ({route}) => {
                       <Text style={styles.owner}>{owner}</Text>
           </View>
           <View style={styles.tagContainer}>
-            <Text style={styles.tag}>SQL Server</Text>
+            <Text style={styles.tag}>Bodybuilding</Text>
           </View>
           <Text style={styles.postDescription}>
             {description}
@@ -119,7 +238,7 @@ const PostDetail = ({route}) => {
 
         {/* Interaction Buttons */}
         <View style={styles.interactionContainer}>
-          <TouchableOpacity style={styles.interactionButton} onPress={handleLike}>
+          <TouchableOpacity style={styles.interactionButton} onPress={isLiked?handleUnlikeToggle:handleLikeToggle}>
             <Icon name="heart" size={20} color="#FF4500" />
             <Text style={styles.interactionText}>{likes} Likes</Text>
           </TouchableOpacity>
@@ -129,7 +248,7 @@ const PostDetail = ({route}) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.interactionButton}
-            onPress={() => setIsBookmarked(!isBookmarked)}
+            onPress={() => {isBookmarked?handleUnbookmarkToggle:handleBookmarkToggle}}
           >
             <Icon name={isBookmarked ? 'bookmark' : 'bookmark-outline'} size={20} color="#FFD700" />
             <Text style={styles.interactionText}>Bookmark</Text>

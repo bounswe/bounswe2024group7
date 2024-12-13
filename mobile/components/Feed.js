@@ -199,6 +199,7 @@ const FeedPage = ({ darkMode }) => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <PostCard
+            post_id={item.id}
             title={item.title}
             owner={item.username}
             description={item.content}

@@ -57,7 +57,7 @@ useEffect(() => {
               password
           }
       )
-
+      console.log("Login response: "+response)
       if (response.status === 200) {
 
           const token = response.data.sessionToken;
