@@ -59,7 +59,9 @@ const WorkoutCard = () => {
                                         </p>
                                     </td>
                                     <td className="p-4">
-                                        <button className="
+                                        <button
+                                            onClick={onOpen}
+                                            className="
                                             px-4 py-2.5 
                                             bg-gradient-to-r from-blue-500 to-blue-600 
                                             text-white 
@@ -112,10 +114,10 @@ const WorkoutCard = () => {
             </button>
 
             {/* Show Detailed Description Button */}
-            <button onClick={onOpen} className="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors text-sm">
+            <button className="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors text-sm">
                 Show Detailed Description
             </button>
-            <Detailed_Ex_Modal isOpen={isOpen} onClose={onClose} data={data} weekID={16} workoutID={26} excersizeID={51} />
+            <Detailed_Ex_Modal isOpen={isOpen} onClose={onClose} data={data} weekID={16} workoutID={26} excersizeID={52} />
         </div>
     );
 };
