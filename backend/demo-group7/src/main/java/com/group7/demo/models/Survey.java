@@ -1,9 +1,13 @@
 package com.group7.demo.models;
 
+import com.group7.demo.models.enums.ProgramLevel;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Entity
+@Table(name = "surveys")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -19,15 +23,16 @@ public class Survey {
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // Link the survey to a user
 
-    @Column(nullable = false)
-    private String fitnessGoal; // e.g., Weight Loss, Muscle Building
+    @ManyToMany
+    @JoinTable(
+            name = "survey_tags",
+            joinColumns = @JoinColumn(name = "survey_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> fitnessGoals; // Tags associated with the survey
 
     @Column(nullable = false)
-    private String fitnessLevel; // e.g., Beginner, Intermediate, Advanced
+    private ProgramLevel fitnessLevel; // e.g., Beginner, Intermediate, Advanced
 
-    @Column(nullable = false)
-    private String workoutPreference; // e.g., Gym, Home, Outdoor
 
-    @Column(nullable = true)
-    private String availability; // e.g., Weekdays, Weekends, Morning, Evening
 }
