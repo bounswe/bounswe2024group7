@@ -1,6 +1,7 @@
 package com.group7.demo.controllers;
 
 import com.group7.demo.dtos.FeedbackRequest;
+import com.group7.demo.dtos.FeedbackResponse;
 import com.group7.demo.models.Feedback;
 import com.group7.demo.services.FeedbackService;
 import org.springframework.http.ResponseEntity;
@@ -19,20 +20,20 @@ public class FeedbackController {
     }
 
     @PostMapping
-    public ResponseEntity<Feedback> addFeedback(@RequestBody FeedbackRequest request) {
-        Feedback feedback = feedbackService.addFeedback(request);
-        return ResponseEntity.ok(feedback);
+    public ResponseEntity<FeedbackResponse> addFeedback(@RequestBody FeedbackRequest request) {
+        FeedbackResponse response = feedbackService.addFeedback(request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/training-program/{id}")
-    public ResponseEntity<List<Feedback>> getFeedbackForTrainingProgram(@PathVariable Long id) {
-        List<Feedback> feedbackList = feedbackService.getFeedbackForTrainingProgram(id);
+    public ResponseEntity<List<FeedbackResponse>> getFeedbackForTrainingProgram(@PathVariable Long id) {
+        List<FeedbackResponse> feedbackList = feedbackService.getFeedbackForTrainingProgram(id);
         return ResponseEntity.ok(feedbackList);
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<Feedback>> getFeedbackForUser(@PathVariable Long id) {
-        List<Feedback> feedbackList = feedbackService.getFeedbackForUser(id);
+    public ResponseEntity<List<FeedbackResponse>> getFeedbackForUser(@PathVariable Long id) {
+        List<FeedbackResponse> feedbackList = feedbackService.getFeedbackForUser(id);
         return ResponseEntity.ok(feedbackList);
     }
 }

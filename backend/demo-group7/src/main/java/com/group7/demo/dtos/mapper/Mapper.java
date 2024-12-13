@@ -156,4 +156,22 @@ public class Mapper {
                 .completedSets(workoutExerciseWithTracking.getCompletedSets())
                 .build();
     }
+
+
+    public FeedbackResponse mapToFeedbackResponse(Feedback feedback) {
+        return FeedbackResponse.builder()
+                .id(feedback.getId())
+                .trainingProgramTitle(feedback.getTrainingProgram().getTitle()) // Map training program title
+                .username(feedback.getUser().getUsername()) // Map user's username
+                .bodyPart(feedback.getBodyPart()) // Map body part
+                .weekNumber(feedback.getWeekNumber()) // Map week number
+                .workoutNumber(feedback.getWorkoutNumber()) // Map workout number
+                .exerciseNumber(feedback.getExerciseNumber()) // Map exercise number
+                .feedbackText(feedback.getFeedbackText()) // Map feedback text
+                .createdAt(feedback.getCreatedAt()) // Map creation timestamp
+                .build();
+    }
+
+
+
 }

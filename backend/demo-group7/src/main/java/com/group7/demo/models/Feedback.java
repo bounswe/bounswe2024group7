@@ -1,5 +1,6 @@
 package com.group7.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.group7.demo.models.enums.BodyPart;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,7 @@ public class Feedback {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"followers", "following", "posts"})
     private User user;
 
     @Enumerated(EnumType.STRING)
