@@ -1,20 +1,30 @@
-import React from 'react';
-import { StarIcon, AtSignIcon } from '@chakra-ui/icons';
-import { Icon } from '@chakra-ui/react';
-import Detailed_Ex_Modal from './Detailed_Ex_Modal.components.jsx';
+import React, { useState } from 'react';
 import { useDisclosure } from '@chakra-ui/react';
+import Detailed_Ex_Modal from './Detailed_Ex_Modal.components.jsx';
+import Detailed_Workout_Modal from './Detailed_Workout_Modal.components.jsx';
 import data from "./mock_Data.json";
 
-
 const WorkoutCard = () => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isExerciseModalOpen,
+        onOpen: onExerciseModalOpen,
+        onClose: onExerciseModalClose
+    } = useDisclosure();
+
+    const {
+        isOpen: isWeekModalOpen,
+        onOpen: onWeekModalOpen,
+        onClose: onWeekModalClose
+    } = useDisclosure();
+
     const getWorkoutByNumber = (weekNumber, workoutNumber) => {
         return (data.weeks.find(week => week.weekNumber === weekNumber)).workouts.find(workout => workout.workoutNumber === workoutNumber);
     };
-    // assumed week number 1 workout1
+
     const weekNumber = 1;
     const workoutNumber = 1;
     const current_workout = getWorkoutByNumber(weekNumber, workoutNumber);
+
     return (
         <div className="w-full max-w-[40%] mx-auto p-4 bg-white shadow-lg rounded-lg text-sm">
             {/* Title */}
@@ -60,7 +70,7 @@ const WorkoutCard = () => {
                                     </td>
                                     <td className="p-4">
                                         <button
-                                            onClick={onOpen}
+                                            onClick={onExerciseModalOpen}
                                             className="
                                             px-4 py-2.5 
                                             bg-gradient-to-r from-blue-500 to-blue-600 
@@ -114,10 +124,29 @@ const WorkoutCard = () => {
             </button>
 
             {/* Show Detailed Description Button */}
-            <button className="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors text-sm">
+            <button
+                onClick={onWeekModalOpen}
+                className="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors text-sm">
                 Show Detailed Description
             </button>
-            <Detailed_Ex_Modal isOpen={isOpen} onClose={onClose} data={data} weekID={16} workoutID={26} excersizeID={52} />
+
+            {/* Modals */}
+            <Detailed_Ex_Modal
+                isOpen={isExerciseModalOpen}
+                onClose={onExerciseModalClose}
+                data={data}
+                weekID={16}
+                workoutID={26}
+                excersizeID={52}
+            />
+            <Detailed_Workout_Modal
+                isOpen={isWeekModalOpen}
+                onClose={onWeekModalClose}
+                data={data}
+                weekNumber={1}
+                workoutNumber={1}
+
+            />
         </div>
     );
 };
