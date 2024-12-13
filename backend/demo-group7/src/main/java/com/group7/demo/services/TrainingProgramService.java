@@ -51,30 +51,62 @@ public class TrainingProgramService {
                 .title(trainingProgramRequest.getTitle())
                 .description(trainingProgramRequest.getDescription())
                 .trainer(user)
-                .createdAt(LocalDateTime.now())
+                .type(trainingProgramRequest.getType())
+                .level(trainingProgramRequest.getLevel())
+                .interval(trainingProgramRequest.getInterval())
+                .rating(0.0)
+                .ratingCount(0)
                 .build();
 
-        List<TrainingProgramExercise> exercises = trainingProgramRequest.getExercises().stream()
-                .map(exerciseRequest -> {
-                    // Fetch the exercise from the database (assuming exerciseId is unique)
-                    Exercise exercise = exerciseRepository.findById(exerciseRequest.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("Exercise not found with id: " + exerciseRequest.getId()));
+        // Create the weeks and workouts
+        List<Week> weeks = trainingProgramRequest.getWeeks().stream()
+                .map(weekRequest -> {
+                    // Create the week entity
+                    Week week = Week.builder()
+                            .weekNumber(trainingProgramRequest.getWeeks().indexOf(weekRequest) + 1)
+                            .trainingProgram(trainingProgram)
+                            .build();
 
-                    // Create the TrainingProgramExercise entity
-                    TrainingProgramExercise trainingProgramExercise = new TrainingProgramExercise();
-                    trainingProgramExercise.setTrainingProgram(trainingProgram);  // Set the training program reference
-                    trainingProgramExercise.setExercise(exercise);  // Set the exercise reference
-                    trainingProgramExercise.setRepetitions(exerciseRequest.getRepetitions());  // Set repetitions
-                    trainingProgramExercise.setSets(exerciseRequest.getSets());  // Set sets
+                    // Create workouts for the week
+                    List<Workout> workouts = weekRequest.getWorkouts().stream()
+                            .map(workoutRequest -> {
+                                // Create the workout entity
+                                Workout workout = Workout.builder()
+                                        .name(workoutRequest.getName())
+                                        .workoutNumber(weekRequest.getWorkouts().indexOf(workoutRequest) + 1)
+                                        .week(week)
+                                        .build();
 
-                    return trainingProgramExercise;
+                                // Create exercises for the workout
+                                List<WorkoutExercise> workoutExercises = workoutRequest.getExercises().stream()
+                                        .map(exerciseRequest -> {
+                                            Exercise exercise = exerciseRepository.findById(exerciseRequest.getExerciseId())
+                                                    .orElseThrow(() -> new IllegalArgumentException("Exercise not found with id: " + exerciseRequest.getExerciseId()));
+
+                                            // Create the workout exercise entity
+                                            WorkoutExercise workoutExercise = WorkoutExercise.builder()
+                                                    .workout(workout)
+                                                    .exercise(exercise)
+                                                    .exerciseNumber(workoutRequest.getExercises().indexOf(exerciseRequest) + 1)
+                                                    .repetitions(exerciseRequest.getRepetitions())
+                                                    .sets(exerciseRequest.getSets())
+                                                    .build();
+                                            return workoutExercise;
+                                        })
+                                        .collect(Collectors.toList());
+
+                                workout.setExercises(workoutExercises); // Set exercises for the workout
+                                return workout;
+                            })
+                            .collect(Collectors.toList());
+
+                    week.setWorkouts(workouts); // Set workouts for the week
+                    return week;
                 })
                 .collect(Collectors.toList());
 
-        // Set the exercises for the training program
-        trainingProgram.setExercises(exercises);
+        trainingProgram.setWeeks(weeks); // Set weeks for the training program
 
-        // Save the training program and return a response
         TrainingProgram savedProgram = trainingProgramRepository.save(trainingProgram);
         return mapper.mapToTrainingProgramResponse(savedProgram);
     }
@@ -125,7 +157,7 @@ public class TrainingProgramService {
         // Delete the training program
         trainingProgramRepository.delete(trainingProgram);
     }
-
+    // TODO: This function will change
     @Transactional
     public UserTrainingProgramResponse joinTrainingProgram(Long trainingProgramId , HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
@@ -139,7 +171,7 @@ public class TrainingProgramService {
         if (hasOngoingProgram) {
             throw new IllegalStateException("User is already actively participating in this training program.");
         }
-
+        /*
         // Initialize the progress JSON object
         ObjectMapper objectMapper = new ObjectMapper();
         Map<Long, Boolean> exerciseProgress = trainingProgram.getExercises().stream()
@@ -154,14 +186,14 @@ public class TrainingProgramService {
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Failed to initialize exercise progress JSON", e);
         }
-
+        */
         // Create a new UserTrainingProgram entity
         UserTrainingProgram userTrainingProgram = UserTrainingProgram.builder()
                 .user(user)
                 .trainingProgram(trainingProgram)
                 .joinedAt(LocalDateTime.now())
                 .status(UserTrainingProgramStatus.ONGOING)
-                .exerciseProgress(progressJson)
+                //.exerciseProgress(progressJson)
                 .completedAt(null)
                 .build();
 
@@ -180,7 +212,7 @@ public class TrainingProgramService {
                 .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
                 .collect(Collectors.toSet());
     }
-
+    // TODO: This function will change
     // Return the list of joined training programs for the authenticated user
     @Transactional
     public List<UserTrainingProgramResponse> getJoinedTrainingPrograms(String username) throws Exception {
@@ -195,7 +227,7 @@ public class TrainingProgramService {
                 .map(mapper::mapToUserTrainingProgramResponse) // Map to UserTrainingProgramResponse instead of TrainingProgramResponse
                 .collect(Collectors.toList());
     }
-
+    // TODO: This function will change
     private UserTrainingProgram getOngoingUserTrainingProgram(User user, Long trainingProgramId) {
         List<UserTrainingProgram> ongoingPrograms = userTrainingProgramRepository.findByUserAndTrainingProgramIdAndStatus(user, trainingProgramId, UserTrainingProgramStatus.ONGOING);
 
@@ -207,7 +239,7 @@ public class TrainingProgramService {
         return ongoingPrograms.get(0);
 
     }
-
+    // TODO: This function will change
     @Transactional
     public UserTrainingProgramResponse markExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
@@ -233,7 +265,7 @@ public class TrainingProgramService {
     }
 
 
-
+    // TODO: This function will change
     @Transactional
     public UserTrainingProgramResponse unmarkExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
@@ -257,7 +289,7 @@ public class TrainingProgramService {
 
         return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
-
+    // TODO: This function will change
     @Transactional
     public UserTrainingProgramResponse markTrainingProgramAsCompleted(Long trainingProgramId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
@@ -270,7 +302,7 @@ public class TrainingProgramService {
 
         return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
     }
-
+    // TODO: This function will change
     @Transactional
     public UserTrainingProgramResponse leaveTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);

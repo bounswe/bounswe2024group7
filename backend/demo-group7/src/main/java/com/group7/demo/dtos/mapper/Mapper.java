@@ -40,11 +40,16 @@ public class Mapper {
                 .id(program.getId())
                 .title(program.getTitle())
                 .description(program.getDescription())
-                .trainerUsername(program.getTrainer().getUsername())
+                .trainer(program.getTrainer().getUsername())
+                .type(program.getType())
+                .level(program.getLevel())
+                .interval(program.getInterval())
+                .rating(program.getRating())
+                .ratingCount(program.getRatingCount())
                 .createdAt(program.getCreatedAt())
-                .exercises(program.getExercises().stream()
-                        .map(this::mapToExerciseDetailResponse)
-                        .sorted(Comparator.comparing(ExerciseDetail::getId))
+                .weeks(program.getWeeks().stream()
+                        .map(this::mapToWeekResponse)
+                        .sorted(Comparator.comparing(WeekResponse::getWeekNumber))
                         .collect(Collectors.toList()))
                 .participants(program.getParticipants() == null ?
                         Set.of() :
@@ -55,12 +60,36 @@ public class Mapper {
                 .build();
     }
 
-    public ExerciseDetail mapToExerciseDetailResponse(TrainingProgramExercise trainingProgramExercise) {
-        return ExerciseDetail.builder()
-                .id(trainingProgramExercise.getId())
-                .exercise(trainingProgramExercise.getExercise())
-                .repetitions(trainingProgramExercise.getRepetitions())
-                .sets(trainingProgramExercise.getSets())
+    public WeekResponse mapToWeekResponse(Week week) {
+        return WeekResponse.builder()
+                .id(week.getId())
+                .weekNumber(week.getWeekNumber())
+                .workouts(week.getWorkouts().stream()
+                        .map(this::mapToWorkoutResponse)
+                        .sorted(Comparator.comparing(WorkoutResponse::getWorkoutNumber))
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    public WorkoutResponse mapToWorkoutResponse(Workout workout) {
+        return WorkoutResponse.builder()
+                .id(workout.getId())
+                .name(workout.getName())
+                .workoutNumber(workout.getWorkoutNumber())
+                .workoutExercises(workout.getExercises().stream()
+                        .map(this::maptoWorkoutExerciseResponse)
+                        .sorted(Comparator.comparing(WorkoutExerciseResponse::getExerciseNumber))
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    public WorkoutExerciseResponse maptoWorkoutExerciseResponse(WorkoutExercise workoutExercise) {
+        return WorkoutExerciseResponse.builder()
+                .id(workoutExercise.getId())
+                .exerciseNumber(workoutExercise.getExerciseNumber())
+                .exercise(workoutExercise.getExercise())
+                .repetitions(workoutExercise.getRepetitions())
+                .sets(workoutExercise.getSets())
                 .build();
     }
 
@@ -69,7 +98,13 @@ public class Mapper {
         Map<Long, Boolean> completedExercises = userTrainingProgram.getExerciseProgress(); // Now returns Map<Long, Boolean>
 
         // Use the new mapper function for exercises
-        List<UserExerciseDetail> exerciseDetails = program.getExercises().stream()
+        List<UserExerciseDetail> exerciseDetails = program.getWeeks().stream()
+                .map(Week::getWorkouts)
+                .map(workouts -> workouts.stream()
+                        .map(Workout::getExercises)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList()))
+                .flatMap(List::stream)
                 .map(exercise -> mapToUserExerciseDetailResponse(exercise, completedExercises))
                 .sorted(Comparator.comparing(UserExerciseDetail::getId))
                 .collect(Collectors.toList());
@@ -90,7 +125,7 @@ public class Mapper {
                 .build();
     }
 
-    public UserExerciseDetail mapToUserExerciseDetailResponse(TrainingProgramExercise trainingProgramExercise, Map<Long, Boolean> completedExercises) {
+    public UserExerciseDetail mapToUserExerciseDetailResponse(WorkoutExercise trainingProgramExercise, Map<Long, Boolean> completedExercises) {
         return UserExerciseDetail.builder()
                 .id(trainingProgramExercise.getId())
                 .exercise(trainingProgramExercise.getExercise())
