@@ -1,15 +1,11 @@
 package com.group7.demo.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.group7.demo.dtos.*;
 import com.group7.demo.dtos.mapper.Mapper;
+import com.group7.demo.exceptions.UnauthorizedException;
 import com.group7.demo.models.*;
-import com.group7.demo.models.enums.UserTrainingProgramStatus;
-import com.group7.demo.repository.ExerciseRepository;
-import com.group7.demo.repository.TrainingProgramRepository;
-import com.group7.demo.repository.UserTrainingProgramRepository;
-import com.group7.demo.repository.UserRepository;
+import com.group7.demo.models.enums.TrainingProgramWithTrackingStatus;
+import com.group7.demo.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -17,8 +13,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,7 +26,10 @@ public class TrainingProgramService {
 
     private final AuthenticationService authenticationService;
 
-    private final UserTrainingProgramRepository userTrainingProgramRepository;
+    private final TrainingProgramWithTrackingRepository trainingProgramWithTrackingRepository;
+    private final WeekWithTrackingRepository weekWithTrackingRepository;
+    private final WorkoutWithTrackingRepository workoutWithTrackingRepository;
+    private final WorkoutExerciseWithTrackingRepository workoutExerciseWithTrackingRepository;
 
     private final UserRepository userRepository;
     private final UserService userService;
@@ -43,7 +42,7 @@ public class TrainingProgramService {
     public TrainingProgramResponse createTrainingProgram(TrainingProgramRequest trainingProgramRequest, HttpServletRequest request) throws IllegalAccessException {
         User user = authenticationService.getAuthenticatedUserInternal(request);
         if (!user.getRole().name().equals("TRAINER")) {
-            throw new IllegalAccessException("Only trainers can create training programs.");
+            throw new UnauthorizedException("Only trainers can create training programs.");
         }
 
         // Create the training program
@@ -95,7 +94,7 @@ public class TrainingProgramService {
                                         })
                                         .collect(Collectors.toList());
 
-                                workout.setExercises(workoutExercises); // Set exercises for the workout
+                                workout.setWorkoutExercises(workoutExercises); // Set exercises for the workout
                                 return workout;
                             })
                             .collect(Collectors.toList());
@@ -151,54 +150,91 @@ public class TrainingProgramService {
 
         User user = authenticationService.getAuthenticatedUserInternal(request);
         if (!trainingProgram.getTrainer().equals(user)) {
-            throw new IllegalAccessException("You can't delete a program you don't own");
+            throw new UnauthorizedException("You can't delete a program you don't own");
         }
 
         // Delete the training program
         trainingProgramRepository.delete(trainingProgram);
     }
-    // TODO: This function will change
+
     @Transactional
-    public UserTrainingProgramResponse joinTrainingProgram(Long trainingProgramId , HttpServletRequest request) {
+    public TrainingProgramWithTrackingResponse joinTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
         TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
                 .orElseThrow(() -> new EntityNotFoundException("Training Program not found with id: " + trainingProgramId));
 
-        // Check if the user is already actively participating in this training program
-        boolean hasOngoingProgram = userTrainingProgramRepository.existsByUserAndTrainingProgramIdAndStatus(user, trainingProgramId, UserTrainingProgramStatus.ONGOING);
+        // Check if the user is already actively participating in a training program of this type
+        boolean hasOngoingProgram = trainingProgramWithTrackingRepository.existsByUserAndTrainingProgram_TypeAndStatus(user, trainingProgram.getType(), TrainingProgramWithTrackingStatus.ONGOING);
 
         if (hasOngoingProgram) {
-            throw new IllegalStateException("User is already actively participating in this training program.");
+            throw new IllegalStateException("User can participate in at most one program of type " + trainingProgram.getType());
         }
-        /*
-        // Initialize the progress JSON object
-        ObjectMapper objectMapper = new ObjectMapper();
-        Map<Long, Boolean> exerciseProgress = trainingProgram.getExercises().stream()
-                .collect(Collectors.toMap(
-                        TrainingProgramExercise::getId, // Exercise ID
-                        TrainingProgramExercise -> false // Not completed yet
-                ));
 
-        String progressJson;
-        try {
-            progressJson = objectMapper.writeValueAsString(exerciseProgress);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Failed to initialize exercise progress JSON", e);
-        }
-        */
-        // Create a new UserTrainingProgram entity
-        UserTrainingProgram userTrainingProgram = UserTrainingProgram.builder()
+        // Create TrainingProgramWithTracking entity
+        TrainingProgramWithTracking trainingProgramWithTracking = TrainingProgramWithTracking.builder()
                 .user(user)
                 .trainingProgram(trainingProgram)
                 .joinedAt(LocalDateTime.now())
-                .status(UserTrainingProgramStatus.ONGOING)
-                //.exerciseProgress(progressJson)
+                .status(TrainingProgramWithTrackingStatus.ONGOING)
                 .completedAt(null)
                 .build();
 
-        // Save the UserTrainingProgram entity
-        return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
+        // Collect weeks
+        List<WeekWithTracking> weeksWithTracking = trainingProgram.getWeeks().stream()
+                .map(week -> {
+                    List<WorkoutWithTracking> workoutsWithTracking = new ArrayList<>();
+
+                    WeekWithTracking weekWithTracking = WeekWithTracking.builder()
+                            .trainingProgramWithTracking(trainingProgramWithTracking)
+                            .week(week)
+                            .completedAt(null)
+                            .workoutsWithTracking(workoutsWithTracking)
+                            .build();
+
+                    // Collect workouts for this week
+                    week.getWorkouts().forEach(workout -> {
+                        List<WorkoutExerciseWithTracking> exercisesWithTracking = new ArrayList<>();
+
+                        WorkoutWithTracking workoutWithTracking = WorkoutWithTracking.builder()
+                                .weekWithTracking(weekWithTracking)
+                                .workout(workout)
+                                .completedAt(null)
+                                .workoutExercisesWithTracking(exercisesWithTracking)
+                                .build();
+
+                        // Collect exercises for this workout
+                        workout.getWorkoutExercises().forEach(exercise -> {
+                            WorkoutExerciseWithTracking exerciseWithTracking = WorkoutExerciseWithTracking.builder()
+                                    .workoutWithTracking(workoutWithTracking)
+                                    .workoutExercise(exercise)
+                                    .completedAt(null)
+                                    .completedSetsJSON(null)
+                                    .build();
+
+                            exercisesWithTracking.add(exerciseWithTracking);
+                        });
+
+                        workoutsWithTracking.add(workoutWithTracking);
+                    });
+
+                    return weekWithTracking;
+                })
+                .collect(Collectors.toList());
+
+        trainingProgramWithTracking.setWeeksWithTracking(weeksWithTracking);
+        // Save all entities in batch
+        trainingProgramWithTrackingRepository.save(trainingProgramWithTracking);
+        weekWithTrackingRepository.saveAll(weeksWithTracking);
+        workoutWithTrackingRepository.saveAll(weeksWithTracking.stream()
+                .flatMap(week -> week.getWorkoutsWithTracking().stream())
+                .collect(Collectors.toList()));
+        workoutExerciseWithTrackingRepository.saveAll(weeksWithTracking.stream()
+                .flatMap(week -> week.getWorkoutsWithTracking().stream())
+                .flatMap(workout -> workout.getWorkoutExercisesWithTracking().stream())
+                .collect(Collectors.toList()));
+
+        return mapper.mapToTrainingProgramWithTrackingResponse(trainingProgramWithTracking);
     }
 
     @Transactional
@@ -209,112 +245,44 @@ public class TrainingProgramService {
 
         // Fetch the list of participants' usernames
         return trainingProgram.getParticipants().stream()
-                .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
+                .map(trainingProgramWithTracking -> trainingProgramWithTracking.getUser().getUsername())
                 .collect(Collectors.toSet());
     }
-    // TODO: This function will change
-    // Return the list of joined training programs for the authenticated user
+
     @Transactional
-    public List<UserTrainingProgramResponse> getJoinedTrainingPrograms(String username) throws Exception {
-        // Fetch the authenticated user
+    public List<TrainingProgramWithTrackingResponse> getJoinedTrainingPrograms(String username) {
         User user = userService.getUserByUsername(username);
 
         // Fetch the list of training programs the user has joined
-        List<UserTrainingProgram> userTrainingPrograms = userTrainingProgramRepository.findByUserAndStatusNot(user, UserTrainingProgramStatus.LEFT);
+        List<TrainingProgramWithTracking> trainingProgramsWithTracking = trainingProgramWithTrackingRepository.findByUserAndStatusNot(user, TrainingProgramWithTrackingStatus.LEFT);
 
-        // Map the list of UserTrainingProgram entities to UserTrainingProgramResponse DTOs
-        return userTrainingPrograms.stream()
-                .map(mapper::mapToUserTrainingProgramResponse) // Map to UserTrainingProgramResponse instead of TrainingProgramResponse
+        return trainingProgramsWithTracking.stream()
+                .map(mapper::mapToTrainingProgramWithTrackingResponse)
                 .collect(Collectors.toList());
     }
-    // TODO: This function will change
-    private UserTrainingProgram getOngoingUserTrainingProgram(User user, Long trainingProgramId) {
-        List<UserTrainingProgram> ongoingPrograms = userTrainingProgramRepository.findByUserAndTrainingProgramIdAndStatus(user, trainingProgramId, UserTrainingProgramStatus.ONGOING);
+
+    private TrainingProgramWithTracking getOngoingUserTrainingProgram(User user, Long trainingProgramId) {
+        List<TrainingProgramWithTracking> ongoingPrograms = trainingProgramWithTrackingRepository.findByUserAndTrainingProgramIdAndStatus(user, trainingProgramId, TrainingProgramWithTrackingStatus.ONGOING);
 
         if (ongoingPrograms.isEmpty()) {
             throw new IllegalStateException("No ongoing training program found.");
         }
 
-        // Return the first ongoing program if available
+        // This list can contain at most one element because of the joinTrainingProgram method
         return ongoingPrograms.get(0);
 
     }
-    // TODO: This function will change
+
     @Transactional
-    public UserTrainingProgramResponse markExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
+    public TrainingProgramWithTrackingResponse leaveTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
-        UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
-
-        // Get the current progress map
-        Map<Long, Boolean> exerciseProgress = userTrainingProgram.getExerciseProgress();
-
-        // Mark the exercise as completed
-        exerciseProgress.put(exerciseId, true);
-
-        // Serialize the updated exercise progress map back to JSON
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            String updatedProgressJson = objectMapper.writeValueAsString(exerciseProgress);
-            userTrainingProgram.setExerciseProgress(updatedProgressJson); // Save the updated JSON string
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to update exercise progress JSON", e);
-        }
-
-        return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
-    }
-
-
-    // TODO: This function will change
-    @Transactional
-    public UserTrainingProgramResponse unmarkExerciseAsCompleted(Long trainingProgramId, Long exerciseId, HttpServletRequest request) {
-        User user = authenticationService.getAuthenticatedUserInternal(request);
-
-        UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
-
-        // Get the current progress map from the serialized exerciseProgress
-        Map<Long, Boolean> exerciseProgress = userTrainingProgram.getExerciseProgress();
-
-        // Mark the exercise as incomplete (unmark)
-        exerciseProgress.put(exerciseId, false);
-
-        // Serialize the updated progress map back to JSON
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            String updatedProgressJson = objectMapper.writeValueAsString(exerciseProgress);
-            userTrainingProgram.setExerciseProgress(updatedProgressJson); // Save the updated JSON string
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to update exercise progress JSON", e);
-        }
-
-        return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
-    }
-    // TODO: This function will change
-    @Transactional
-    public UserTrainingProgramResponse markTrainingProgramAsCompleted(Long trainingProgramId, HttpServletRequest request) {
-        User user = authenticationService.getAuthenticatedUserInternal(request);
-
-        UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
-
-        // Mark the entire training program as completed
-        userTrainingProgram.setStatus(UserTrainingProgramStatus.COMPLETED);
-        userTrainingProgram.setCompletedAt(LocalDateTime.now());
-
-        return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
-    }
-    // TODO: This function will change
-    @Transactional
-    public UserTrainingProgramResponse leaveTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
-        User user = authenticationService.getAuthenticatedUserInternal(request);
-
-        UserTrainingProgram userTrainingProgram = getOngoingUserTrainingProgram(user, trainingProgramId);
-
-
+        TrainingProgramWithTracking trainingProgramWithTracking = getOngoingUserTrainingProgram(user, trainingProgramId);
         // Mark the training program as left
-        userTrainingProgram.setStatus(UserTrainingProgramStatus.LEFT);
-        userTrainingProgram.setCompletedAt(LocalDateTime.now());
+        trainingProgramWithTracking.setStatus(TrainingProgramWithTrackingStatus.LEFT);
+        trainingProgramWithTracking.setCompletedAt(LocalDateTime.now());
 
-        return mapper.mapToUserTrainingProgramResponse(userTrainingProgramRepository.save(userTrainingProgram));
+        return mapper.mapToTrainingProgramWithTrackingResponse(trainingProgramWithTrackingRepository.save(trainingProgramWithTracking));
     }
 
 }

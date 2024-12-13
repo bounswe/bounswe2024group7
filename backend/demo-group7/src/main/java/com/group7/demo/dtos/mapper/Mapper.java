@@ -2,15 +2,13 @@ package com.group7.demo.dtos.mapper;
 
 import com.group7.demo.dtos.*;
 import com.group7.demo.models.*;
-import com.group7.demo.models.enums.UserTrainingProgramStatus;
+import com.group7.demo.models.enums.TrainingProgramWithTrackingStatus;
 import com.group7.demo.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,13 +52,13 @@ public class Mapper {
                 .participants(program.getParticipants() == null ?
                         Set.of() :
                         program.getParticipants().stream()
-                                .filter(participant -> participant.getStatus() == UserTrainingProgramStatus.ONGOING)
-                                .map(userTrainingProgram -> userTrainingProgram.getUser().getUsername())
+                                .filter(participant -> participant.getStatus() == TrainingProgramWithTrackingStatus.ONGOING)
+                                .map(trainingProgramWithTracking -> trainingProgramWithTracking.getUser().getUsername())
                                 .collect(Collectors.toSet()))
                 .build();
     }
 
-    public WeekResponse mapToWeekResponse(Week week) {
+    private WeekResponse mapToWeekResponse(Week week) {
         return WeekResponse.builder()
                 .id(week.getId())
                 .weekNumber(week.getWeekNumber())
@@ -71,19 +69,19 @@ public class Mapper {
                 .build();
     }
 
-    public WorkoutResponse mapToWorkoutResponse(Workout workout) {
+    private WorkoutResponse mapToWorkoutResponse(Workout workout) {
         return WorkoutResponse.builder()
                 .id(workout.getId())
                 .name(workout.getName())
                 .workoutNumber(workout.getWorkoutNumber())
-                .workoutExercises(workout.getExercises().stream()
+                .workoutExercises(workout.getWorkoutExercises().stream()
                         .map(this::maptoWorkoutExerciseResponse)
                         .sorted(Comparator.comparing(WorkoutExerciseResponse::getExerciseNumber))
                         .collect(Collectors.toList()))
                 .build();
     }
 
-    public WorkoutExerciseResponse maptoWorkoutExerciseResponse(WorkoutExercise workoutExercise) {
+    private WorkoutExerciseResponse maptoWorkoutExerciseResponse(WorkoutExercise workoutExercise) {
         return WorkoutExerciseResponse.builder()
                 .id(workoutExercise.getId())
                 .exerciseNumber(workoutExercise.getExerciseNumber())
@@ -93,45 +91,69 @@ public class Mapper {
                 .build();
     }
 
-    public UserTrainingProgramResponse mapToUserTrainingProgramResponse(UserTrainingProgram userTrainingProgram) {
-        TrainingProgram program = userTrainingProgram.getTrainingProgram();
-        Map<Long, Boolean> completedExercises = userTrainingProgram.getExerciseProgress(); // Now returns Map<Long, Boolean>
-
-        // Use the new mapper function for exercises
-        List<UserExerciseDetail> exerciseDetails = program.getWeeks().stream()
-                .map(Week::getWorkouts)
-                .map(workouts -> workouts.stream()
-                        .map(Workout::getExercises)
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList()))
-                .flatMap(List::stream)
-                .map(exercise -> mapToUserExerciseDetailResponse(exercise, completedExercises))
-                .sorted(Comparator.comparing(UserExerciseDetail::getId))
-                .collect(Collectors.toList());
-
-        return UserTrainingProgramResponse.builder()
+    public TrainingProgramWithTrackingResponse mapToTrainingProgramWithTrackingResponse(TrainingProgramWithTracking trainingProgramWithTracking) {
+        TrainingProgram program = trainingProgramWithTracking.getTrainingProgram();
+        return TrainingProgramWithTrackingResponse.builder()
                 .id(program.getId())
                 .title(program.getTitle())
                 .description(program.getDescription())
-                .trainerUsername(program.getTrainer().getUsername())
-                .participants(program.getParticipants().stream()
-                        .filter(participant -> participant.getStatus() == UserTrainingProgramStatus.ONGOING)
-                        .map(participant -> participant.getUser().getUsername())
-                        .collect(Collectors.toSet()))
-                .exercises(exerciseDetails)
-                .status(userTrainingProgram.getStatus())
-                .joinedAt(userTrainingProgram.getJoinedAt())
-                .completedAt(userTrainingProgram.getCompletedAt())
+                .trainer(program.getTrainer().getUsername())
+                .type(program.getType())
+                .level(program.getLevel())
+                .interval(program.getInterval())
+                .rating(program.getRating())
+                .ratingCount(program.getRatingCount())
+                .createdAt(program.getCreatedAt())
+                .joinedAt(trainingProgramWithTracking.getJoinedAt())
+                .status(trainingProgramWithTracking.getStatus())
+                .completedAt(trainingProgramWithTracking.getCompletedAt())
+                .weeks(trainingProgramWithTracking.getWeeksWithTracking().stream()
+                        .map(this::mapToWeekWithTrackingResponse)
+                        .sorted(Comparator.comparing(WeekWithTrackingResponse::getWeekNumber))
+                        .collect(Collectors.toList()))
+                .participants(program.getParticipants() == null ?
+                        Set.of() :
+                        program.getParticipants().stream()
+                                .filter(participant -> participant.getStatus() == TrainingProgramWithTrackingStatus.ONGOING)
+                                .map(t -> trainingProgramWithTracking.getUser().getUsername())
+                                .collect(Collectors.toSet()))
                 .build();
     }
 
-    public UserExerciseDetail mapToUserExerciseDetailResponse(WorkoutExercise trainingProgramExercise, Map<Long, Boolean> completedExercises) {
-        return UserExerciseDetail.builder()
-                .id(trainingProgramExercise.getId())
-                .exercise(trainingProgramExercise.getExercise())
-                .repetitions(trainingProgramExercise.getRepetitions())
-                .sets(trainingProgramExercise.getSets())
-                .completed(completedExercises.getOrDefault(trainingProgramExercise.getId(), false)) // Use `getOrDefault` to handle missing keys
+    private WeekWithTrackingResponse mapToWeekWithTrackingResponse(WeekWithTracking weekWithTracking) {
+        return WeekWithTrackingResponse.builder()
+                .id(weekWithTracking.getWeek().getId())
+                .weekNumber(weekWithTracking.getWeek().getWeekNumber())
+                .completedAt(weekWithTracking.getCompletedAt())
+                .workouts(weekWithTracking.getWorkoutsWithTracking().stream()
+                        .map(this::mapToWorkoutWithTrackingResponse)
+                        .sorted(Comparator.comparing(WorkoutWithTrackingResponse::getWorkoutNumber))
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    private WorkoutWithTrackingResponse mapToWorkoutWithTrackingResponse(WorkoutWithTracking workoutWithTracking) {
+        return WorkoutWithTrackingResponse.builder()
+                .id(workoutWithTracking.getWorkout().getId())
+                .name(workoutWithTracking.getWorkout().getName())
+                .workoutNumber(workoutWithTracking.getWorkout().getWorkoutNumber())
+                .completedAt(workoutWithTracking.getCompletedAt())
+                .workoutExercises(workoutWithTracking.getWorkoutExercisesWithTracking().stream()
+                        .map(this::mapToWorkoutExerciseWithTracking)
+                        .sorted(Comparator.comparing(WorkoutExerciseWithTrackingResponse::getExerciseNumber))
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    private WorkoutExerciseWithTrackingResponse mapToWorkoutExerciseWithTracking(WorkoutExerciseWithTracking workoutExerciseWithTracking) {
+        return WorkoutExerciseWithTrackingResponse.builder()
+                .id(workoutExerciseWithTracking.getWorkoutExercise().getId())
+                .exerciseNumber(workoutExerciseWithTracking.getWorkoutExercise().getExerciseNumber())
+                .exercise(workoutExerciseWithTracking.getWorkoutExercise().getExercise())
+                .repetitions(workoutExerciseWithTracking.getWorkoutExercise().getRepetitions())
+                .sets(workoutExerciseWithTracking.getWorkoutExercise().getSets())
+                .completedAt(workoutExerciseWithTracking.getCompletedAt())
+                .completedSets(workoutExerciseWithTracking.getCompletedSets())
                 .build();
     }
 }
