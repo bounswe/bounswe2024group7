@@ -16,6 +16,10 @@ import Label from './components/Label';
 import SearchBar from './components/SearchBar';
 import SearchResult from './components/SearchResult';
 import ProgressTracker from './components/ProgressTracker';
+import WorkoutDetails from './components/WorkoutDetails';
+import JoinedWorkout from './components/JoinedWorkout';
+import JoinedWeek from './components/JoinedWeek';
+
 import { Provider as ReduxProvider } from 'react-redux';
 import {
   QueryClient,
@@ -69,6 +73,10 @@ const App = () => {
                 <Stack.Screen name="SearchBar" component={SearchBar} />
                 <Stack.Screen name="SearchResult" component={SearchResult} />
                 <Stack.Screen name="ProgressTracker" component={ProgressTracker} />
+                <Stack.Screen name="WorkoutDetails" component={WorkoutDetails} />
+                <Stack.Screen name="JoinedWeek" component={JoinedWeek} />
+                <Stack.Screen name="JoinedWorkout" component={JoinedWorkout} />
+
               </Stack.Navigator>
             </NavigationContainer>
           </AuthProvider>
