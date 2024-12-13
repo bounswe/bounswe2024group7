@@ -77,4 +77,15 @@ public class TrainingProgramController {
         List<TrainingProgramWithTrackingResponse> responses = trainingProgramService.getJoinedTrainingPrograms(username);
         return ResponseEntity.ok(responses);
     }
+
+    @PostMapping("/{programId}/workout-exercises/{workoutExerciseId}/complete")
+    public ResponseEntity<TrainingProgramWithTrackingResponse> completeExercise(
+            @PathVariable Long programId,
+            @PathVariable Long workoutExerciseId,
+            @RequestBody List<Integer> completedSets,
+            HttpServletRequest request)
+    {
+        TrainingProgramWithTrackingResponse response = trainingProgramService.completeExercise(programId, workoutExerciseId, request, completedSets);
+        return ResponseEntity.ok(response);
+    }
 }

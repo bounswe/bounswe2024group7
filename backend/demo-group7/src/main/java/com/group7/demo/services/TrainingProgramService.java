@@ -285,4 +285,78 @@ public class TrainingProgramService {
         return mapper.mapToTrainingProgramWithTrackingResponse(trainingProgramWithTrackingRepository.save(trainingProgramWithTracking));
     }
 
+    @Transactional
+    public TrainingProgramWithTrackingResponse completeExercise(Long trainingProgramId, Long workoutExerciseId, HttpServletRequest request, List<Integer> completedSets) {
+        // Get the authenticated user
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        // Retrieve the training program with tracking for the user
+        TrainingProgramWithTracking trainingProgramWithTracking = getOngoingUserTrainingProgram(user, trainingProgramId);
+
+        // Retrieve the WorkoutExerciseWithTracking entity
+        WorkoutExerciseWithTracking workoutExerciseWithTracking = workoutExerciseWithTrackingRepository
+                .findByWorkoutWithTracking_WeekWithTracking_TrainingProgramWithTrackingAndWorkoutExercise_Id(
+                        trainingProgramWithTracking, workoutExerciseId)
+                .orElseThrow(() -> new EntityNotFoundException("Workout exercise not found with the specified ID in the training program."));
+
+        // Check if the exercise is already completed
+        if (workoutExerciseWithTracking.getCompletedAt() != null) {
+            throw new IllegalStateException("This workout exercise has already been completed.");
+        }
+
+        if (completedSets.size() != workoutExerciseWithTracking.getWorkoutExercise().getSets()) {
+            throw new IllegalArgumentException("Number of completed sets does not match the required number of sets for the exercise.");
+        }
+
+        WorkoutWithTracking currentWorkout = getCurrentWorkout(trainingProgramWithTracking);
+        if (!currentWorkout.equals(workoutExerciseWithTracking.getWorkoutWithTracking())) {
+            throw new IllegalStateException("You can't complete this exercise without completing previous workouts.");
+        }
+
+        // Update completed sets and mark the exercise as completed
+        workoutExerciseWithTracking.setCompletedSets(completedSets);
+        workoutExerciseWithTracking.setCompletedAt(LocalDateTime.now());
+        workoutExerciseWithTrackingRepository.save(workoutExerciseWithTracking);
+
+        // Check if all exercises in the workout are completed, and update workout tracking
+        WorkoutWithTracking workoutWithTracking = workoutExerciseWithTracking.getWorkoutWithTracking();
+        boolean allExercisesCompleted = workoutWithTracking.getWorkoutExercisesWithTracking().stream()
+                .allMatch(exercise -> exercise.getCompletedAt() != null);
+
+        if (allExercisesCompleted && workoutWithTracking.getCompletedAt() == null) {
+            workoutWithTracking.setCompletedAt(LocalDateTime.now());
+            workoutWithTrackingRepository.save(workoutWithTracking);
+        }
+
+        // Check if all workouts in the week are completed, and update week tracking
+        WeekWithTracking weekWithTracking = workoutWithTracking.getWeekWithTracking();
+        boolean allWorkoutsCompleted = weekWithTracking.getWorkoutsWithTracking().stream()
+                .allMatch(workout -> workout.getCompletedAt() != null);
+
+        if (allWorkoutsCompleted && weekWithTracking.getCompletedAt() == null) {
+            weekWithTracking.setCompletedAt(LocalDateTime.now());
+            weekWithTrackingRepository.save(weekWithTracking);
+        }
+
+        // Check if all weeks in the program are completed, and update program tracking
+        boolean allWeeksCompleted = trainingProgramWithTracking.getWeeksWithTracking().stream()
+                .allMatch(week -> week.getCompletedAt() != null);
+
+        if (allWeeksCompleted && trainingProgramWithTracking.getCompletedAt() == null) {
+            trainingProgramWithTracking.setCompletedAt(LocalDateTime.now());
+            trainingProgramWithTracking.setStatus(TrainingProgramWithTrackingStatus.COMPLETED);
+            trainingProgramWithTrackingRepository.save(trainingProgramWithTracking);
+        }
+
+        return mapper.mapToTrainingProgramWithTrackingResponse(trainingProgramWithTracking);
+    }
+
+    private WorkoutWithTracking getCurrentWorkout(TrainingProgramWithTracking trainingProgramWithTracking) {
+        return trainingProgramWithTracking.getWeeksWithTracking().stream()
+                .filter(week -> week.getCompletedAt() == null)
+                .flatMap(week -> week.getWorkoutsWithTracking().stream())
+                .filter(workout -> workout.getCompletedAt() == null)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("All workouts are completed in the training program."));
+    }
 }
