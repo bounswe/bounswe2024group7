@@ -53,7 +53,7 @@ const TrainingCard = () => {
     };
 
     return (
-        <div className="max-w-xl mx-auto p-4 bg-white shadow-lg rounded-lg text-sm">
+        <div className="w-full max-w-[40%] mx-auto p-4 bg-white shadow-lg rounded-lg text-sm">
             {/* Title */}
             <h1 className="
                 text-2xl 

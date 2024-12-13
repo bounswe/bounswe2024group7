@@ -16,6 +16,7 @@ import { searchRoute } from './routes/search'
 import React from 'react'
 import { registerRoute } from './routes/register'
 import { weekRoute } from './routes/week'
+import { workoutRoute } from './routes/workout'
 import {
   QueryClient,
   QueryClientProvider
@@ -32,6 +33,7 @@ const routeTree = rootRoute.addChildren([
   programRoute,
   trainingRoute,
   weekRoute,
+  workoutRoute,
   progressRoute,
   progressTodayRoute,
   searchRoute

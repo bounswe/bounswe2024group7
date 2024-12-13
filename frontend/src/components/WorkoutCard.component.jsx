@@ -1,18 +1,20 @@
 import React from 'react';
 import { StarIcon, AtSignIcon } from '@chakra-ui/icons';
 import { Icon } from '@chakra-ui/react';
-import Detailed_Week_Modal from './Detailed_Week_Modal.components.jsx';
+import Detailed_Ex_Modal from './Detailed_Ex_Modal.components.jsx';
 import { useDisclosure } from '@chakra-ui/react';
 import data from "./mock_Data.json";
 
-// assumed week number 1
-const WeekCard = () => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const getWeekByNumber = (weekNumber) => {
-        return data.weeks.find(week => week.weekNumber === weekNumber);
-    };
 
-    const current_week = getWeekByNumber(1);
+const WorkoutCard = () => {
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const getWorkoutByNumber = (weekNumber, workoutNumber) => {
+        return (data.weeks.find(week => week.weekNumber === weekNumber)).workouts.find(workout => workout.workoutNumber === workoutNumber);
+    };
+    // assumed week number 1 workout1
+    const weekNumber = 1;
+    const workoutNumber = 1;
+    const current_workout = getWorkoutByNumber(weekNumber, workoutNumber);
     return (
         <div className="w-full max-w-[40%] mx-auto p-4 bg-white shadow-lg rounded-lg text-sm">
             {/* Title */}
@@ -25,7 +27,7 @@ const WeekCard = () => {
                 tracking-tight
                 text-[#805AD5]
             ">
-                {data.title} | Week1
+                {data.title} | Week{weekNumber} | Workout{workoutNumber}
             </h1>
 
             {/* Line Under Title */}
@@ -35,15 +37,25 @@ const WeekCard = () => {
             <div className="bg-white shadow-md rounded-lg overflow-hidden mb-4">
                 <table className="w-full">
                     <tbody>
-                        {current_week.workouts.map((workout, index) => (
+                        {current_workout.workoutExercises.map((ex, index) => (
                             <React.Fragment key={index}>
                                 <tr className="transition-colors duration-200 hover:bg-blue-50 border-b border-gray-200">
                                     <td className="p-4">
                                         <h2 className="text-sm font-semibold text-gray-800">
-                                            {workout.name}
+                                            Session {ex.exerciseNumber}
                                         </h2>
                                         <p className="text-xs text-gray-500">
-                                            {workout.workoutExercises ? workout.workoutExercises.length : 0} Exercises
+                                            {ex.exercise.name}
+                                        </p>
+                                    </td>
+                                    <td className="p-4">
+                                        <p className="text-xs text-gray-500">
+                                            {ex.sets} Sets
+                                        </p>
+                                    </td>
+                                    <td className="p-4">
+                                        <p className="text-xs text-gray-500">
+                                            {ex.repetitions} Repetitions
                                         </p>
                                     </td>
                                     <td className="p-4">
@@ -103,9 +115,9 @@ const WeekCard = () => {
             <button onClick={onOpen} className="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors text-sm">
                 Show Detailed Description
             </button>
-            <Detailed_Week_Modal isOpen={isOpen} onClose={onClose} data={data} weekNumber={1} />
+            <Detailed_Ex_Modal isOpen={isOpen} onClose={onClose} data={data} weekID={16} workoutID={26} excersizeID={51} />
         </div>
     );
 };
 
-export default WeekCard;
+export default WorkoutCard;
