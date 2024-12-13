@@ -6,10 +6,10 @@ import { UserContextProvider } from '../context/UserContext'
 export const trainingRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/training',
-    component: Training,
+    component: Training_func,
 })
 
-function Training() {
+function Training_func() {
     return (
         <UserContextProvider>
             <TrainingCard />

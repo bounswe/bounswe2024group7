@@ -1,12 +1,21 @@
 import React from 'react';
 import { StarIcon, AtSignIcon } from '@chakra-ui/icons';
 import { Icon } from '@chakra-ui/react';
-import Detailed_Training_Modal from './Detailed_Training_Modal.components.jsx';
+import Detailed_Training_Modal from './Detailed_Training_Modal.component';
 import { useDisclosure } from '@chakra-ui/react';
 import data from "./mock_Data.json";
-
+import { useNavigate } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 const TrainingCard = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const navigate = useNavigate()
+    const handleStartPracticing = (data) => {
+        navigate(
+            {
+                to: `/training/week`,
+            }
+        )
+    }
 
     const renderRatingStars = (rating) => {
         return (
@@ -160,7 +169,9 @@ const TrainingCard = () => {
                                         </p>
                                     </td>
                                     <td className="p-4">
-                                        <button className="
+                                        <button onClick={handleStartPracticing}
+
+                                            className="
                                             px-4 py-2.5 
                                             bg-gradient-to-r from-blue-500 to-blue-600 
                                             text-white 

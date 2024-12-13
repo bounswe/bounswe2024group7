@@ -1,10 +1,11 @@
 import React from 'react';
 import { StarIcon, AtSignIcon } from '@chakra-ui/icons';
 import { Icon } from '@chakra-ui/react';
-import Detailed_Week_Modal from './Detailed_Week_Modal.components.jsx';
+import Detailed_Week_Modal from './Detailed_Week_Modal.component';
 import { useDisclosure } from '@chakra-ui/react';
 import data from "./mock_Data.json";
-
+import { useNavigate } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 // assumed week number 1
 const WeekCard = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -13,6 +14,15 @@ const WeekCard = () => {
     };
 
     const current_week = getWeekByNumber(1);
+    const router = useRouter();
+    const navigate = useNavigate()
+    const handleStartPracticing = (data) => {
+        navigate(
+            {
+                to: `/training/week/workout`,
+            }
+        )
+    }
     return (
         <div className="w-full max-w-[40%] mx-auto p-4 bg-white shadow-lg rounded-lg text-sm">
             {/* Title */}
@@ -47,7 +57,7 @@ const WeekCard = () => {
                                         </p>
                                     </td>
                                     <td className="p-4">
-                                        <button className="
+                                        <button onClick={handleStartPracticing} className="
                                             px-4 py-2.5 
                                             bg-gradient-to-r from-blue-500 to-blue-600 
                                             text-white 

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useDisclosure } from '@chakra-ui/react';
-import Detailed_Ex_Modal from './Detailed_Ex_Modal.components.jsx';
-import Detailed_Workout_Modal from './Detailed_Workout_Modal.components.jsx';
+import Detailed_Ex_Modal from './Detailed_Ex_Modal.component';
+import Detailed_Workout_Modal from './Detailed_Workout_Modal.component';
 import data from "./mock_Data.json";
+import { useNavigate } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 
 const WorkoutCard = () => {
+    const router = useRouter();
     const {
         isOpen: isExerciseModalOpen,
         onOpen: onExerciseModalOpen,
