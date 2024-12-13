@@ -41,5 +41,5 @@ build/
 ### VS Code ###
 .vscode/
 
-backend/demo-group7/src/main/resources/application.properties
+src/main/resources/application.properties
 
