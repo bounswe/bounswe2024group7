@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../AuthContext';
 import PostCard from './PostCard';
 import ProgramCard from './ProgramCard';
+import JoinedProgramCard from './JoinedProgramCard';
 import DietCard from './DietCard';
 import { UserContext } from "../UserContext";
 import { useSelector } from 'react-redux';
