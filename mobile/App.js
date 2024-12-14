@@ -19,6 +19,7 @@ import ProgressTracker from './components/ProgressTracker';
 import WorkoutDetails from './components/WorkoutDetails';
 import JoinedWorkout from './components/JoinedWorkout';
 import JoinedWeek from './components/JoinedWeek';
+import JoinedExercise from './components/JoinedExercise';
 
 import { Provider as ReduxProvider } from 'react-redux';
 import {
@@ -76,7 +77,7 @@ const App = () => {
                 <Stack.Screen name="WorkoutDetails" component={WorkoutDetails} />
                 <Stack.Screen name="JoinedWeek" component={JoinedWeek} />
                 <Stack.Screen name="JoinedWorkout" component={JoinedWorkout} />
-
+                <Stack.Screen name="JoinedExercise" component={JoinedExercise} />
               </Stack.Navigator>
             </NavigationContainer>
           </AuthProvider>

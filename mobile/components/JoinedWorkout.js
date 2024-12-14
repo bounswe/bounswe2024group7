@@ -23,7 +23,7 @@ const JoinedWorkout = ({ route }) => {
 
         <Text style={styles.repCount}>{item.repetitions} Reps</Text>
 
-        <TouchableOpacity style={styles.startButton}>
+        <TouchableOpacity style={styles.startButton} onPress={()=>navigation.navigate('JoinedExercise',{programId,weekId,weekNumber,workoutId,workoutNumber,exerciseNumber:item.exerciseNumber,exerciseId:item.id,exercise:item.exercise,sets:item.sets,repetitions:item.repetitions})}>
           <Text style={styles.startButtonText}>Start</Text>
         </TouchableOpacity>
         <Text style={styles.completionText}>0%</Text>
