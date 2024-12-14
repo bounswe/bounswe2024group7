@@ -170,6 +170,8 @@ const FeedPage = ({ darkMode }) => {
               rating = {item.rating}
               navigation = {navigation}
               programId = {item.id}
+              type = {item.type}
+              interval = {item.interval}
 
             />
           )}
