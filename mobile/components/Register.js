@@ -22,6 +22,8 @@ const Signup = ({ navigation }) => {
 
   const goLogin = () => navigation.navigate('Login');
 
+  const goSurvey = () => navigation.navigate('Survey');
+
   const checkDatabase = async (fullName, username, email, password, role) => {
     console.log({ fullName, username, email, password, role });
     //goHome();
@@ -59,7 +61,8 @@ const Signup = ({ navigation }) => {
 
         //Cookies.set("username", username)
 
-        goHome();
+        // goHome();
+        goSurvey();
     }
 } catch (e) {
       console.log(e);
