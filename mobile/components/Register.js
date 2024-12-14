@@ -22,7 +22,7 @@ const Signup = ({ navigation }) => {
 
   const goLogin = () => navigation.navigate('Login');
 
-  const goSurvey = () => navigation.navigate('Survey');
+  const goSurvey = () => navigation.navigate('Survey',{username, navigation});
 
   const checkDatabase = async (fullName, username, email, password, role) => {
     console.log({ fullName, username, email, password, role });
