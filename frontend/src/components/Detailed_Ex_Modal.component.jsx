@@ -29,7 +29,7 @@ const DetailedExModal = ({ isOpen, onClose, programID, excersizeID }) => {
     const [exerciseData, setExerciseData] = useState(null);
 
     function getExerciseInfo(excersizeID) {
-        console.log("Searching for exerciseID:", excersizeID); // Debug log
+        // console.log("Searching for exerciseID:", excersizeID); // Debug log
 
         for (const week of data.weeks) {
             for (const workout of week.workouts) {
@@ -59,7 +59,7 @@ const DetailedExModal = ({ isOpen, onClose, programID, excersizeID }) => {
                 setIsSubmitted(false);
                 setIsAlertOpen(false);
             } else {
-                console.error(`Exercise with ID ${excersizeID} not found`);
+                // console.error(`Exercise with ID ${excersizeID} not found`);
                 onClose(); // Close the modal if exercise not found
             }
         }
