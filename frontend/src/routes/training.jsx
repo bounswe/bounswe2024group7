@@ -1,5 +1,5 @@
 import { createRoute } from '@tanstack/react-router'
-import TrainingCard from '../components/TrainingCard.component'
+import Training from '../components/Training.component'
 import { rootRoute } from './__root'
 import { UserContextProvider } from '../context/UserContext'
 
@@ -12,7 +12,7 @@ export const trainingRoute = createRoute({
 function Training_func() {
     return (
         <UserContextProvider>
-            <TrainingCard />
+            <Training />
         </UserContextProvider>
     )
 }

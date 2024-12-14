@@ -21,38 +21,52 @@ import {
     TagLeftIcon, Input
 } from '@chakra-ui/react';
 import { InfoIcon, StarIcon, RepeatIcon, ArrowRightIcon, SettingsIcon } from '@chakra-ui/icons';
-const DetailedExModal = ({ isOpen, onClose, data, weekID, workoutID, excersizeID }) => {
+import data from "./mock_Data.json";
+const DetailedExModal = ({ isOpen, onClose, programID, excersizeID }) => {
     const [setInputs, setSetInputs] = useState([]);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isAlertOpen, setIsAlertOpen] = useState(false);
+    const [exerciseData, setExerciseData] = useState(null);
 
-    const getDetailsByID = (weekID, workoutID, exerciseID) => {
-        const current_week = data.weeks.find(week => week.id === weekID);
-        if (!current_week) return { current_week: null, current_workout: null, current_ex: null };
+    function getExerciseInfo(excersizeID) {
+        console.log("Searching for exerciseID:", excersizeID); // Debug log
 
-        const current_workout = current_week.workouts.find(workout => workout.id === workoutID);
-        if (!current_workout) return { current_week, current_workout: null, current_ex: null };
-
-        const current_ex = current_workout.workoutExercises.find(ex => ex.id === exerciseID) || null;
-
-        return { current_week, current_workout, current_ex };
-    };
-
-    const { current_week, current_workout, current_ex } = getDetailsByID(weekID, workoutID, excersizeID);
-    const exercise = current_ex.exercise;
-
-    // Initialize set inputs when modal opens
-    React.useEffect(() => {
-        if (isOpen) {
-            setSetInputs(new Array(current_ex.sets).fill(''));
-            setIsSubmitted(false);
-            setIsAlertOpen(false);
+        for (const week of data.weeks) {
+            for (const workout of week.workouts) {
+                for (const workoutExercise of workout.workoutExercises) {
+                    if (workoutExercise.id === excersizeID) {
+                        return {
+                            current_ex: workoutExercise,
+                            weekNumber: week.weekNumber,
+                            workoutNumber: workout.workoutNumber
+                        };
+                    }
+                }
+            }
         }
-    }, [isOpen, current_ex.sets]);
+        return null;
+    }
+
+    // Fetch exercise information when modal opens
+    useEffect(() => {
+        if (isOpen && excersizeID) {
+            const result = getExerciseInfo(excersizeID);
+
+            if (result) {
+                setExerciseData(result);
+                // Initialize set inputs when modal opens
+                setSetInputs(new Array(result.current_ex.sets).fill(''));
+                setIsSubmitted(false);
+                setIsAlertOpen(false);
+            } else {
+                console.error(`Exercise with ID ${excersizeID} not found`);
+                onClose(); // Close the modal if exercise not found
+            }
+        }
+    }, [isOpen, excersizeID, onClose]);
 
     // Handle input change for set inputs
     const handleSetInputChange = (index, value) => {
-        // Only allow numeric input
         const numericValue = value.replace(/[^0-9]/g, '');
         const newInputs = [...setInputs];
         newInputs[index] = numericValue;
@@ -76,19 +90,19 @@ const DetailedExModal = ({ isOpen, onClose, data, weekID, workoutID, excersizeID
     // Handle progress submission
     const handleSubmitProgress = () => {
         if (areAllInputsFilled()) {
-            // TODO: Implement actual progress saving logic
             console.log('Progress saved:', setInputs);
             setIsSubmitted(true);
             onClose();
         } else {
-            // Optional: Add a toast or alert about incomplete inputs
             console.warn('Please fill all set inputs');
         }
     };
 
-    // Render nothing if modal is not open
-    if (!isOpen) return null;
+    // Render nothing if modal is not open or exercise data not found
+    if (!isOpen || !exerciseData) return null;
 
+    const { current_ex, weekNumber, workoutNumber } = exerciseData;
+    const exercise = current_ex.exercise;
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/50">
             <div className="relative w-full max-w-5xl max-h-full">
@@ -100,11 +114,11 @@ const DetailedExModal = ({ isOpen, onClose, data, weekID, workoutID, excersizeID
                         <div className="flex space-x-2">
                             <span className="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded">
                                 <StarIcon className="w-4 h-4 mr-1" />
-                                Week {current_week.weekNumber}
+                                Week {weekNumber}
                             </span>
                             <span className="inline-flex items-center px-2 py-1 text-sm font-medium text-green-800 bg-green-100 rounded">
                                 <StarIcon className="w-4 h-4 mr-1" />
-                                Workout {current_workout.workoutNumber}
+                                Workout {workoutNumber}
                             </span>
                         </div>
                     </div>
