@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
+import { LineChart, BarChart, PieChart, ProgressChart, ContributionGraph, StackedBarChart } from "react-native-chart-kit";
 
 const ProgressTracker = () => {
   const currentDayIndex = 2; // Let's assume today is Monday (index 2)
@@ -18,6 +19,45 @@ const ProgressTracker = () => {
 
   // Example progress for each day (in percentages)
   const progressData = [30, 50, 80, 40, 60, 70, 90];
+
+  const ProgressGraph = ({progress}) => {
+    return (
+              <View>
+          <Text>Your Progress Graph</Text>
+          <LineChart
+            data={{
+              labels: ["Sat", "Sun", "Mon", "Tues", "Wes", "Thurs", "Fri"],
+              datasets: [{ data: progressData }]}}
+            width={Dimensions.get("window").width} 
+            height={220}
+            yAxisLabel="Days"
+            yAxisSuffix="Days"
+            yAxisInterval={1} // optional, defaults to 1
+            chartConfig={{
+              backgroundColor: "#e26a00",
+              backgroundGradientFrom: "#fb8c00",
+              backgroundGradientTo: "#ffa726",
+              decimalPlaces: 2, // optional, defaults to 2dp
+              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              style: {
+                borderRadius: 16
+              },
+              propsForDots: {
+                r: "6",
+                strokeWidth: "2",
+                stroke: "#ffa726"
+              }
+            }}
+            bezier
+            style={{
+              marginVertical: 8,
+              borderRadius: 16
+            }}
+          />
+        </View>
+    )
+  }
 
   const ProgressCircle = ({ progress }) => {
     const radius = 50;
@@ -84,6 +124,7 @@ const ProgressTracker = () => {
 
       <View style={styles.card}>
         <ProgressCircle progress={progressData[selectedDay]} />
+        <ProgressGraph progress={progressData[selectedDay]} />
         <View style={styles.progressContent}>
           <Text style={styles.progressTitle}>{getProgressTitle()}</Text>
           <TouchableOpacity style={styles.continueButton}>
