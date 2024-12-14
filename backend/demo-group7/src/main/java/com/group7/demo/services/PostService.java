@@ -5,10 +5,7 @@ import com.group7.demo.dtos.PostResponse;
 import com.group7.demo.dtos.mapper.Mapper;
 import com.group7.demo.exceptions.UnauthorizedException;
 import com.group7.demo.models.*;
-import com.group7.demo.repository.PostRepository;
-import com.group7.demo.repository.TagRepository;
-import com.group7.demo.repository.TrainingProgramRepository;
-import com.group7.demo.repository.UserRepository;
+import com.group7.demo.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +33,8 @@ public class PostService {
     private AuthenticationService authenticationService;
 
     private Mapper mapper;
+
+    private SurveyRepository surveyRepository;
 
     @Transactional
     public PostResponse createPost(PostRequest postRequest, HttpServletRequest request) {
@@ -194,5 +193,26 @@ public class PostService {
         return postRepository.findByBookmarkedByUsersContaining(user).stream()
                 .map(post -> mapper.mapToPostResponse(post, request))
                 .collect(Collectors.toList());
+    }
+
+
+    public List<PostResponse> getPostsByFitnessGoals(HttpServletRequest request) {
+        // Get the authenticated user
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        // Fetch the user's survey
+        Survey survey = surveyRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Survey not found for user"));
+
+        // Extract fitness goals (tags) from the survey
+        Set<Tag> fitnessGoals = survey.getFitnessGoals();
+
+        // Fetch posts with tags matching fitness goals
+        List<Post> posts = postRepository.findAllByTagsIn(fitnessGoals);
+
+        // Convert posts to PostResponse
+        return posts.stream()
+                .map(this::mapToPostResponse)
+                .toList();
     }
 }

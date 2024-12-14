@@ -98,5 +98,11 @@ public class PostController {
         return ResponseEntity.ok(bookmarkedPosts);
     }
 
+    @GetMapping("/fitness-goals")
+    public ResponseEntity<List<PostResponse>> fetchPostsByFitnessGoals(HttpServletRequest request) {
+        List<PostResponse> posts = postService.getPostsByFitnessGoals(request);
+        return ResponseEntity.ok(posts);
+    }
+
 }
 
