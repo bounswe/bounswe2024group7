@@ -1,8 +1,11 @@
 package com.group7.demo.dtos;
 
+import com.group7.demo.models.enums.ProgramLevel;
+import com.group7.demo.models.enums.ProgramType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -11,16 +14,16 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class TrainingProgramRequest {
+    @NonNull
     private String title;
-    private List<ExerciseDto> exercises;
+    @NonNull
     private String description;
-
-
-    @Data
-    @AllArgsConstructor
-    public static class ExerciseDto {
-        private Long id;
-        private int repetitions;
-        private int sets;
-    }
+    @NonNull
+    private ProgramType type;
+    @NonNull
+    private ProgramLevel level;
+    @NonNull
+    private int interval;
+    @NonNull
+    private List<WeekRequest> weeks;
 }

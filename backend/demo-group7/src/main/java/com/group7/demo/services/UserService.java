@@ -3,9 +3,10 @@ package com.group7.demo.services;
 import com.group7.demo.dtos.PostResponse;
 import com.group7.demo.dtos.TrainingProgramResponse;
 import com.group7.demo.dtos.UserProfileResponse;
-import com.group7.demo.dtos.UserTrainingProgramResponse;
+import com.group7.demo.dtos.TrainingProgramWithTrackingResponse;
 import com.group7.demo.models.User;
 import com.group7.demo.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
@@ -33,9 +34,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserProfileResponse getUserProfile(String username, HttpServletRequest request) throws Exception {
+    public UserProfileResponse getUserProfile(String username, HttpServletRequest request) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
 
         Set<String> followers = user.getFollowers()
                 .stream()
@@ -49,7 +50,7 @@ public class UserService {
 
         List<PostResponse> posts = postService.getPostsByUser(user.getUsername(), request);
         List<TrainingProgramResponse> trainingPrograms = trainingProgramService.getTrainingProgramByTrainer(user.getUsername());
-        List<UserTrainingProgramResponse> joinedPrograms = trainingProgramService.getJoinedTrainingPrograms(user.getUsername());
+        List<TrainingProgramWithTrackingResponse> joinedPrograms = trainingProgramService.getJoinedTrainingPrograms(user.getUsername());
 
         return UserProfileResponse.builder()
                 .username(user.getUsername())
@@ -63,10 +64,10 @@ public class UserService {
                 .build();
     }
 
-    public void followUser(String usernameToFollow, HttpServletRequest request) throws Exception {
+    public void followUser(String usernameToFollow, HttpServletRequest request) {
         User authenticatedUser = authenticationService.getAuthenticatedUserInternal(request);
         User userToFollow = userRepository.findByUsername(usernameToFollow)
-                .orElseThrow(() -> new Exception("Entity not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + usernameToFollow));
 
         if (!authenticatedUser.getUsername().equals(usernameToFollow) && !authenticatedUser.getFollowing().contains(userToFollow)) {
             authenticatedUser.getFollowing().add(userToFollow);
@@ -74,14 +75,14 @@ public class UserService {
             userRepository.save(authenticatedUser);
             userRepository.save(userToFollow);
         } else {
-            throw new Exception("You already follow this user");
+            throw new IllegalStateException("You already follow " + usernameToFollow);
         }
     }
 
-    public void unfollowUser(String usernameToUnfollow, HttpServletRequest request) throws Exception {
+    public void unfollowUser(String usernameToUnfollow, HttpServletRequest request) {
         User authenticatedUser = authenticationService.getAuthenticatedUserInternal(request);
         User userToUnfollow = userRepository.findByUsername(usernameToUnfollow)
-                .orElseThrow(() -> new Exception("Entity not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + usernameToUnfollow));
 
         if (authenticatedUser.getFollowing().contains(userToUnfollow)) {
             authenticatedUser.getFollowing().remove(userToUnfollow);
@@ -89,29 +90,29 @@ public class UserService {
             userRepository.save(authenticatedUser);
             userRepository.save(userToUnfollow);
         } else {
-            throw new Exception("You don't follow this user");
+            throw new IllegalStateException("You are not following " + usernameToUnfollow);
         }
     }
 
-    public Set<String> getFollowers(String username) throws Exception {
+    public Set<String> getFollowers(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
         return user.getFollowers().stream()
                 .map(User::getUsername)
                 .collect(Collectors.toSet());
     }
 
-    public Set<String> getFollowing(String username) throws Exception {
+    public Set<String> getFollowing(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
         return user.getFollowing().stream()
                 .map(User::getUsername)
                 .collect(Collectors.toSet());
     }
 
-    public User getUserByUsername(String username) throws Exception {
+    public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
     }
 
 }

@@ -1,10 +1,12 @@
 package com.group7.demo.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.group7.demo.models.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -69,6 +71,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("user")
-    private Set<UserTrainingProgram> joinedPrograms = new HashSet<>();
+    private Set<TrainingProgramWithTracking> joinedPrograms = new HashSet<>();
 
 }

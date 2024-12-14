@@ -1,0 +1,1058 @@
+openapi: 3.0.1
+info:
+  title: FitnessFact API
+  version: v0.2
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      operationId: logout
+      security:
+        - sessionToken: []
+      parameters:
+        - name: sessionToken
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /api/user/{username}/follow:
+    post:
+      tags:
+        - User
+      operationId: followUser
+      security:
+        - sessionToken: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+        - User
+      operationId: unfollowUser
+      security:
+        - sessionToken: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/training-programs:
+    get:
+      tags:
+        - Training Program
+      operationId: getAllTrainingPrograms
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrainingProgramResponse'
+    post:
+      tags:
+        - Training Program
+      operationId: createTrainingProgram
+      security:
+        - sessionToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrainingProgramRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TrainingProgramResponse'
+  /api/training-programs/{trainingProgramId}/exercises/{exerciseId}/uncomplete:
+    post:
+      tags:
+        - Training Program
+      operationId: unmarkExerciseAsCompleted
+      security:
+        - sessionToken: []
+      parameters:
+        - name: trainingProgramId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: exerciseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserTrainingProgramResponse'
+  /api/training-programs/{trainingProgramId}/exercises/{exerciseId}/complete:
+    post:
+      tags:
+        - Training Program
+      operationId: markExerciseAsCompleted
+      security:
+        - sessionToken: []
+      parameters:
+        - name: trainingProgramId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: exerciseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserTrainingProgramResponse'
+  /api/training-programs/{trainingProgramId}/complete:
+    post:
+      tags:
+        - Training Program
+      operationId: markTrainingProgramAsCompleted
+      security:
+        - sessionToken: []
+      parameters:
+        - name: trainingProgramId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserTrainingProgramResponse'
+  /api/training-programs/{programId}/join:
+    post:
+      tags:
+        - Training Program
+      operationId: joinTrainingProgram
+      security:
+        - sessionToken: []
+      parameters:
+        - name: programId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserTrainingProgramResponse'
+  /api/posts:
+    get:
+      tags:
+        - Post
+      operationId: fetchPosts
+      parameters:
+        - name: tags
+          in: query
+          required: false
+          schema:
+            uniqueItems: true
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponse'
+    post:
+      tags:
+        - Post
+      operationId: createPost
+      security:
+        - sessionToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+  /api/posts/{postId}/like:
+    post:
+      tags:
+        - Post
+      operationId: likePost
+      security:
+        - sessionToken: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - Post
+      operationId: unlikePost
+      security:
+        - sessionToken: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+  /api/posts/{postId}/bookmark:
+    post:
+      tags:
+        - Post
+      operationId: bookmarkPost
+      security:
+        - sessionToken: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - Post
+      operationId: unbookmarkPost
+      security:
+        - sessionToken: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+  /auth/user:
+    get:
+      tags:
+        - Authentication
+      operationId: getAuthenticatedUser
+      security:
+        - sessionToken: []
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /api/user/{username}:
+    get:
+      tags:
+        - User
+      operationId: getUserByUsername
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+  /api/user/{username}/following:
+    get:
+      tags:
+        - User
+      operationId: getFollowing
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  type: string
+  /api/user/{username}/followers:
+    get:
+      tags:
+        - User
+      operationId: getFollowers
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  type: string
+  /api/training-programs/{programId}/participants:
+    get:
+      tags:
+        - Training Program
+      operationId: getRegisteredUsernames
+      parameters:
+        - name: programId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  type: string
+  /api/training-programs/{id}:
+    get:
+      tags:
+        - Training Program
+      operationId: getTrainingProgramById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TrainingProgramResponse'
+    delete:
+      tags:
+        - Training Program
+      operationId: deleteTrainingProgram
+      security:
+        - sessionToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+  /api/training-programs/trainer/{username}:
+    get:
+      tags:
+        - Training Program
+      operationId: getTrainingProgramsByTrainer
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrainingProgramResponse'
+  /api/training-programs/joined/{username}:
+    get:
+      tags:
+        - Training Program
+      operationId: getJoinedTrainingPrograms
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserTrainingProgramResponse'
+  /api/tags:
+    get:
+      tags:
+        - Tag
+      operationId: getAllTags
+      security:
+        - sessionToken: []
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/search:
+    get:
+      tags:
+        - Search
+      operationId: search
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /api/posts/user/{username}:
+    get:
+      tags:
+        - Post
+      operationId: getPostsByUser
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponse'
+  /api/posts/random:
+    get:
+      tags:
+        - Post
+      operationId: getRandomPosts
+      parameters:
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponse'
+  /api/posts/bookmarked:
+    get:
+      tags:
+        - Post
+      operationId: getBookmarkedPosts
+      security:
+        - sessionToken: []
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponse'
+  /api/exercises:
+    get:
+      tags:
+        - Exercise
+      operationId: getAllExercises
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exercise'
+  /api/training-programs/{programId}/leave:
+    delete:
+      tags:
+        - Training Program
+      operationId: leaveProgram
+      security:
+        - sessionToken: []
+      parameters:
+        - name: programId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserTrainingProgramResponse'
+  /api/posts/{postId}:
+    delete:
+      tags:
+        - Post
+      operationId: deletePost
+      security:
+        - sessionToken: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+components:
+  securitySchemes:
+    sessionToken:
+      type: apiKey
+      in: header
+      name: x-session-token
+  schemas:
+    RegisterRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+          enum:
+            - TRAINEE
+            - TRAINER
+            - DIETICIAN
+            - ADMIN
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    LoginResponse:
+      type: object
+      properties:
+        sessionToken:
+          type: string
+        role:
+          type: string
+          enum:
+            - TRAINEE
+            - TRAINER
+            - DIETICIAN
+            - ADMIN
+        username:
+          type: string
+        email:
+          type: string
+    ExerciseDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        repetitions:
+          type: integer
+          format: int32
+        sets:
+          type: integer
+          format: int32
+    TrainingProgramRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseDto'
+        description:
+          type: string
+    Exercise:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        gifUrl:
+          type: string
+        bodyPart:
+          type: string
+          enum:
+            - BACK
+            - CARDIO
+            - CHEST
+            - LOWER_ARMS
+            - LOWER_LEGS
+            - NECK
+            - SHOULDERS
+            - UPPER_ARMS
+            - UPPER_LEGS
+            - WAIST
+        targetMuscle:
+          type: string
+          enum:
+            - ABDOMINALS
+            - ABDUCTORS
+            - ABS
+            - ADDUCTORS
+            - ANKLE_STABILIZERS
+            - ANKLES
+            - BACK
+            - BICEPS
+            - BRACHIALIS
+            - CALVES
+            - CARDIOVASCULAR_SYSTEM
+            - CHEST
+            - CORE
+            - DELTOIDS
+            - DELTS
+            - FEET
+            - FOREARMS
+            - GLUTES
+            - GRIP_MUSCLES
+            - GROIN
+            - HAMSTRINGS
+            - HANDS
+            - HIP_FLEXORS
+            - INNER_THIGHS
+            - LATISSIMUS_DORSI
+            - LATS
+            - LEVATOR_SCAPULAE
+            - LOWER_ABS
+            - LOWER_BACK
+            - OBLIQUES
+            - PECTORALS
+            - QUADRICEPS
+            - QUADS
+            - REAR_DELTOIDS
+            - RHOMBOIDS
+            - ROTATOR_CUFF
+            - SERRATUS_ANTERIOR
+            - SHINS
+            - SHOULDERS
+            - SOLEUS
+            - SPINE
+            - STERNOCLEIDOMASTOID
+            - TRAPEZIUS
+            - TRAPS
+            - TRICEPS
+            - UPPER_BACK
+            - UPPER_CHEST
+            - WRIST_EXTENSORS
+            - WRIST_FLEXORS
+            - WRISTS
+        equipment:
+          type: string
+          enum:
+            - ASSISTED
+            - BAND
+            - BARBELL
+            - BODY_WEIGHT
+            - BOSU_BALL
+            - CABLE
+            - DUMBBELL
+            - ELLIPTICAL_MACHINE
+            - EZ_BARBELL
+            - HAMMER
+            - KETTLEBELL
+            - LEVERAGE_MACHINE
+            - MEDICINE_BALL
+            - OLYMPIC_BARBELL
+            - RESISTANCE_BAND
+            - ROLLER
+            - ROPE
+            - SKIERG_MACHINE
+            - SLED_MACHINE
+            - SMITH_MACHINE
+            - STABILITY_BALL
+            - STATIONARY_BIKE
+            - STEPMILL_MACHINE
+            - TIRE
+            - TRAP_BAR
+            - UPPER_BODY_ERGOMETER
+            - WEIGHTED
+            - WHEEL_ROLLER
+        instructions:
+          type: array
+          items:
+            type: string
+        secondaryMuscles:
+          type: array
+          items:
+            type: string
+            enum:
+              - ABDOMINALS
+              - ABDUCTORS
+              - ABS
+              - ADDUCTORS
+              - ANKLE_STABILIZERS
+              - ANKLES
+              - BACK
+              - BICEPS
+              - BRACHIALIS
+              - CALVES
+              - CARDIOVASCULAR_SYSTEM
+              - CHEST
+              - CORE
+              - DELTOIDS
+              - DELTS
+              - FEET
+              - FOREARMS
+              - GLUTES
+              - GRIP_MUSCLES
+              - GROIN
+              - HAMSTRINGS
+              - HANDS
+              - HIP_FLEXORS
+              - INNER_THIGHS
+              - LATISSIMUS_DORSI
+              - LATS
+              - LEVATOR_SCAPULAE
+              - LOWER_ABS
+              - LOWER_BACK
+              - OBLIQUES
+              - PECTORALS
+              - QUADRICEPS
+              - QUADS
+              - REAR_DELTOIDS
+              - RHOMBOIDS
+              - ROTATOR_CUFF
+              - SERRATUS_ANTERIOR
+              - SHINS
+              - SHOULDERS
+              - SOLEUS
+              - SPINE
+              - STERNOCLEIDOMASTOID
+              - TRAPEZIUS
+              - TRAPS
+              - TRICEPS
+              - UPPER_BACK
+              - UPPER_CHEST
+              - WRIST_EXTENSORS
+              - WRIST_FLEXORS
+              - WRISTS
+    ExerciseDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        exercise:
+          $ref: '#/components/schemas/Exercise'
+        repetitions:
+          type: integer
+          format: int32
+        sets:
+          type: integer
+          format: int32
+    TrainingProgramResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExerciseDetail'
+        description:
+          type: string
+        trainerUsername:
+          type: string
+        participants:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+    UserExerciseDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        exercise:
+          $ref: '#/components/schemas/Exercise'
+        repetitions:
+          type: integer
+          format: int32
+        sets:
+          type: integer
+          format: int32
+        completed:
+          type: boolean
+    UserTrainingProgramResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        exercises:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserExerciseDetail'
+        description:
+          type: string
+        trainerUsername:
+          type: string
+        participants:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum:
+            - ONGOING
+            - LEFT
+            - COMPLETED
+        joinedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+    PostRequest:
+      type: object
+      properties:
+        content:
+          type: string
+        tags:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        trainingProgramId:
+          type: integer
+          format: int64
+        imageUrl:
+          type: string
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        content:
+          type: string
+        tags:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        username:
+          type: string
+        trainingProgram:
+          $ref: '#/components/schemas/TrainingProgramResponse'
+        likeCount:
+          type: integer
+          format: int32
+        imageUrl:
+          type: string
+        bookmarked:
+          type: boolean
+        liked:
+          type: boolean
+    UserProfileResponse:
+      type: object
+      properties:
+        username:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+          enum:
+            - TRAINEE
+            - TRAINER
+            - DIETICIAN
+            - ADMIN
+        followers:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        following:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostResponse'
+        trainingPrograms:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrainingProgramResponse'
+        joinedPrograms:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserTrainingProgramResponse'

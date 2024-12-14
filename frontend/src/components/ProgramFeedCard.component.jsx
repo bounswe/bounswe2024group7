@@ -221,10 +221,10 @@ function ProgramFeedCard({
     )
 
     const navigate = useNavigate()
-    const handleStartPracticing = (program_name) => {
+    const handleStartPracticing = (program_data) => {
         navigate(
             {
-                to: "/program"
+                to: `/program?programId=${program_id}`,
             }
         )
     }

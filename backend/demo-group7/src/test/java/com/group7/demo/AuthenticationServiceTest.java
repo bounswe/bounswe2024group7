@@ -3,7 +3,7 @@ package com.group7.demo;
 import com.group7.demo.dtos.LoginRequest;
 import com.group7.demo.dtos.LoginResponse;
 import com.group7.demo.dtos.RegisterRequest;
-import com.group7.demo.models.Role;
+import com.group7.demo.models.enums.Role;
 import com.group7.demo.models.User;
 import com.group7.demo.repository.UserRepository;
 import com.group7.demo.services.AuthenticationService;

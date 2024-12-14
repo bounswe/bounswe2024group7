@@ -31,58 +31,6 @@ public class SearchService {
         this.trainingProgramRepository = trainingProgramRepository;
         this.mapper = mapper;
     }
-
-//    public Map<String, Object> search(String query) {
-//        Map<String, Object> results = new HashMap<>();
-//
-//        // Use the mapper for converting entities to response objects
-//        List<PostResponse> postResponses = postRepository.search(query).stream()
-//                .map(mapper::mapToPostResponse)
-//                .collect(Collectors.toList());
-//
-//        // Map training programs (assumes you have a corresponding method in the Mapper class)
-//        List<TrainingProgramResponse> trainingProgramResponses = trainingProgramRepository.search(query).stream()
-//                .map(mapper::mapToTrainingProgramResponse)
-//                .collect(Collectors.toList());
-//
-//        // Add exercises directly if they don't need custom mapping
-//        List<Exercise> exercises = exerciseRepository.search(query);
-//
-//        // Add to the results map
-//        results.put("posts", postResponses);
-//        results.put("trainingPrograms", trainingProgramResponses);
-//        results.put("exercises", exercises);
-//
-//        return results;
-//    }
-
-//    public Map<String, Object> search(List<String> keywords) {
-//        // Search for posts, exercises, and training programs by looping over keywords
-//        List<PostResponse> posts = keywords.stream()
-//                .flatMap(keyword -> postRepository.search(keyword).stream())
-//                .distinct() // Remove duplicates
-//                .map(mapper::mapToPostResponse)
-//                .toList();
-//
-//        List<Exercise> exercises = keywords.stream()
-//                .flatMap(keyword -> exerciseRepository.search(keyword).stream())
-//                .distinct()
-//                .toList();
-//
-//        List<TrainingProgramResponse> trainingPrograms = keywords.stream()
-//                .flatMap(keyword -> trainingProgramRepository.search(keyword).stream())
-//                .distinct()
-//                .map(mapper::mapToTrainingProgramResponse)
-//                .toList();
-//
-//        // Aggregate results into a map
-//        Map<String, Object> results = new HashMap<>();
-//        results.put("posts", posts);
-//        results.put("exercises", exercises);
-//        results.put("trainingPrograms", trainingPrograms);
-//
-//        return results;
-//    }
 public Map<String, Object> search(String query, HttpServletRequest request) {
     // Split the query into individual keywords
     String[] keywords = query.trim().split("\\s+");

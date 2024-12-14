@@ -1,5 +1,4 @@
 import React from 'react'
-import { useState } from 'react'
 import {
     Avatar,
     Box,
@@ -10,43 +9,59 @@ import {
     CardHeader,
     Flex,
     Heading,
-    IconButton,
-    Icon,
     Image,
     Text,
     Badge,
     useToast,
-    Textarea,
-    useColorModeValue,
-    useColorMode
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalCloseButton,
+    useDisclosure,
+    Accordion,
+    AccordionItem,
+    AccordionButton,
+    AccordionIcon,
+    AccordionPanel,
 } from '@chakra-ui/react'
-import {
-    ChatIcon,
-} from '@chakra-ui/icons'
 import HeartIcon from '../icons/HeartIcon'
-import ThreeDotsIcon from '../icons/ThreeDotsIcon'
 import BookmarkAddIcon from '../icons/BookmarkAddIcon'
-import BookmarkCheckIcon from '../icons/BookmarkCheckIcon'
-import BookmarkRemoveIcon from '../icons/BookmarkRemoveIcon'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useContext } from 'react'
-import { PostContext } from '../context/PostContext'
 import { useSelector } from 'react-redux'
 import { userSessionToken } from '../context/user'
 import apiInstance from '../instance/apiInstance'
+import { useColorModeValue } from '@chakra-ui/react'
 
-
-function PostFeedCard({
-    post
-}) {
-    console.log(post)
+function PostFeedCard({ post }) {
     const sessionToken = useSelector(userSessionToken)
     const toast = useToast()
-
+    const { isOpen, onOpen, onClose } = useDisclosure()
     const queryClient = useQueryClient()
     const likeButtonColor = useColorModeValue('#6b46c1', '#d6bcfa')
 
-    // Like a post Mutation
+    const program = {
+        title: 'Heavy Gym Instruments Fitness Program',
+        steps: [
+            {
+                title: 'Step 1: Deadlift',
+                description: 'Use the barbell for deadlifting. Ensure your feet are shoulder-width apart, grip the bar just outside your knees, and lift the bar while keeping your back straight.',
+                gif: 'https://v2.exercisedb.io/image/ogjzsJ3u4sUljM',
+            },
+            {
+                title: 'Step 2: Squat',
+                description: 'Set the barbell on your upper back. Lower your body by bending your knees and hips, keeping your chest up, until your thighs are parallel to the ground.',
+                gif: 'https://v2.exercisedb.io/image/ogjzsJ3u4sUljM',
+            },
+            {
+                title: 'Step 3: Bench Press',
+                description: 'Lie flat on the bench, grip the barbell slightly wider than shoulder-width, and press the bar up and down with control.',
+                gif: 'https://v2.exercisedb.io/image/ogjzsJ3u4sUljM',
+            }
+        ]
+    }
+
     const { mutate: likePost } = useMutation(
         {
             mutationFn: async (postId) => {
@@ -217,12 +232,6 @@ function PostFeedCard({
                                 </Text>
                             </Box>
                         </Flex>
-                        {/* <IconButton
-                            variant='ghost'
-                            colorScheme='gray'
-                            aria-label='See menu'
-                            icon={<ThreeDotsIcon />}
-                        /> */}
                     </Flex>
                 </CardHeader>
                 <CardBody
@@ -238,9 +247,6 @@ function PostFeedCard({
                     <Text>
                         {post.content}
                     </Text>
-                    {/* 
-                    Labels
-                */}
                     <Flex flexWrap='wrap' gap='2'>
                         {
                             post.tags.map((tag, index) => (
@@ -255,6 +261,11 @@ function PostFeedCard({
                             ))
                         }
                     </Flex>
+                    {post.trainingProgram && (
+                        <Button colorScheme="purple" variant="outline" onClick={onOpen}>
+                            View Training Program
+                        </Button>
+                    )}
                 </CardBody>
                 {
                     post.imageUrl && (
@@ -316,8 +327,38 @@ function PostFeedCard({
                     </Button>
                 </CardFooter>
             </Card>
-        </>
 
+            <Modal isOpen={isOpen} onClose={onClose} size="xl">
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>{post.trainingProgram?.title}</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody pb={6}>
+                        <Accordion allowToggle>
+                            {post.trainingProgram?.steps?.map((step, index) => (
+                                <AccordionItem key={index}>
+                                    <AccordionButton>
+                                        <Box flex="1" textAlign="left">
+                                            {step.title}
+                                        </Box>
+                                        <AccordionIcon />
+                                    </AccordionButton>
+                                    <AccordionPanel>
+                                        <Text mb={4}>{step.description}</Text>
+                                        <Image
+                                            src={step.gif}
+                                            alt={step.title}
+                                            boxSize="256px"
+                                            objectFit="cover"
+                                        />
+                                    </AccordionPanel>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
+        </>
     )
 }
 
