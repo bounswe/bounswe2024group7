@@ -31,7 +31,7 @@ public class SurveyService {
     // Add a new survey
     public SurveyResponse addSurvey(SurveyRequest request) {
         // Validate the user
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         // Map tag names to Tag entities (convert input to lowercase)
@@ -54,8 +54,9 @@ public class SurveyService {
     }
 
 
-    // Get survey by user ID
-    public SurveyResponse getSurveyByUser(Long userId) {
+    // Get survey by user username
+    public SurveyResponse getSurveyByUser(String username) {
+        Long userId = getUserIdFromUsername(username);
         Survey survey = surveyRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Survey not found for user ID: " + userId));
 
@@ -74,7 +75,8 @@ public class SurveyService {
                 .build();
     }
 
-    public List<String> getUserFitnessGoals(Long userId) {
+    public List<String> getUserFitnessGoals(String username) {
+        Long userId = getUserIdFromUsername(username);
         Survey survey = surveyRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Survey not found for user ID: " + userId));
 
@@ -84,7 +86,8 @@ public class SurveyService {
     }
 
 
-    public List<String> addFitnessGoals(Long userId, List<String> goals) {
+    public List<String> addFitnessGoals(String username, List<String> goals) {
+        Long userId = getUserIdFromUsername(username);
         Survey survey = surveyRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Survey not found for user ID: " + userId));
 
@@ -108,7 +111,8 @@ public class SurveyService {
                 .collect(Collectors.toList());
     }
 
-    public void removeFitnessGoals(Long userId, List<String> goals) {
+    public void removeFitnessGoals(String username, List<String> goals) {
+        Long userId = getUserIdFromUsername(username);
         Survey survey = surveyRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Survey not found for user ID: " + userId));
 
@@ -123,6 +127,12 @@ public class SurveyService {
 
         survey.getFitnessGoals().removeAll(tagsToRemove);
         surveyRepository.save(survey);
+    }
+
+    private Long getUserIdFromUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username))
+                .getId();
     }
 
 
