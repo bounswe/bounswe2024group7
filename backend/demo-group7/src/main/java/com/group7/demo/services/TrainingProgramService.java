@@ -13,9 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -359,4 +357,38 @@ public class TrainingProgramService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("All workouts are completed in the training program."));
     }
+
+    public Map<Long, Double> getCompletionRatesForProgram(Long programTrackingId) {
+// Fetch the TrainingProgramWithTracking
+        TrainingProgramWithTracking programTracking = trainingProgramWithTrackingRepository
+                .findById(programTrackingId)
+                .orElseThrow(() -> new IllegalArgumentException("Training program tracking not found"));
+
+        // Map to store completion rates for each week
+        Map<Long, Double> weeklyCompletionRates = new HashMap<>();
+
+        // Iterate over weeks in the training program
+        for (WeekWithTracking weekWithTracking : programTracking.getWeeksWithTracking()) {
+            int totalExercises = 0;
+            int completedExercises = 0;
+
+            // Iterate over workouts in the week
+            for (WorkoutWithTracking workoutWithTracking : weekWithTracking.getWorkoutsWithTracking()) {
+                // Iterate over exercises in the workout
+                for (WorkoutExerciseWithTracking exerciseTracking : workoutWithTracking.getWorkoutExercisesWithTracking()) {
+                    totalExercises++;
+                    if (exerciseTracking.getCompletedAt() != null) {
+                        completedExercises++;
+                    }
+                }
+            }
+
+            // Calculate completion rate for the week
+            double completionRate = totalExercises == 0 ? 0.0 : (double) completedExercises / totalExercises * 100;
+            weeklyCompletionRates.put(weekWithTracking.getWeek().getId(), completionRate);
+        }
+
+        return weeklyCompletionRates;
+    }
+
 }
