@@ -28,10 +28,7 @@ const ProgramDetail = ({ route }) => {
       <View style={styles.weekContainer}>
         <Text style={styles.weekTitle}>Week {index + 1}</Text>
         <Text style={styles.workoutCount}>{workoutCount} Workouts</Text>
-        <TouchableOpacity style={styles.startButton} onPress = {()=>{navigation.navigate("JoinedWeek",{programId,programTitle:title,weekId:item.id,weekNumber:item.weekNumber,workouts:item.workouts, navigation:navigation})}}>
-          <Text style={styles.startButtonText}>Start Workout</Text>
-        </TouchableOpacity>
-        <Text style={styles.completionText}>0%</Text>
+
       </View>
     );
   };
@@ -55,7 +52,7 @@ const ProgramDetail = ({ route }) => {
       />
 
       <TouchableOpacity style={styles.commitButton}>
-        <Text style={styles.commitButtonText}>Commit to Program</Text>
+        <Text style={styles.commitButtonText}>Join Program</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.detailButton} onPress = {()=>navigation.navigate("WorkoutDetails",{weeks,navigation})}>

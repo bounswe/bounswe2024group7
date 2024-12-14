@@ -47,3 +47,4 @@ staticfiles
 ./frontend/package.json
 jsonconfig.json
 ./frontend/src/routeTree.gen.ts
+src/main/resources/application.properties

@@ -2,12 +2,11 @@ import React, { useState, useEffect, useContext } from 'react';
 import { CircularProgress, CircularProgressLabel, Box, Text, HStack, VStack, Button } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 import { UserContext } from '../context/UserContext';
-
+import { useNavigate } from '@tanstack/react-router'
 const calculateProgress = (joinedPrograms) => {
     let done = 0;
     let undone = 0;
 
-    // Iterate through each program and its exercises
     joinedPrograms.forEach((program) => {
         program.exercises.forEach((exercise) => {
             if (exercise.completed) {
@@ -18,39 +17,80 @@ const calculateProgress = (joinedPrograms) => {
         });
     });
 
-    // Calculate the current progress percentage
     const total = done + undone;
-    const progress = total > 0 ? (done * 100) / total : 0;  // Prevent division by zero
+    const progress = total > 0 ? (done * 100) / total : 0;
 
     return progress.toFixed(2);
 };
+
+const calculateWeeklyProgress = (joinedPrograms) => {
+
+    const daysOfWeek = ['Sat', 'Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri'];
+    const today = new Date();
+    const active = [];
+    const progress_days = [];
+
+    daysOfWeek.forEach((day, index) => {
+        const currentDay = new Date(today);
+        currentDay.setDate(today.getDate() - today.getDay() + index);
+
+        // Check if the day is in the past or today
+        if (currentDay <= today) {
+            active.push(1);
+
+            // Calculate progress for this specific day
+            const dayProgress = joinedPrograms.reduce((totalProgress, program) => {
+                const dayExercises = program.exercises.filter(exercise =>
+                    exercise.completedAt &&
+                    new Date(exercise.completedAt).toDateString() === currentDay.toDateString()
+                );
+
+                const totalExercises = program.exercises.length;
+                const completedExercises = dayExercises.length;
+
+                return (completedExercises / totalExercises) * 100;
+            }, 0);
+
+            progress_days.push(Math.round(dayProgress));
+        } else {
+            active.push(0);
+            progress_days.push(0);
+        }
+    });
+
+    return { active, progress_days };
+};
+
 function ProgressBoard() {
+    const navigate = useNavigate()
+    const handleStartPracticing = (program_name) => {
+        navigate(
+            {
+                to: "/program"
+            }
+        )
+    }
     const { joinedPrograms } = useContext(UserContext);
     const currentProgress = calculateProgress(joinedPrograms);
-    const [progress, setProgress] = useState(0); // Initialize progress to 0
+    const [progress, setProgress] = useState(0);
 
-    // MockData
+    const { active, progress_days } = calculateWeeklyProgress(joinedPrograms);
     const daysOfWeek = ['Sat', 'Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri'];
-    const active = [1, 1, 1, 0, 0, 0, 0];
-    const progress_days = [50, 100, 70, 0, 0, 0, 0];
 
     useEffect(() => {
-        // Increment progress by 10% every 80ms until it reaches currentProgress
         const interval = setInterval(() => {
             setProgress((prev) => {
                 if (prev < currentProgress) {
                     return prev + 10;
                 } else {
-                    clearInterval(interval); // Clear the interval once we reach currentProgress
+                    clearInterval(interval);
                     return prev;
                 }
             });
         }, 80);
 
-        return () => clearInterval(interval); // Cleanup the interval on component unmount
+        return () => clearInterval(interval);
     }, [currentProgress]);
-
-
 
     return (
         <Box
@@ -105,14 +145,6 @@ function ProgressBoard() {
                         transform="translate(-50%, -50%)"
                         textAlign="center"
                     >
-                    </Box>
-                    <Box
-                        position="absolute"
-                        top="50%"
-                        left="50%"
-                        transform="translate(-50%, -50%)"
-                        textAlign="center"
-                    >
                         <Text fontSize="lg" fontWeight="bold" color="gray.700" mb={4}>
                             Today: {currentProgress}%
                         </Text>
@@ -121,14 +153,13 @@ function ProgressBoard() {
                                 <StarIcon boxSize={12} color="teal" />
                             ) : null
                         ) : (
-                            <Button bg="teal" color="white" _hover={{ bg: 'teal' }} size="sm">
+                            <Button bg="teal" color="white" _hover={{ bg: 'teal' }} size="sm" onClick={() => handleStartPracticing(joinedPrograms)}>
                                 Nail It !
                             </Button>
                         )}
                     </Box>
                 </Box>
 
-                {/* Days of the week and circular progress bars */}
                 <Box textAlign="center">
                     <HStack spacing={6} justifyContent="center" mb={2}>
                         {daysOfWeek.map((day, i) => (
@@ -166,7 +197,6 @@ function ProgressBoard() {
                 </Box>
             </Box>
         </Box>
-
     );
 }
 

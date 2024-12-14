@@ -1,6 +1,6 @@
 package com.group7.demo.dtos;
 
-import com.group7.demo.models.Role;
+import com.group7.demo.models.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

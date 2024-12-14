@@ -41,7 +41,7 @@ public class SecurityConfiguration {
                             "/api/posts/**",
                             "/api/tags",
                             "/api/training-programs/**",
-                            "/api/exercises/**"
+                            "/api/exercises/*"
                     ).permitAll()
                     .anyRequest().authenticated() // All other requests require authentication
             )

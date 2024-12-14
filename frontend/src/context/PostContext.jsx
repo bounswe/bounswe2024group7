@@ -36,7 +36,13 @@ export const PhaseContextProvider = ({ children }) => {
     } = useQuery({
         queryKey: ['posts'],
         queryFn: async () => {
-            const response = await apiInstance().get('/api/posts')
+            let response;
+
+            if (sessionToken) {
+                response = await apiInstance(sessionToken).get('/api/posts')
+            } else {
+                response = await apiInstance().get('/api/posts')
+            }
 
             return response.data
         },

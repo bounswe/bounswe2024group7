@@ -1,20 +1,28 @@
 package com.group7.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
-@Data
 @NoArgsConstructor
-public class TrainingProgramExercise {
+@Builder
+@AllArgsConstructor
+@Getter
+@Setter
+public class WorkoutExercise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private int exerciseNumber;
+
     @ManyToOne
-    @JoinColumn(name = "training_program_id")
-    private TrainingProgram trainingProgram;
+    @JoinColumn(name = "workout_id")
+    @JsonBackReference
+    private Workout workout;
 
     @ManyToOne
     @JoinColumn(name = "exercise_id")

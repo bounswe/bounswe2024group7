@@ -1,13 +1,15 @@
 package com.group7.demo.dtos;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Data
+@Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class ExerciseProgress {
-    private boolean completed;
-    private String completedAt;
+    private LocalDate completedDate;
+    private int completedCount;
 }
