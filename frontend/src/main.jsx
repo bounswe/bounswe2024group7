@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import store from "./context/index.js"
+import React from 'react'
 import { Provider as ContextProvider } from 'react-redux'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { ChakraProvider } from '@chakra-ui/react'
@@ -8,15 +9,16 @@ import { rootRoute } from "./routes/__root"
 import { indexRoute } from './routes/index'
 import { loginRoute } from './routes/login'
 import { profileRoute } from './routes/profile'
-import { programRoute } from './routes/program'
-import { trainingRoute } from './routes/training'
-import { progressRoute } from './routes/progress'
-import { progressTodayRoute } from './routes/progressToday'
 import { searchRoute } from './routes/search'
-import React from 'react'
 import { registerRoute } from './routes/register'
-import { weekRoute } from './routes/week'
-import { workoutRoute } from './routes/workout'
+import { trainingRoute } from './routes/training'
+
+// import { programRoute } from './routes/program'
+// import { progressRoute } from './routes/progress'
+// import { progressTodayRoute } from './routes/progressToday'
+// import { weekRoute } from './routes/week'
+// import { workoutRoute } from './routes/workout'
+
 import {
   QueryClient,
   QueryClientProvider
@@ -30,13 +32,14 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   registerRoute,
   profileRoute,
-  programRoute,
+  searchRoute,
   trainingRoute,
-  weekRoute,
-  workoutRoute,
-  progressRoute,
-  progressTodayRoute,
-  searchRoute
+  // programRoute,
+  // weekRoute,
+  // workoutRoute,
+  // progressRoute,
+  // progressTodayRoute,
+
 ])
 
 const router = createRouter({ routeTree })

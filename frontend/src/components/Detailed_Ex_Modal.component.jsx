@@ -21,8 +21,8 @@ import {
     TagLeftIcon, Input
 } from '@chakra-ui/react';
 import { InfoIcon, StarIcon, RepeatIcon, ArrowRightIcon, SettingsIcon } from '@chakra-ui/icons';
-import data from "./mock_Data.json";
-const DetailedExModal = ({ isOpen, onClose, programID, excersizeID }) => {
+
+const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
     const [setInputs, setSetInputs] = useState([]);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isAlertOpen, setIsAlertOpen] = useState(false);

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StarIcon, AtSignIcon } from '@chakra-ui/icons';
 import { Icon } from '@chakra-ui/react';
-import Detailed_Training_Modal from './Detailed_Training_Modal.component';
 import { useDisclosure } from '@chakra-ui/react';
 import { useNavigate, useLocation } from '@tanstack/react-router';
 import { useRouter } from '@tanstack/react-router';
@@ -327,7 +326,7 @@ const TrainingCard = () => {
             <Detailed_Ex_Modal
                 isOpen={isOpen}
                 onClose={onClose}
-                programID={program.id}
+                data={program}
                 excersizeID={selectedExerciseId}
             />
         </div >
