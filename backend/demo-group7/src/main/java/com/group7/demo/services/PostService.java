@@ -212,7 +212,10 @@ public class PostService {
 
         // Convert posts to PostResponse
         return posts.stream()
-                .map(this::mapToPostResponse)
-                .toList();
+                .map(post -> mapper.mapToPostResponse(post, request))
+                .collect(Collectors.toList());
+
     }
+
+
 }
