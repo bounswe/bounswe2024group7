@@ -14,6 +14,8 @@ public interface TrainingProgramWithTrackingRepository extends JpaRepository<Tra
     List<TrainingProgramWithTracking> findByUserAndTrainingProgramIdAndStatus(User user, Long trainingProgramId, TrainingProgramWithTrackingStatus status);
     List<TrainingProgramWithTracking> findByUser(User user);
     List<TrainingProgramWithTracking> findByUserAndStatusNot(User user, TrainingProgramWithTrackingStatus status);
+    boolean existsByTrainingProgramIdAndUserId(Long trainingProgramId, Long userId);
+
 
 
 }
