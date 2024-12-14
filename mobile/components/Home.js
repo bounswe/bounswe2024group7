@@ -9,7 +9,11 @@ import CreatePost from './CreatePost';
 import CreateProgram from './CreateProgram';
 import Create from './Create';
 import SearchResults from './SearchResults';
-import { isLoggedIn } from '../user';
+import { isLoggedIn, userSessionToken } from '../user';
+import { useDispatch } from 'react-redux'
+import apiInstance from '../Api';
+import Toast from 'react-native-toast-message';
+import { userActions } from '../user.js'
 
 
 
@@ -17,16 +21,17 @@ import { isLoggedIn } from '../user';
 const Home = ({ navigation }) => {
   //const { isLoggedIn, logout } = useAuth();
   const {logout} = useAuth();
+  const dispatch = useDispatch();
   //const {isLoggedIn} = useUser();
   const LoggedIn = useSelector(isLoggedIn);
   //const isLoggedIn = true;
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [selectedPage, setSelectedPage] = useState('Feed');
   const [darkMode, setDarkMode] = useState(false); // Dark mode state
-
+  const sessionToken = useSelector(userSessionToken);
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const currentStyles = darkMode ? darkStyles : lightStyles;
-
+  console.log(sessionToken);
   const ProfilePageContainer = () => (
     <View style={currentStyles.page}>
       <ProfilePage darkMode={darkMode}/>
@@ -44,6 +49,42 @@ const Home = ({ navigation }) => {
         <SearchResults/>
       </View>
     );
+    const handleLogOut = async () => {
+      try {
+          const response = await apiInstance(sessionToken).post(`auth/logout?sessionToken=${sessionToken}`)
+          console.log(response);
+          if (response.status === 200) {
+
+              dispatch(userActions.logout());
+              navigation.replace('Home');
+                       }
+          else{
+            console.log(e)
+          Toast.show({
+            type: 'error',
+            position: 'bottom',
+            text1: 'Logout Error 2',
+            text2: 'There was an error while logging out. Please try again.',
+            visibilityTime: 2000,
+            autoHide: true,
+            topOffset: 30,
+            bottomOffset: 40
+          });
+          }
+      } catch (e) {
+          console.log(e)
+          Toast.show({
+            type: 'error',
+            position: 'bottom',
+            text1: 'Logout Error',
+            text2: 'There was an error while logging out. Please try again.',
+            visibilityTime: 2000,
+            autoHide: true,
+            topOffset: 30,
+            bottomOffset: 40
+          });
+      }
+  }
 
   // Apply styles based on dark mode
 
@@ -124,7 +165,7 @@ const Home = ({ navigation }) => {
                 <TouchableOpacity
 
                   style={currentStyles.profileMenuItem}
-                  onPress={logout}
+                  onPress={handleLogOut}
                 >
                   <Text style={currentStyles.profileMenuItemText}>Logout</Text>
                 </TouchableOpacity>

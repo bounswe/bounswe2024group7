@@ -8,58 +8,42 @@ import {
   ScrollView,
 } from 'react-native';
 
-const ProgramDetail = ({ route }) => {
-  const {
-    trainerUsername,
-    title,
-    description,
-    programId,
-    weeks,
-    rating,
-    level,
-    date,
-    participants,
-    navigation
-  } = route.params;
+const JoinedWorkout = ({ route }) => {
+  const {programId,weekId,weekNumber,workoutId,name,workoutNumber,workoutExercises, navigation} = route.params;
   const {expandedState,setExpandedState} = useState(0);
-  const renderWeek = ({ item, index }) => {
-    const workoutCount = item.workouts.length;
+  const renderExercise = ({ item, index, navigation }) => {
     return (
-      <View style={styles.weekContainer}>
-        <Text style={styles.weekTitle}>Week {index + 1}</Text>
-        <Text style={styles.workoutCount}>{workoutCount} Workouts</Text>
-        <TouchableOpacity style={styles.startButton} onPress = {()=>{navigation.navigate("JoinedWeek",{programId,programTitle:title,weekId:item.id,weekNumber:item.weekNumber,workouts:item.workouts, navigation:navigation})}}>
-          <Text style={styles.startButtonText}>Start Workout</Text>
+      <View style={styles.exerciseContainer}>
+       <View style={styles.exerciseNameContainer}>
+        <Text style={styles.exerciseTitle}>Session {index + 1}</Text>
+        <Text style={styles.exerciseName}>{item.exercise.name}</Text>
+
+        </View>
+        <Text style={styles.setCount}>{item.sets} Sets</Text>
+
+        <Text style={styles.repCount}>{item.repetitions} Reps</Text>
+
+        <TouchableOpacity style={styles.startButton}>
+          <Text style={styles.startButtonText}>Start</Text>
         </TouchableOpacity>
         <Text style={styles.completionText}>0%</Text>
+
       </View>
     );
   };
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.detailsContainer}>
-        <Text style={styles.level}>Level: {level}</Text>
-        <Text style={styles.type}>Type: BODY_BUILDING</Text>
-        <Text style={styles.trainer}>Trainer: {trainerUsername}</Text>
-        <Text style={styles.date}>Created @ {date}</Text>
-      </View>
-      <Text style={styles.description}>{description}</Text>
-      <Text style={styles.rating}>Rating: {rating}/5 (0 ratings)</Text>
+      <Text style={styles.title}>{name}</Text>
 
       <FlatList
-        data={weeks}
-        renderItem={renderWeek}
+        data={workoutExercises}
+        renderItem={(props) => renderExercise({ ...props, navigation })}
         keyExtractor={(item, index) => index.toString()}
       />
 
       <TouchableOpacity style={styles.commitButton}>
         <Text style={styles.commitButtonText}>Commit to Program</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.detailButton} onPress = {()=>navigation.navigate("WorkoutDetails",{weeks,navigation})}>
-        <Text style={styles.detailButtonText}>Show Detailed Description</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -70,6 +54,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#fff',
+  },
+  exerciseNameContainer: {
+    flex: 1,
   },
   title: {
     fontSize: 24,
@@ -105,21 +92,33 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'center',
   },
-  weekContainer: {
+  exerciseContainer: {
     backgroundColor: '#f9f9f9',
     padding: 16,
     marginBottom: 8,
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly', // Ensure equal spacing between items
   },
-  weekTitle: {
+  exerciseTitle: {
     fontSize: 16,
     fontWeight: 'bold',
   },
-  workoutCount: {
+  setCount: {
     fontSize: 14,
+    color: 'gray',
+    flex: 0.8, // Set equal flex for alignment
+    textAlign: 'center',
+  },
+  repCount: {
+    fontSize: 14,
+    color: 'gray',
+    flex: 0.8, // Set equal flex for alignment
+    textAlign: 'center',
+  },
+  exerciseName: {
+    fontSize: 13,
     color: 'gray',
   },
   startButton: {
@@ -127,6 +126,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 4,
+    flex: 0.9, // Equalize space allocation
+    alignItems: 'center',
   },
   startButtonText: {
     color: '#fff',
@@ -135,6 +136,8 @@ const styles = StyleSheet.create({
   completionText: {
     fontSize: 14,
     color: 'green',
+    flex: 0.4, // Equal flex
+    textAlign: 'center',
   },
   commitButton: {
     backgroundColor: 'green',
@@ -161,4 +164,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProgramDetail;
+export default JoinedWorkout;

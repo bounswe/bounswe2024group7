@@ -168,7 +168,7 @@ const FeedPage = ({ darkMode }) => {
           }},
     ];
 
-  const [selectedTab, setSelectedTab] = useState('forum'); // To track the selected tab
+  const [selectedTab, setSelectedTab] = useState('training'); // To track the selected tab
 
   // Function to render posts or programs based on the selected tab
   const renderContent = () => {
@@ -199,6 +199,7 @@ const FeedPage = ({ darkMode }) => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <PostCard
+            post_id={item.id}
             title={item.title}
             owner={item.username}
             description={item.content}
@@ -223,11 +224,14 @@ const FeedPage = ({ darkMode }) => {
             <ProgramCard
               title={item.title}
               description={item.description}
-              trainerUsername={item.trainerUsername}
-              exercises={item.exercises}
+              trainerUsername={item.trainer}
+              weeks={item.weeks}
               participants = {item.participants}
               date = {item.createdAt}
+              level = {item.level}
+              rating = {item.rating}
               navigation = {navigation}
+              programId = {item.id}
 
             />
           )}

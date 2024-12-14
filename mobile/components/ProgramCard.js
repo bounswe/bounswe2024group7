@@ -1,18 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const ProgramCard = ({ trainerUsername, title, description, exercises, date, participants, navigation }) => {
+const ProgramCard = ({ trainerUsername, title, description, programId, weeks, rating, level, date, participants, navigation }) => {
   return (
     <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('ProgramDetail', { trainerUsername, title, description, exercises, participants, date, navigation })}
+          onPress={() => navigation.navigate('ProgramDetail', { trainerUsername, title, description, programId, weeks, rating, level, date, participants, navigation })}
         >
       <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { username: trainerUsername })}>
         <Text style={styles.owner}>{trainerUsername}</Text>
       </TouchableOpacity>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
-      <Text style={styles.description}>Exercise count: {exercises.length}</Text>
+      <Text style={styles.description}>Week count: {weeks.length}</Text>
       <Text style={styles.description}>Participant count: {participants.length}</Text>
     </TouchableOpacity>
   );

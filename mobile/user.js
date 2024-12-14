@@ -37,7 +37,7 @@ const userSlice = createSlice({
       state.profile = null;
       state.password = "";
       state.sessionToken = "";
-      state.isLoggedIn = true;
+      state.isLoggedIn = false;
       saveState("userName", "");
       saveState("profile", null);
       saveState("password", "");

@@ -29,10 +29,17 @@ const UserProfile = ({ route}) => {
                                                                                                                                                                   ], likeCount: 15 },
     ];
 
-  const programs = [
+    const programs = [
       { id: 1, title: "Full Body Workout",
                    description: "This is a comprehensive program targeting all major muscle groups.",
-                   trainerUsername: "fitness_guru_123",
+                   trainerUsername: "sametalan",
+                   participants:[
+                    "sametalan2",
+                    "Hanaaa",
+                    "deno",
+                    "fit_deniz"
+                   ],
+                   createdAt:'2024-11-25T13:52:56.512941',
                    exercises: [
                      { exercise:{
                        name: "Push-Up",
@@ -61,7 +68,14 @@ const UserProfile = ({ route}) => {
                    ]},
        { id: 2, title: "Full Body Workout",
                     description: "This is a comprehensive program targeting all major muscle groups.",
-                    trainerUsername: "fitness_guru_123",
+                    trainerUsername: "fit_deniz",
+                    participants:[
+                      "sametalan2",
+                      "Hanaaa",
+                      "deno",
+                      "fit_deniz"
+                     ],
+                     createdAt:'2024-11-25T13:52:56.512941',
                     exercises: [
                       { exercise:{
                         name: "Push-Up",
@@ -90,6 +104,7 @@ const UserProfile = ({ route}) => {
                     ]}
 
     ];
+
 
 const diet_programs = [
         { id: 1, title: 'Gluten-free Diet Program', description: 'A protein based gluten-free diet.', owner: 'dietician_john', followCount: 100, category: 'gluten-free', nutrition_list: ['180 g fat', '300 g protein'], weeklySchedule: {
@@ -127,7 +142,7 @@ const {
     queryFn: async () => {
       try{
         const response = await apiInstance(sessionToken).get(`api/user/${username}`);
-
+        console.log("User response data: "+response.data)
         return response.data;
       }catch (error) {
         console.error('Error fetching posts:', error);
@@ -255,7 +270,7 @@ useEffect(() => {
       const response = await apiInstance(sessionToken).post(`api/user/${username}/follow`, {
 
         })
-          console.log(response)
+          console.log('Follow response : '+response)
 
         if (response.status === 200) {
 

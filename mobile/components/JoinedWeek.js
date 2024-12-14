@@ -8,58 +8,39 @@ import {
   ScrollView,
 } from 'react-native';
 
-const ProgramDetail = ({ route }) => {
-  const {
-    trainerUsername,
-    title,
-    description,
-    programId,
-    weeks,
-    rating,
-    level,
-    date,
-    participants,
-    navigation
-  } = route.params;
+const JoinedWeek = ({ route }) => {
+  const {programId,programTitle,weekId,weekNumber,workouts,navigation} = route.params;
   const {expandedState,setExpandedState} = useState(0);
-  const renderWeek = ({ item, index }) => {
-    const workoutCount = item.workouts.length;
+  const renderWorkout = ({ item, index, navigation }) => {
     return (
-      <View style={styles.weekContainer}>
-        <Text style={styles.weekTitle}>Week {index + 1}</Text>
-        <Text style={styles.workoutCount}>{workoutCount} Workouts</Text>
-        <TouchableOpacity style={styles.startButton} onPress = {()=>{navigation.navigate("JoinedWeek",{programId,programTitle:title,weekId:item.id,weekNumber:item.weekNumber,workouts:item.workouts, navigation:navigation})}}>
-          <Text style={styles.startButtonText}>Start Workout</Text>
+      <View style={styles.exerciseContainer}>
+       <View style={styles.exerciseNameContainer}>
+        <Text style={styles.exerciseTitle}>{item.name}</Text>
+        <Text style={styles.exerciseName}>{item.workoutExercises.length}</Text>
+
+        </View>
+
+        <TouchableOpacity style={styles.startButton} onPress = {()=>{navigation.navigate("JoinedWorkout",{programId,weekId,weekNumber,workoutId:item.id,name:item.name,workoutNumber:item.workoutNumber,workoutExercises:item.workoutExercises, navigation})}}>
+          <Text style={styles.startButtonText}>Start</Text>
         </TouchableOpacity>
         <Text style={styles.completionText}>0%</Text>
+
       </View>
     );
   };
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.detailsContainer}>
-        <Text style={styles.level}>Level: {level}</Text>
-        <Text style={styles.type}>Type: BODY_BUILDING</Text>
-        <Text style={styles.trainer}>Trainer: {trainerUsername}</Text>
-        <Text style={styles.date}>Created @ {date}</Text>
-      </View>
-      <Text style={styles.description}>{description}</Text>
-      <Text style={styles.rating}>Rating: {rating}/5 (0 ratings)</Text>
+      <Text style={styles.title}>{programTitle} | Week{weekNumber}</Text>
 
       <FlatList
-        data={weeks}
-        renderItem={renderWeek}
+        data={workouts}
+        renderItem={(props) => renderWorkout({ ...props, navigation })}
         keyExtractor={(item, index) => index.toString()}
       />
 
       <TouchableOpacity style={styles.commitButton}>
         <Text style={styles.commitButtonText}>Commit to Program</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.detailButton} onPress = {()=>navigation.navigate("WorkoutDetails",{weeks,navigation})}>
-        <Text style={styles.detailButtonText}>Show Detailed Description</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -71,6 +52,10 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
+  exerciseNameContainer: {
+      flex: 0.9,
+      padding: 10
+    },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -105,7 +90,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'center',
   },
-  weekContainer: {
+  exerciseContainer: {
     backgroundColor: '#f9f9f9',
     padding: 16,
     marginBottom: 8,
@@ -114,19 +99,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  weekTitle: {
+  exerciseTitle: {
     fontSize: 16,
     fontWeight: 'bold',
   },
-  workoutCount: {
+  setCount: {
     fontSize: 14,
     color: 'gray',
   },
+  repCount: {
+      fontSize: 14,
+      color: 'gray',
+    },
+   exerciseName: {
+         fontSize: 13,
+         color: 'gray',
+       },
   startButton: {
     backgroundColor: '#007bff',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 4,
+    flex:0.8
   },
   startButtonText: {
     color: '#fff',
@@ -135,6 +129,9 @@ const styles = StyleSheet.create({
   completionText: {
     fontSize: 14,
     color: 'green',
+    flex:0.6,
+    padding: 10,
+
   },
   commitButton: {
     backgroundColor: 'green',
@@ -161,4 +158,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProgramDetail;
+export default JoinedWeek;
