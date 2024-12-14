@@ -7,22 +7,38 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-
+import { Picker } from '@react-native-picker/picker'; // Import Picker
 
 const Survey = ({ route }) => {
-    const {userId, fitnessGoals, fitnessLevel, navigation} = route.params;
+    const {username,  navigation} = route.params;
 
     const goHome = () => navigation.navigate('Home');
 
     const [level, setLevel] = useState('Beginner'); // Default Level
-    const [geals, setGoals] = useState(''); // Default No Goals
+    const [goals, setGoals] = useState([]); // Default No Goals
+    const goalOptions = [
+        { label: 'Pilates', value: 'pilates' },
+        { label: 'Cycling', value: 'cycling' },
+        { label: 'Yoga', value: 'yoga' },
+        { label: 'Cardio', value: 'cardio' },
+        { label: 'Strength Training', value: 'strength_training' },
+      ];
 
-    const deliverDatabase = async (userId, fitnessGoals, fitnessLevel) => {
+    const handleGoalSelection = (goal) => {
+        if (goals.includes(goal)) {
+          // Goal is already selected, remove it
+          setGoals(goals.filter((selectedGoal) => selectedGoal !== goal));
+        } else {
+          // Goal is not selected, add it
+          setGoals([...goals, goal]);
+        }
+      };
+    /*const deliverDatabase = async (username, fitnessGoals, fitnessLevel) => {
         try{
             const response = await apiInstance().post(
                 "api/surveys",
                 {
-                    userId,
+                    username,
                     fitnessGoals,
                     fitnessLevel
                 }
@@ -32,14 +48,7 @@ const Survey = ({ route }) => {
             
                     const data = response.data
             
-                    dispatch(
-                        userActions.login({
-                            userId: data.id,
-                            userName: data.username,
-                            fitnessGoals: data.fitnessGoals,
-                            fitnessLevel: data.fitnessLevel
-                        })
-                    )            
+
                     goHome();
                 }
         }
@@ -56,47 +65,59 @@ const Survey = ({ route }) => {
                 bottomOffset: 40
             });
         }
-    }
+    }*/
 
-    const renderSurvey = ({ item, index, navigation }) => {
-        <View style={styles.exerciseContainer}>
+    const deliverDatabase = (username, goals, level) => {
+            console.log(goals);
+            console.log(level);
+            goHome();
+        }
 
-            <Text style={styles.fitnessGoal}>{item.fitnessGoals} Your Fitness Goals</Text>
-            <Picker
-                selectedValue={fitnessGoals}
-                onValueChange={(itemValue) => setGoals(itemValue)}
-                style={styles.picker} >
-                <Picker.Item label="Pilates" value="pilates" />
-                <Picker.Item label="Cycling" value="cycling" />
-                <Picker.Item label="Yoga" value="yoga" />
-                <Picker.Item label="Cardio" value="cardio" />
-                <Picker.Item label="Strength Training" value="strength_training" />
-            </Picker>
-        
-            <Text style={styles.fitnessLevel}>{item.fitnessLevels} Select Your Fitness Level</Text>        
-            <Picker
-                selectedValue={fitnessLevel}
-                onValueChange={(itemValue) => setLevel(itemValue)}
-                style={styles.picker} >
-                <Picker.Item label="Intermediate" value="Intermediate" />
-                <Picker.Item label="Beginner" value="Beginner" />
-                <Picker.Item label="Professional" value="Professional" />
-            </Picker>
-        
-        </View>
-    }
 
     return (
         <ScrollView style={styles.container}>
           <Text style={styles.title}> Before Facting Fitness... </Text>    
-            <FlatList
-                data={fitnessGoals}
-                renderItem={(props) => renderSurvey({ item, index, navigation })}
-                keyExtractor={(item, index) => index.toString()}
-            />
+            <View style={styles.exerciseContainer}>
+
+                        <Text style={styles.fitnessGoal}> Select Your Fitness Goals</Text>
+                        <View style={styles.optionsContainer}>
+
+                        {goalOptions.map((option) => (
+                                  <TouchableOpacity
+                                    key={option.value}
+                                    style={[
+                                      styles.goalOption,
+                                      goals.includes(option.value) && styles.selectedGoalOption,
+                                    ]}
+                                    onPress={() => handleGoalSelection(option.value)}
+                                  >
+                                    <Text
+                                      style={[
+                                        styles.goalOptionText,
+                                        goals.includes(option.value) && styles.selectedGoalOptionText,
+                                      ]}
+                                    >
+                                      {option.label}
+                                    </Text>
+                                  </TouchableOpacity>
+                                ))}
+                        </View>
+                        <Text style={styles.fitnessLevel}> Select Your Fitness Level</Text>
+                        <View style={styles.pickerContainer}>
+                        <Picker
+                            selectedValue={level}
+                            onValueChange={(itemValue) => setLevel(itemValue)}
+                            style={styles.picker} >
+                            <Picker.Item label="Intermediate" value="Intermediate" />
+                            <Picker.Item label="Beginner" value="Beginner" />
+                            <Picker.Item label="Professional" value="Professional" />
+                        </Picker>
+                        </View>
+
+                    </View>
             <TouchableOpacity
                   style={styles.button}
-                  onPress={() => deliverDatabase(userId, fitnessGoals, fitnessLevel)}
+                  onPress={() => deliverDatabase(username, goals, level)}
                 >
                   <Text style={styles.buttonText}>Start The Journey</Text>
             </TouchableOpacity>
@@ -107,6 +128,25 @@ const Survey = ({ route }) => {
 
 
 const styles = StyleSheet.create({
+goalOption: {
+    backgroundColor: '#f9f9f9',
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  selectedGoalOption: {
+    backgroundColor: '#007bff',
+    borderColor: '#007bff',
+  },
+  goalOptionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  selectedGoalOptionText: {
+    color: '#fff',
+  },
     container: {
       flex: 1,
       padding: 16,
@@ -115,6 +155,9 @@ const styles = StyleSheet.create({
     exerciseNameContainer: {
       flex: 1,
     },
+    pickerContainer: {
+          alignItems: "center",
+        },
     title: {
       fontSize: 24,
       fontWeight: 'bold',
@@ -150,27 +193,32 @@ const styles = StyleSheet.create({
       textAlign: 'center',
     },
     exerciseContainer: {
-      backgroundColor: '#f9f9f9',
       padding: 16,
       marginBottom: 8,
       borderRadius: 8,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-evenly', // Ensure equal spacing between items
+      flex:1
     },
+    optionsContainer: {
+          padding: 10,
+          flexDirection:'column',
+          justifyContent:'space-between',
+          marginBottom: 20
+        },
     exerciseTitle: {
       fontSize: 16,
       fontWeight: 'bold',
     },
     fitnessGoal: {
-      fontSize: 14,
-      color: 'gray',
+      fontSize: 17,
+      fontWeight: 'bold',
+      marginBottom: 8,
       flex: 0.8, // Set equal flex for alignment
       textAlign: 'center',
     },
     fitnessLevel: {
-      fontSize: 14,
-      color: 'gray',
+      fontSize: 17,
+      fontWeight: 'bold',
+      marginBottom: 8,
       flex: 0.8, // Set equal flex for alignment
       textAlign: 'center',
     },
@@ -223,14 +271,14 @@ const styles = StyleSheet.create({
         width: '80%',
         height: 50,
         marginTop: 10,
+        marginLeft:10,
         backgroundColor: '#F8F8F8',
         borderColor: 'gray',
         borderWidth: 1,
         borderRadius: 5,
     },
     button: {
-        backgroundColor: '#3C3633',
-        width: '80%',
+    backgroundColor: '#6366F1',
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
