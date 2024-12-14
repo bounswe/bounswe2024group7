@@ -25,30 +25,30 @@ public class SurveyController {
         return ResponseEntity.ok(response);
     }
 
-    // Get survey by user ID
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<SurveyResponse> getSurveyByUser(@PathVariable Long userId) {
-        SurveyResponse response = surveyService.getSurveyByUser(userId);
+    // Get survey by username
+    @GetMapping("/user/{username}")
+    public ResponseEntity<SurveyResponse> getSurveyByUser(@PathVariable String username) {
+        SurveyResponse response = surveyService.getSurveyByUser(username);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{userId}/fitness-goals")
-    public ResponseEntity<List<String>> getUserFitnessGoals(@PathVariable Long userId) {
-        List<String> fitnessGoals = surveyService.getUserFitnessGoals(userId);
+    @GetMapping("/{username}/fitness-goals")
+    public ResponseEntity<List<String>> getUserFitnessGoals(@PathVariable String username) {
+        List<String> fitnessGoals = surveyService.getUserFitnessGoals(username);
         return ResponseEntity.ok(fitnessGoals);
     }
 
     // Add multiple fitness goals
-    @PostMapping("/{userId}/fitness-goals")
-    public ResponseEntity<List<String>> addFitnessGoals(@PathVariable Long userId, @RequestBody List<String> goals) {
-        List<String> addedGoals = surveyService.addFitnessGoals(userId, goals);
+    @PostMapping("/{username}/fitness-goals")
+    public ResponseEntity<List<String>> addFitnessGoals(@PathVariable String username, @RequestBody List<String> goals) {
+        List<String> addedGoals = surveyService.addFitnessGoals(username, goals);
         return ResponseEntity.ok(addedGoals);
     }
 
     // Remove multiple fitness goals
-    @DeleteMapping("/{userId}/fitness-goals")
-    public ResponseEntity<Void> removeFitnessGoals(@PathVariable Long userId, @RequestBody List<String> goals) {
-        surveyService.removeFitnessGoals(userId, goals);
+    @DeleteMapping("/{username}/fitness-goals")
+    public ResponseEntity<Void> removeFitnessGoals(@PathVariable String username, @RequestBody List<String> goals) {
+        surveyService.removeFitnessGoals(username, goals);
         return ResponseEntity.ok().build();
     }
 }
