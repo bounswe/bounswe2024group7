@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class TrainingProgramService {
 
     private final TrainingProgramRepository trainingProgramRepository;
+    private final TrainingProgramRatingRepository trainingProgramRatingRepository;
 
     private final AuthenticationService authenticationService;
 
@@ -389,6 +390,65 @@ public class TrainingProgramService {
         }
 
         return weeklyCompletionRates;
+    }
+
+    public void rateTrainingProgram(Long trainingProgramId, Long userId, int rating) {
+        // Validate the rating value
+        if (rating < 0 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 0 and 5");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+
+        // Ensure the user is a participant
+        boolean isParticipant = trainingProgramWithTrackingRepository.existsByTrainingProgramIdAndUserId(trainingProgramId, userId);
+        if (!isParticipant) {
+            throw new IllegalArgumentException("Only participants can rate the training program");
+        }
+
+        // Fetch the training program
+        TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
+                .orElseThrow(() -> new IllegalArgumentException("Training program not found"));
+
+        // Check if the user has already rated the program
+        Optional<TrainingProgramRating> existingRatingOpt = trainingProgramRatingRepository.findByTrainingProgramIdAndUserId(trainingProgramId, userId);
+
+        if (existingRatingOpt.isPresent()) {
+            // Update the existing rating
+            TrainingProgramRating existingRating = existingRatingOpt.get();
+            int oldRating = existingRating.getRating();
+            existingRating.setRating(rating);
+            trainingProgramRatingRepository.save(existingRating);
+
+            // Adjust the program's average rating
+            updateAverageRating(trainingProgram, oldRating, rating, false);
+        } else {
+            // Add a new rating
+            TrainingProgramRating newRating = TrainingProgramRating.builder()
+                    .trainingProgram(trainingProgram)
+                    .user(user)
+                    .rating(rating)
+                    .build();
+            trainingProgramRatingRepository.save(newRating);
+
+            // Adjust the program's average rating
+            updateAverageRating(trainingProgram, 0, rating, true);
+        }
+    }
+
+    private void updateAverageRating(TrainingProgram trainingProgram, int oldRating, int newRating, boolean isNew) {
+        double totalRatingSum = trainingProgram.getRating() * trainingProgram.getRatingCount();
+
+        if (isNew) {
+            totalRatingSum += newRating;
+            trainingProgram.setRatingCount(trainingProgram.getRatingCount() + 1);
+        } else {
+            totalRatingSum = totalRatingSum - oldRating + newRating;
+        }
+
+        trainingProgram.setRating(totalRatingSum / trainingProgram.getRatingCount());
+        trainingProgramRepository.save(trainingProgram);
     }
 
 }
