@@ -96,6 +96,14 @@ public class TrainingProgramController {
         return ResponseEntity.ok(completionRates);
     }
 
+    @PostMapping("/{trainingProgramId}/rate")
+    public ResponseEntity<Void> rateTrainingProgram(@PathVariable Long trainingProgramId,
+                                                    @RequestParam Long userId,
+                                                    @RequestParam int rating) {
+        trainingProgramService.rateTrainingProgram(trainingProgramId, userId, rating);
+        return ResponseEntity.ok().build();
+    }
+
 
 
 }
