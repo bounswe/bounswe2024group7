@@ -20,6 +20,7 @@ import WorkoutDetails from './components/WorkoutDetails';
 import JoinedWorkout from './components/JoinedWorkout';
 import JoinedWeek from './components/JoinedWeek';
 import JoinedExercise from './components/JoinedExercise';
+import JoinedProgramDetail from './components/JoinedProgramDetail';
 
 import { Provider as ReduxProvider } from 'react-redux';
 import {
@@ -78,6 +79,8 @@ const App = () => {
                 <Stack.Screen name="JoinedWeek" component={JoinedWeek} />
                 <Stack.Screen name="JoinedWorkout" component={JoinedWorkout} />
                 <Stack.Screen name="JoinedExercise" component={JoinedExercise} />
+                <Stack.Screen name="JoinedProgramDetail" component={JoinedProgramDetail} />
+
               </Stack.Navigator>
             </NavigationContainer>
           </AuthProvider>
