@@ -224,7 +224,7 @@ function ProgramFeedCard({
     const handleStartPracticing = (program_id) => {
         navigate(
             {
-                to: `/program?programId=${program_id}`,
+                to: `/training?trainingId=${program_id}`,
             }
         )
     }

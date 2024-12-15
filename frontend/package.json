@@ -49,6 +49,7 @@
     "react-redux": "^9.1.1",
     "react-router-dom": "^6.28.0",
     "react-select": "^5.8.0",
+    "react-toastify": "^10.0.6",
     "sass": "^1.54.5",
     "vite": "^3.0.9"
   },
