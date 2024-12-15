@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -15,34 +15,40 @@ import {
     useColorModeValue,
     useDisclosure,
     useToast,
+    VStack,
+    HStack,
+    Box,
+    Text,
+    IconButton,
+    NumberInput,
+    NumberInputField,
 } from "@chakra-ui/react";
-import { useState } from 'react';
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { muscleGroups, locationType, programTypes } from '../constants/program';
 import { UserContext } from '../context/UserContext';
 import { AppContext } from '../context/AppContext';
 import apiInstance from '../instance/apiInstance';
 
-function CreateProgramModal({ isOpen, onClose }) {
-    const sessionToken = useSelector((state) => state.user.sessionToken);
+const programLevelOptions = [
+    { value: 'BEGINNER', label: 'Beginner' },
+    { value: 'INTERMEDIATE', label: 'Intermediate' },
+    { value: 'ADVANCED', label: 'Advanced' }
+];
 
-    const [title, setTitle] = useState('');
-    const [exercises, setExercises] = useState([]);
-    const [description, setDescription] = useState('');
-    const [selectedExercise, setSelectedExercise] = useState('');
-    const [exerciseSets, setExerciseSets] = useState('');
-    const [exerciseReps, setExerciseReps] = useState('');
+const programTypeOptions = [
+    { value: 'CARDIO', label: 'Cardio' },
+    { value: 'BODY_BUILDING', label: 'Body Building' },
+    { value: 'FLEXIBILITY', label: 'Flexibility' },
+    { value: 'BALANCE', label: 'Balance' }
+];
 
-    const { user } = useContext(UserContext);
-    const { exercises: exerciseOptions, isLoadingExercises } = useContext(AppContext);
-
-    const {
-        isOpen: isExerciseModalOpen,
-        onOpen: onExerciseModalOpen,
-        onClose: onExerciseModalClose,
-    } = useDisclosure();
+// Exercise Modal Component
+function ExerciseModal({ isOpen, onClose, onAdd, exercises }) {
+    const [selectedExercise, setSelectedExercise] = useState(null);
+    const [sets, setSets] = useState('');
+    const [reps, setReps] = useState('');
 
     const theme = useColorModeValue('light', 'dark');
     const selectComponentStyles = {
@@ -53,16 +59,151 @@ function CreateProgramModal({ isOpen, onClose }) {
         }),
     };
 
+    const handleAdd = () => {
+        if (selectedExercise && sets && reps) {
+            const exercise = exercises.find(ex => ex.id === selectedExercise.value);
+            onAdd({
+                exerciseId: exercise.id,
+                name: exercise.name,
+                sets: parseInt(sets),
+                repetitions: parseInt(reps)
+            });
+            handleClose();
+        }
+    };
+
+    const handleClose = () => {
+        setSelectedExercise(null);
+        setSets('');
+        setReps('');
+        onClose();
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={handleClose}>
+            <ModalOverlay />
+            <ModalContent>
+                <ModalHeader>Add Exercise</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                    <FormControl mb={4}>
+                        <FormLabel>Exercise</FormLabel>
+                        <Select
+                            options={exercises.map(exercise => ({
+                                value: exercise.id,
+                                label: exercise.name
+                            }))}
+                            value={selectedExercise}
+                            onChange={setSelectedExercise}
+                            styles={selectComponentStyles}
+                        />
+                    </FormControl>
+
+                    <FormControl mb={4}>
+                        <FormLabel>Sets</FormLabel>
+                        <NumberInput min={1} value={sets} onChange={(value) => setSets(value)}>
+                            <NumberInputField />
+                        </NumberInput>
+                    </FormControl>
+
+                    <FormControl mb={4}>
+                        <FormLabel>Repetitions</FormLabel>
+                        <NumberInput min={1} value={reps} onChange={(value) => setReps(value)}>
+                            <NumberInputField />
+                        </NumberInput>
+                    </FormControl>
+                </ModalBody>
+
+                <ModalFooter>
+                    <Button colorScheme="blue" mr={3} onClick={handleAdd}>
+                        Add Exercise
+                    </Button>
+                    <Button onClick={handleClose}>Cancel</Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
+    );
+}
+
+// Main CreateProgramModal Component
+function CreateProgramModal({ isOpen, onClose }) {
+    const sessionToken = useSelector((state) => state.user.sessionToken);
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [programLevel, setProgramLevel] = useState(null);
+    const [programType, setProgramType] = useState(null);
+    const [interval, setInterval] = useState(1);
+    const [weeks, setWeeks] = useState([{ workouts: [] }]);
+    
+    // State for exercise modal
+    const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
+    const [currentWeekIndex, setCurrentWeekIndex] = useState(null);
+    const [currentWorkoutIndex, setCurrentWorkoutIndex] = useState(null);
+
+    const { user } = useContext(UserContext);
+    const { exercises: exerciseOptions, isLoadingExercises } = useContext(AppContext);
+    const theme = useColorModeValue('light', 'dark');
     const toast = useToast();
     const queryClient = useQueryClient();
+
+    const selectComponentStyles = {
+        control: (styles) => ({
+            ...styles,
+            backgroundColor: theme === 'light' ? 'white' : 'gray.700',
+            color: theme === 'light' ? 'black' : 'white',
+        }),
+    };
 
     const resetAllFields = () => {
         setTitle('');
         setDescription('');
-        setExercises([]);
-        setSelectedExercise('');
-        setExerciseSets('');
-        setExerciseReps('');
+        setProgramLevel(null);
+        setProgramType(null);
+        setInterval(1);
+        setWeeks([{ workouts: [] }]);
+    };
+
+    const addWeek = () => {
+        setWeeks([...weeks, { workouts: [] }]);
+    };
+
+    const addWorkout = (weekIndex) => {
+        const newWeeks = [...weeks];
+        const workoutNumber = newWeeks[weekIndex].workouts.length + 1;
+        newWeeks[weekIndex].workouts.push({
+            name: `Workout ${workoutNumber}`,
+            exercises: []
+        });
+        setWeeks(newWeeks);
+    };
+
+    const openExerciseModal = (weekIndex, workoutIndex) => {
+        setCurrentWeekIndex(weekIndex);
+        setCurrentWorkoutIndex(workoutIndex);
+        setIsExerciseModalOpen(true);
+    };
+
+    const handleAddExercise = (exercise) => {
+        const newWeeks = [...weeks];
+        newWeeks[currentWeekIndex].workouts[currentWorkoutIndex].exercises.push(exercise);
+        setWeeks(newWeeks);
+    };
+
+    const removeWeek = (weekIndex) => {
+        const newWeeks = weeks.filter((_, index) => index !== weekIndex);
+        setWeeks(newWeeks);
+    };
+
+    const removeWorkout = (weekIndex, workoutIndex) => {
+        const newWeeks = [...weeks];
+        newWeeks[weekIndex].workouts.splice(workoutIndex, 1);
+        setWeeks(newWeeks);
+    };
+
+    const removeExercise = (weekIndex, workoutIndex, exerciseIndex) => {
+        const newWeeks = [...weeks];
+        newWeeks[weekIndex].workouts[workoutIndex].exercises.splice(exerciseIndex, 1);
+        setWeeks(newWeeks);
     };
 
     const createProgramMutation = useMutation({
@@ -70,7 +211,7 @@ function CreateProgramModal({ isOpen, onClose }) {
             if (!user) {
                 toast({
                     title: 'Not logged in.',
-                    description: 'Please log in to create a post.',
+                    description: 'Please log in to create a program.',
                     status: 'error',
                     duration: 9000,
                     isClosable: true,
@@ -78,10 +219,10 @@ function CreateProgramModal({ isOpen, onClose }) {
                 return;
             }
 
-            if (!title || !description || exercises.length === 0) {
+            if (!title || !description || !programLevel || !programType || weeks.length === 0) {
                 toast({
                     title: 'Invalid program.',
-                    description: 'Please fill in all fields.',
+                    description: 'Please fill in all required fields.',
                     status: 'error',
                     duration: 9000,
                     isClosable: true,
@@ -89,11 +230,26 @@ function CreateProgramModal({ isOpen, onClose }) {
                 return;
             }
 
-            const response = await apiInstance(sessionToken).post('api/training-programs', {
+            // Transform the data to match the API structure
+            const requestData = {
                 title,
                 description,
-                exercises,
-            });
+                type: programType.value,
+                level: programLevel.value,
+                interval,
+                weeks: weeks.map(week => ({
+                    workouts: week.workouts.map(workout => ({
+                        name: workout.name,
+                        exercises: workout.exercises.map(exercise => ({
+                            exerciseId: exercise.exerciseId,
+                            repetitions: exercise.repetitions,
+                            sets: exercise.sets
+                        }))
+                    }))
+                }))
+            };
+
+            const response = await apiInstance(sessionToken).post('api/training-programs', requestData);
 
             toast({
                 title: 'Program created.',
@@ -121,140 +277,146 @@ function CreateProgramModal({ isOpen, onClose }) {
         },
     });
 
-    const addExercise = () => {
-        if (!selectedExercise || !exerciseSets || !exerciseReps) {
-            toast({
-                title: 'Invalid exercise.',
-                description: 'Please fill in all fields.',
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-            });
-            return;
-        }
-
-        setExercises([
-            ...exercises,
-            {
-                id: selectedExercise ? selectedExercise.value : '',
-                sets: exerciseSets,
-                repetitions: exerciseReps,
-            },
-        ]);
-
-        setExerciseSets('');
-        setExerciseReps('');
-        setSelectedExercise('');
-        onExerciseModalClose();
-    };
-
-    const onCloseReset = () => {
+    const handleClose = () => {
         resetAllFields();
         onClose();
-    }
+    };
 
     return (
-        <Modal blockScrollOnMount={false} isOpen={isOpen} onClose={onCloseReset} size="3xl">
+        <Modal isOpen={isOpen} onClose={handleClose} size="4xl">
             <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>Create a new program</ModalHeader>
+            <ModalContent maxH="90vh" overflowY="auto">
+                <ModalHeader>Create Training Program</ModalHeader>
                 <ModalCloseButton />
-                <ModalBody display="flex" flexDirection="column" gap={4}>
-                    <FormControl id="title">
-                        <FormLabel>Title</FormLabel>
-                        <Input
-                            type="text"
-                            focusBorderColor="purple.500"
-                            onChange={(e) => setTitle(e.target.value)}
-                        />
-                    </FormControl>
-                    <FormControl id="content">
-                        <FormLabel>Description</FormLabel>
-                        <Textarea
-                            focusBorderColor="purple.500"
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-                    </FormControl>
-                    <FormControl id="exercises">
-                        <FormLabel>Exercises</FormLabel>
-                        <ul>
-                            {exercises.map((exercise, index) => (
-                                <li key={index}>
-                                    {exercise.name} - {exercise.sets} sets of{' '}
-                                    {exercise.repetitions} reps for {exercise.muscleGroup}
-                                </li>
-                            ))}
-                        </ul>
-                    </FormControl>
-                    <Button colorScheme="purple" onClick={onExerciseModalOpen}>
-                        Add Exercises
-                    </Button>
+                <ModalBody>
+                    <VStack spacing={4}>
+                        <FormControl isRequired>
+                            <FormLabel>Title</FormLabel>
+                            <Input
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="Program Title"
+                            />
+                        </FormControl>
+
+                        <FormControl isRequired>
+                            <FormLabel>Description</FormLabel>
+                            <Textarea
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                placeholder="Program Description"
+                            />
+                        </FormControl>
+
+                        <HStack width="100%" spacing={4}>
+                            <FormControl isRequired>
+                                <FormLabel>Level</FormLabel>
+                                <Select
+                                    options={programLevelOptions}
+                                    value={programLevel}
+                                    onChange={setProgramLevel}
+                                    styles={selectComponentStyles}
+                                    placeholder="Select Level"
+                                />
+                            </FormControl>
+
+                            <FormControl isRequired>
+                                <FormLabel>Type</FormLabel>
+                                <Select
+                                    options={programTypeOptions}
+                                    value={programType}
+                                    onChange={setProgramType}
+                                    styles={selectComponentStyles}
+                                    placeholder="Select Type"
+                                />
+                            </FormControl>
+
+                            <FormControl isRequired>
+                                <FormLabel>Interval (weeks)</FormLabel>
+                                <NumberInput min={1} value={interval} onChange={(value) => setInterval(parseInt(value))}>
+                                    <NumberInputField />
+                                </NumberInput>
+                            </FormControl>
+                        </HStack>
+
+                        {weeks.map((week, weekIndex) => (
+                            <Box key={weekIndex} w="100%" p={4} borderWidth="1px" borderRadius="lg">
+                                <HStack justifyContent="space-between" mb={4}>
+                                    <Text fontSize="lg" fontWeight="bold">Week {weekIndex + 1}</Text>
+                                    <HStack>
+                                        <Button size="sm" leftIcon={<AddIcon />} onClick={() => addWorkout(weekIndex)}>
+                                            Add Workout
+                                        </Button>
+                                        <IconButton
+                                            size="sm"
+                                            icon={<DeleteIcon />}
+                                            onClick={() => removeWeek(weekIndex)}
+                                            aria-label="Remove week"
+                                        />
+                                    </HStack>
+                                </HStack>
+
+                                <VStack spacing={4} align="stretch">
+                                    {week.workouts.map((workout, workoutIndex) => (
+                                        <Box key={workoutIndex} p={3} borderWidth="1px" borderRadius="md">
+                                            <HStack justifyContent="space-between" mb={2}>
+                                                <Text fontSize="md" fontWeight="semibold">
+                                                    Workout {workoutIndex + 1}
+                                                </Text>
+                                                <HStack>
+                                                    <Button 
+                                                        size="sm" 
+                                                        onClick={() => openExerciseModal(weekIndex, workoutIndex)}
+                                                    >
+                                                        Add Exercise
+                                                    </Button>
+                                                    <IconButton
+                                                        size="sm"
+                                                        icon={<DeleteIcon />}
+                                                        onClick={() => removeWorkout(weekIndex, workoutIndex)}
+                                                        aria-label="Remove workout"
+                                                    />
+                                                </HStack>
+                                            </HStack>
+
+                                            {workout.exercises.map((exercise, exerciseIndex) => (
+                                                <HStack key={exerciseIndex} mt={2}>
+                                                    <Text flex={1}>{exercise.name}</Text>
+                                                    <Text>{exercise.sets} sets x {exercise.repetitions} reps</Text>
+                                                    <IconButton
+                                                        size="sm"
+                                                        icon={<DeleteIcon />}
+                                                        onClick={() => removeExercise(weekIndex, workoutIndex, exerciseIndex)}
+                                                        aria-label="Remove exercise"
+                                                    />
+                                                </HStack>
+                                            ))}
+                                        </Box>
+                                    ))}
+                                </VStack>
+                            </Box>
+                        ))}
+
+                        <Button leftIcon={<AddIcon />} onClick={addWeek} width="100%">
+                            Add Week
+                        </Button>
+                    </VStack>
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button
-                        colorScheme="purple"
-                        mr={3}
-                        onClick={() => createProgramMutation.mutate()}
-                    >
-                        Save
+                    <Button colorScheme="blue" mr={3} onClick={() => createProgramMutation.mutate()}>
+                        Create Program
                     </Button>
-                    <Button
-                        variant="ghost"
-                        onClick={() => {
-                            onCloseReset();
-                        }}
-                    >
-                        Cancel
-                    </Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                 </ModalFooter>
             </ModalContent>
 
-            <Modal blockScrollOnMount={false} isOpen={isExerciseModalOpen} onClose={onExerciseModalClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Add Exercises</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <FormControl id="exerciseName">
-                            <FormLabel>Exercise Name</FormLabel>
-                            <Select
-                                options={exerciseOptions.map((exercise) => ({
-                                    label: exercise.name,
-                                    value: exercise.id,
-                                }))}
-                                isLoading={isLoadingExercises}
-                                styles={selectComponentStyles}
-                                onChange={(selected) => setSelectedExercise(selected)}
-                            />
-                        </FormControl>
-                        <FormControl id="exerciseSets">
-                            <FormLabel>Sets</FormLabel>
-                            <Input
-                                type="number"
-                                focusBorderColor="purple.500"
-                                onChange={(e) => setExerciseSets(e.target.value)}
-                            />
-                        </FormControl>
-                        <FormControl id="exerciseReps">
-                            <FormLabel>Reps</FormLabel>
-                            <Input
-                                type="number"
-                                focusBorderColor="purple.500"
-                                onChange={(e) => setExerciseReps(e.target.value)}
-                            />
-                        </FormControl>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button colorScheme="purple" mr={3} onClick={addExercise}>
-                            Add
-                        </Button>
-                        <Button variant="ghost" onClick={onExerciseModalClose}>
-                            Cancel
-                        </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+            <ExerciseModal
+                isOpen={isExerciseModalOpen}
+                onClose={() => setIsExerciseModalOpen(false)}
+                onAdd={handleAddExercise}
+                exercises={exerciseOptions || []}
+            />
         </Modal>
     );
 }
