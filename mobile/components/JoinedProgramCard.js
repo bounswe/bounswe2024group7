@@ -1,37 +1,20 @@
+
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { userName, userSessionToken } from '../user.js';
 import { useQuery } from "@tanstack/react-query"
 import apiInstance from '../Api';
-const ProgramCard = ({ trainerUsername, title, description, programId, weeks, rating, level, joined, date, participants, navigation }) => {
+const JoinedProgramCard = ({ trainerUsername, title, description, programId, weeks, rating, level, joined, date, participants, navigation }) => {
 
-    const [isJoined, setIsJoined] = useState(false);
     const sessionToken = useSelector(userSessionToken)
     const username = useSelector(userName)
     console.log(username);
-    const {
-            data: joinedData,
-            isFetching: programsIsFetching,
-            isLoading: programsIsLoading,
-        } = useQuery({
-            queryKey: ['joined-training-program'],
-            queryFn: async () => {
-                const response = await apiInstance().get(`api/training-programs/joined/${username}`)
-                console.log(response);
-                return response.data
-            },
-            refetchInterval:60000,
-        })
-        useEffect(() => {
-            if (joinedData && !programsIsFetching) {
-                setIsJoined(joinedData.some((program)=>{return program.id == programId}))
-            }
-        }, [joinedData, programsIsFetching])
+
   return (
     <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('ProgramDetail', { trainerUsername, joined:isJoined, title, description, programId, weeks, rating, level, date, participants, navigation })}
+          onPress={() => navigation.navigate('JoinedProgramDetail', { trainerUsername, title, description, programId, weeks, rating, level, date, participants, navigation })}
         >
       <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { username: trainerUsername })}>
         <Text style={styles.owner}>{trainerUsername}</Text>
@@ -85,4 +68,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default ProgramCard;
+export default JoinedProgramCard;

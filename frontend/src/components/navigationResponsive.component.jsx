@@ -186,10 +186,6 @@ export default function NavigationResponsive() {
                     <Button onClick={goToSearchPage}>
                         {colorMode === 'light' ? <Search2Icon /> : <SearchIcon />}
                     </Button>
-                    <Button onClick={toggleColorMode}>
-                        {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
-                    </Button>
-
                     {
                         username ? (<Menu>
                             <MenuButton

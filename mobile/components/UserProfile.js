@@ -13,7 +13,7 @@ import Toast from 'react-native-toast-message';
 
 const UserProfile = ({ route}) => {
   const sessionToken = useSelector(userSessionToken);
-  console.log(sessionToken);
+  //console.log(sessionToken);
   const navigation = useNavigation();
   const { username } = route.params; // Get username from route params
 
@@ -29,81 +29,47 @@ const UserProfile = ({ route}) => {
                                                                                                                                                                   ], likeCount: 15 },
     ];
 
-    const programs = [
-      { id: 1, title: "Full Body Workout",
-                   description: "This is a comprehensive program targeting all major muscle groups.",
-                   trainerUsername: "sametalan",
-                   participants:[
-                    "sametalan2",
-                    "Hanaaa",
-                    "deno",
-                    "fit_deniz"
-                   ],
-                   createdAt:'2024-11-25T13:52:56.512941',
-                   exercises: [
-                     { exercise:{
-                       name: "Push-Up",
-                       gifUrl: "https://example.com/push-up.gif",
-                       bodyPart: "Chest",
-                       target: "Pectorals",
-                       equipment: "None",
-                       secondaryMuscles: "Triceps, Shoulders",
-                       instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
-                     },
-                     reps:10,
-                     sets:3
-                     },
-                     {
-                     exercise:{
-                       name: "Squat",
-                       gifUrl: "https://example.com/squat.gif",
-                       bodyPart: "Legs",
-                       target: "Quadriceps",
-                       equipment: "None",
-                       secondaryMuscles: "Glutes, Hamstrings",
-                       instructions: "Keep your back straight, bend your knees, and lower your hips.",
-                     },reps:8,
-                             sets:4
-                         }
-                   ]},
-       { id: 2, title: "Full Body Workout",
-                    description: "This is a comprehensive program targeting all major muscle groups.",
-                    trainerUsername: "fit_deniz",
-                    participants:[
-                      "sametalan2",
-                      "Hanaaa",
-                      "deno",
-                      "fit_deniz"
-                     ],
-                     createdAt:'2024-11-25T13:52:56.512941',
-                    exercises: [
-                      { exercise:{
-                        name: "Push-Up",
-                        gifUrl: "https://example.com/push-up.gif",
-                        bodyPart: "Chest",
-                        target: "Pectorals",
-                        equipment: "None",
-                        secondaryMuscles: "Triceps, Shoulders",
-                        instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
-                      },
-                      reps:10,
-                      sets:3
-                      },
-                      {
-                      exercise:{
-                        name: "Squat",
-                        gifUrl: "https://example.com/squat.gif",
-                        bodyPart: "Legs",
-                        target: "Quadriceps",
-                        equipment: "None",
-                        secondaryMuscles: "Glutes, Hamstrings",
-                        instructions: "Keep your back straight, bend your knees, and lower your hips.",
-                      },reps:8,
-                              sets:4
-                          }
-                    ]}
+    const fetchJoinedPrograms = async (userJoinedData) => {
+      const programArr = [];
 
-    ];
+      console.log(userJoinedData);
+
+      for (const item of userJoinedData) {
+        try {
+          const response = await apiInstance().get(`api/training-programs/${item.id}`);
+          if (response.status === 200) {
+            const currentProgram = response.data;
+            programArr.push(currentProgram);
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      }
+
+      setPrograms(programArr);
+      return programArr;
+    };
+
+
+    const {
+                data: userJoinedData,
+                isFetching: programsIsFetching,
+                isLoading: programsIsLoading,
+            } = useQuery({
+                queryKey: ['user-joined-training-program'],
+                queryFn: async () => {
+                    const response = await apiInstance().get(`api/training-programs/joined/${username}`)
+                    console.log(response);
+                    return response.data
+                },
+                refetchInterval:30000,
+            })
+            useEffect(() => {
+                if(userJoinedData && !programsIsFetching){
+                    programArr = fetchJoinedPrograms(userJoinedData);
+                    setPrograms(programArr);
+                }
+            }, [userJoinedData, programsIsFetching])
 
 
 const diet_programs = [
@@ -129,10 +95,14 @@ const diet_programs = [
   const ownUsername = useSelector(userName);
   const [user, setUser] = useState({})
   const [posts, setPosts] = useState([]);
+  const [programs, setPrograms] = useState([]);
+
   const [followers, setFollowers] = useState([])
     const [following, setFollowing] = useState([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [selectedTab, setSelectedTab] = useState('forum'); // To track the selected tab
+
+
 const {
     data: profileData,
     isFetching: profileIsFetching,
@@ -216,23 +186,23 @@ useEffect(() => {
   if (profileData && !profileIsFetching) {
     const sanitizedProfile = JSON.parse(JSON.stringify(profileData)); // Deep clone to remove non-serializable values
     setUser(sanitizedProfile);
-    console.log(user);
+    //console.log(user);
 
   }
 }, [profileData, profileIsFetching])
 useEffect(() => {
   if (postsData && !postsIsFetching) setPosts(postsData);
-  console.log(posts);
+  //console.log(posts);
 
 }, [postsData, postsIsFetching]);
 useEffect(() => {
   if (followersData && !followersIsFetching) setFollowers(followersData);
-  console.log(followers);
+  //console.log(followers);
 }, [followersData, followersIsFetching, isFollowing]);
 
 useEffect(() => {
   if (followingData && !followingIsFetching) setFollowing(followingData);
-  console.log(following);
+  //console.log(following);
 
 }, [followingData, followingIsFetching]);
   /*const handleFollowToggle = () => {
@@ -367,15 +337,18 @@ useEffect(() => {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <PostCard
-              title={item.title}
-              owner={item.username}
-              description={item.content}
-              labels={item.tags}
-              likeCount={item.likeCount}
-              commentList={forumPosts[0].commentList}
-              date={item.createdAt}
-              navigation={navigation}
-            />
+            description={item.content}
+                        owner={item.username}
+                        tags={item.tags}
+                        liked={item.liked}
+                        likeCount={item.likeCount}
+                        imageUrl = {item.imageUrl}
+                        commentList={forumPosts[0].commentList}
+                        date={item.createdAt}
+                        navigation={navigation}
+                        post_id={item.id}
+                        program_id={item.trainingProgram.id}
+          />
           )}
           style={styles.postList}
           showsVerticalScrollIndicator={false}
@@ -388,12 +361,17 @@ useEffect(() => {
             renderItem={({ item }) => (
               <ProgramCard
                 title={item.title}
-                  description={item.description}
-                  trainerUsername={item.trainerUsername}
-                  exercises={item.exercises}
-                  participants= {item.participants}
-                  date = {item.createdAt}
-                  navigation = {navigation}
+                                            description={item.description}
+                                            trainerUsername={item.trainer}
+                                            weeks={item.weeks}
+                                            participants = {item.participants}
+                                            date = {item.createdAt}
+                                            level = {item.level}
+                                            type = {item.type}
+                                            interval = {item.interval}
+                                            rating = {item.rating}
+                                            navigation = {navigation}
+                                            programId = {item.id}
               />
             )}
             style={styles.postList}

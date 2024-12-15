@@ -40,7 +40,6 @@ const FeedPage = ({ darkMode }) => {
               throw error; // Re-throw the error to trigger error handling in useQuery
             }
         },
-        refetchOnWindowFocus:false,
         refetchInterval:60000,
     })
 
@@ -55,7 +54,7 @@ const FeedPage = ({ darkMode }) => {
 
             return response.data
         },
-        refetchOnWindowFocus:false,
+        refetchOnWindowFocus:true,
         refetchInterval:60000,
     })
 
@@ -85,67 +84,6 @@ const FeedPage = ({ darkMode }) => {
                                                                                                                                                                ], likeCount: 15 },
   ];
 
-  /*const programs = [
-    { id: 1, title: "Full Body Workout",
-                 description: "This is a comprehensive program targeting all major muscle groups.",
-                 trainerUsername: "fitness_guru_123",
-                 exercises: [
-                   { exercise:{
-                     name: "Push-Up",
-                     gifUrl: "https://example.com/push-up.gif",
-                     bodyPart: "Chest",
-                     target: "Pectorals",
-                     equipment: "None",
-                     secondaryMuscles: "Triceps, Shoulders",
-                     instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
-                   },
-                   reps:10,
-                   sets:3
-                   },
-                   {
-                   exercise:{
-                     name: "Squat",
-                     gifUrl: "https://example.com/squat.gif",
-                     bodyPart: "Legs",
-                     target: "Quadriceps",
-                     equipment: "None",
-                     secondaryMuscles: "Glutes, Hamstrings",
-                     instructions: "Keep your back straight, bend your knees, and lower your hips.",
-                   },reps:8,
-                           sets:4
-                       }
-                 ]},
-     { id: 2, title: "Full Body Workout",
-                  description: "This is a comprehensive program targeting all major muscle groups.",
-                  trainerUsername: "fitness_guru_123",
-                  exercises: [
-                    { exercise:{
-                      name: "Push-Up",
-                      gifUrl: "https://example.com/push-up.gif",
-                      bodyPart: "Chest",
-                      target: "Pectorals",
-                      equipment: "None",
-                      secondaryMuscles: "Triceps, Shoulders",
-                      instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
-                    },
-                    reps:10,
-                    sets:3
-                    },
-                    {
-                    exercise:{
-                      name: "Squat",
-                      gifUrl: "https://example.com/squat.gif",
-                      bodyPart: "Legs",
-                      target: "Quadriceps",
-                      equipment: "None",
-                      secondaryMuscles: "Glutes, Hamstrings",
-                      instructions: "Keep your back straight, bend your knees, and lower your hips.",
-                    },reps:8,
-                            sets:4
-                        }
-                  ]}
-
-  ];*/
 
   const diet_programs = [
       { id: 1, title: 'Gluten-free Diet Program', description: 'A protein based gluten-free diet.', owner: 'dietician_john', followCount: 100, category: 'gluten-free', nutrition_list: ['180 g fat', '300 g protein'], weeklySchedule: {
@@ -199,16 +137,17 @@ const FeedPage = ({ darkMode }) => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <PostCard
-            post_id={item.id}
-            title={item.title}
-            owner={item.username}
             description={item.content}
-            labels={item.tags}
-            liked={item.liked}
-            likeCount={item.likeCount}
-            commentList={forumPosts[0].commentList}
-            date={item.createdAt}
-            navigation={navigation}
+                        owner={item.username}
+                        tags={item.tags}
+                        liked={item.liked}
+                        likeCount={item.likeCount}
+                        imageUrl = {item.imageUrl}
+                        commentList={forumPosts[0].commentList}
+                        date={item.createdAt}
+                        navigation={navigation}
+                        post_id={item.id}
+                        program_id={item.trainingProgram.id}
           />
         )}
         style={styles.postList}
@@ -232,6 +171,8 @@ const FeedPage = ({ darkMode }) => {
               rating = {item.rating}
               navigation = {navigation}
               programId = {item.id}
+              type = {item.type}
+              interval = {item.interval}
 
             />
           )}

@@ -7,7 +7,6 @@ import java.util.List;
 
 @Data
 public class SurveyRequest {
-    private Long userId; // ID of the user
     private List<String> fitnessGoals; // List of tag names
     private String fitnessLevel; // Beginner, Intermediate, Advanced
 }

@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../AuthContext';
 import PostCard from './PostCard';
 import ProgramCard from './ProgramCard';
+import JoinedProgramCard from './JoinedProgramCard';
 import DietCard from './DietCard';
 import { UserContext } from "../UserContext";
 import { useSelector } from 'react-redux';
@@ -18,11 +19,31 @@ const ProfilePage = ({ darkMode }) => {
   const profile = useSelector(userProfile);
   const [user, setUser] = useState({})
   const [posts, setPosts] = useState([]);
+  const [programs, setPrograms] = useState([]);
   const [followers, setFollowers] = useState([]);
 
   const [following, setFollowing] = useState([]);
 
-  
+  const fetchJoinedPrograms = async (userJoinedData) => {
+        const programArr = [];
+
+        console.log(userJoinedData);
+
+        for (const item of userJoinedData) {
+          try {
+            const response = await apiInstance().get(`api/training-programs/${item.id}`);
+            if (response.status === 200) {
+              const currentProgram = response.data;
+              programArr.push(currentProgram);
+            }
+          } catch (e) {
+            console.log(e);
+          }
+        }
+
+        setPrograms(programArr);
+        return programArr;
+      };
   //const [programs, setPrograms] = useState([])
   //const { user, followers, following, posts } = useContext(UserContext);
   const {
@@ -45,7 +66,25 @@ const ProfilePage = ({ darkMode }) => {
     refetchOnWindowFocus: false,
     refetchInterval:60000
 });
-
+const {
+            data: joinedData,
+            isFetching: programsIsFetching,
+            isLoading: programsIsLoading,
+        } = useQuery({
+            queryKey: ['joined-training-program'],
+            queryFn: async () => {
+                const response = await apiInstance().get(`api/training-programs/joined/${username}`)
+                console.log(response);
+                return response.data
+            },
+            refetchInterval:30000,
+        })
+        useEffect(() => {
+        if (joinedData && !programsIsFetching) {
+            programArr = fetchJoinedPrograms(joinedData);
+            setPrograms(programArr);
+            }
+        }, [joinedData, programsIsFetching])
 const {
   data: postsData,
   isFetching: postsIsFetching,
@@ -130,23 +169,23 @@ useEffect(() => {
   if (profileData && !profileIsFetching) {
     const sanitizedProfile = JSON.parse(JSON.stringify(profileData)); // Deep clone to remove non-serializable values
     setUser(sanitizedProfile);
-    console.log(user);
+    //console.log(user);
 
   }
 }, [profileData, profileIsFetching])
 useEffect(() => {
   if (postsData && !postsIsFetching) setPosts(postsData);
-  console.log(posts);
+//console.log(posts);
 
 }, [postsData, postsIsFetching]);
 useEffect(() => {
   if (followersData && !followersIsFetching) setFollowers(followersData);
-  console.log(followers);
+  //console.log(followers);
 }, [followersData, followersIsFetching]);
 
 useEffect(() => {
   if (followingData && !followingIsFetching) setFollowing(followingData);
-  console.log(following);
+  //console.log(following);
 
 }, [followingData, followingIsFetching]);
 
@@ -171,83 +210,6 @@ useEffect(() => {
                                                                                                                                                                   { id: '2', user: 'sqlpro23', text: 'You could try batching your statements!' },
                                                                                                                                                                 ], likeCount: 15 },
   ];
-
-  const programs = [
-      { id: 1, title: "Full Body Workout",
-                   description: "This is a comprehensive program targeting all major muscle groups.",
-                   trainerUsername: "sametalan",
-                   participants:[
-                    "sametalan2",
-                    "Hanaaa",
-                    "deno",
-                    "fit_deniz"
-                   ],
-                   createdAt:'2024-11-25T13:52:56.512941',
-                   exercises: [
-                     { exercise:{
-                       name: "Push-Up",
-                       gifUrl: "https://example.com/push-up.gif",
-                       bodyPart: "Chest",
-                       target: "Pectorals",
-                       equipment: "None",
-                       secondaryMuscles: "Triceps, Shoulders",
-                       instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
-                     },
-                     reps:10,
-                     sets:3
-                     },
-                     {
-                     exercise:{
-                       name: "Squat",
-                       gifUrl: "https://example.com/squat.gif",
-                       bodyPart: "Legs",
-                       target: "Quadriceps",
-                       equipment: "None",
-                       secondaryMuscles: "Glutes, Hamstrings",
-                       instructions: "Keep your back straight, bend your knees, and lower your hips.",
-                     },reps:8,
-                             sets:4
-                         }
-                   ]},
-       { id: 2, title: "Full Body Workout",
-                    description: "This is a comprehensive program targeting all major muscle groups.",
-                    trainerUsername: "fit_deniz",
-                    participants:[
-                      "sametalan2",
-                      "Hanaaa",
-                      "deno",
-                      "fit_deniz"
-                     ],
-                     createdAt:'2024-11-25T13:52:56.512941',
-                    exercises: [
-                      { exercise:{
-                        name: "Push-Up",
-                        gifUrl: "https://example.com/push-up.gif",
-                        bodyPart: "Chest",
-                        target: "Pectorals",
-                        equipment: "None",
-                        secondaryMuscles: "Triceps, Shoulders",
-                        instructions: "Keep your body straight and lower yourself until your chest is just above the floor.",
-                      },
-                      reps:10,
-                      sets:3
-                      },
-                      {
-                      exercise:{
-                        name: "Squat",
-                        gifUrl: "https://example.com/squat.gif",
-                        bodyPart: "Legs",
-                        target: "Quadriceps",
-                        equipment: "None",
-                        secondaryMuscles: "Glutes, Hamstrings",
-                        instructions: "Keep your back straight, bend your knees, and lower your hips.",
-                      },reps:8,
-                              sets:4
-                          }
-                    ]}
-
-    ];
-
 
   const diet_programs = [
         { id: 1, title: 'Gluten-free Diet Program', description: 'A protein based gluten-free diet.', owner: 'dietician_john', followCount: 100, category: 'gluten-free', nutrition_list: ['180 g fat', '300 g protein'], weeklySchedule: {
@@ -280,36 +242,19 @@ useEffect(() => {
 
   const renderPosts = () => {
     if (selectedTab === 'forum') {
-      /*return (
-        <FlatList
-          data={forumPosts}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <PostCard
-              title={item.title}
-              owner={item.owner}
-              description={item.description}
-              labels={item.labels}
-              likeCount={item.likeCount}
-              commentList={item.commentList}
-              date={item.date}
-              navigation={navigation}
-            />
-          )}
-          style={styles.postList}
-          showsVerticalScrollIndicator={false}
-        />
-      );*/
+
       return(<FlatList
         data={posts}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <PostCard
-            title={item.title}
-            owner={item.username}
+            program_id={item.trainingProgram.id}
             description={item.content}
-            labels={item.tags}
+            owner={item.username}
+            tags={item.tags}
+            liked={item.liked}
             likeCount={item.likeCount}
+            imageUrl = {item.imageUrl}
             commentList={forumPosts[0].commentList}
             date={item.createdAt}
             navigation={navigation}
@@ -324,14 +269,19 @@ useEffect(() => {
           data={programs}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <ProgramCard
+            <JoinedProgramCard
               title={item.title}
-                description={item.description}
-                trainerUsername={item.trainerUsername}
-                exercises={item.exercises}
-                participants= {item.participants}
-                date = {item.createdAt}
-                navigation = {navigation}
+                            description={item.description}
+                            trainerUsername={item.trainer}
+                            weeks={item.weeks}
+                            participants = {item.participants}
+                            date = {item.createdAt}
+                            level = {item.level}
+                            type = {item.type}
+                            interval = {item.interval}
+                            rating = {item.rating}
+                            navigation = {navigation}
+                            programId = {item.id}
             />
           )}
           style={styles.postList}
@@ -382,6 +332,11 @@ useEffect(() => {
             <Text style={styles.statLabel}>Following</Text>
           </View>
         </View>
+<View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ProgressTracker', { username })}>
+                            <Text style={styles.buttonText}>See Your Progress</Text>
+         </TouchableOpacity>
+</View>
         {/*<TouchableOpacity style={styles.followButton} onPress={handleFollowToggle}>
           <Text style={styles.followButtonText}>
             {isFollowing ? 'Following' : 'Follow'}
@@ -463,6 +418,21 @@ const lightStyles = StyleSheet.create({
     fontSize: 14,
     color: 'gray',
   },
+  buttonContainer: {
+
+        alignItems:'center'
+      },
+  button: {
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      backgroundColor: '#6366F1',
+      borderRadius: 10,
+      elevation: 3,
+    },
+   buttonText: {
+      color: '#ffffff',
+      fontWeight: 'bold',
+    },
   followButton: {
     backgroundColor: '#007bff',
     paddingVertical: 10,

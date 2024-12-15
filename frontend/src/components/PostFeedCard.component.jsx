@@ -256,7 +256,7 @@ function PostFeedCard({ post }) {
                                     padding={"4px 6px"}
                                     borderRadius={6}
                                 >
-                                    {tag.value}
+                                    {tag}
                                 </Badge>
                             ))
                         }

@@ -37,7 +37,7 @@ function PostFeed() {
                 w="40%" // Full width of the parent container
             >
                 {/* Today's Programs */}
-                {programs.length > 0 && (
+                {/* {programs.length > 0 && (
                     <Box
                     // borderRadius="md"
                     // p={4}
@@ -47,7 +47,7 @@ function PostFeed() {
                         <Heading size="lg" mb={4}>Your Progress Today</Heading>
                         <ProgressToday />
                     </Box>
-                )}
+                )} */}
 
                 {/* Recommended Programs */}
                 <Box

@@ -8,6 +8,11 @@ import {
   ScrollView,
 } from 'react-native';
 
+import { useSelector } from 'react-redux';
+import { userSessionToken } from '../user.js';
+import { useQuery } from "@tanstack/react-query"
+import apiInstance from '../Api';
+import Toast from 'react-native-toast-message';
 const ProgramDetail = ({ route }) => {
   const {
     trainerUsername,
@@ -19,9 +24,91 @@ const ProgramDetail = ({ route }) => {
     level,
     date,
     participants,
-    navigation
+    navigation,
+    joined
   } = route.params;
+  const sessionToken = useSelector(userSessionToken);
+
   const {expandedState,setExpandedState} = useState(0);
+  const [participantCount, setParticipants] = useState(participants);
+  const [isJoined, setIsJoined] = useState(joined);
+
+  const handleJoin = async() => {
+         const response = await apiInstance(sessionToken).post(`api/training-programs/${programId}/join`, {
+
+           })
+             console.log(response)
+
+           if (response.status === 200) {
+
+             Toast.show({
+               type: 'success',
+               position: 'bottom',
+               text1: 'Program Joined',
+               text2: 'Program Joined successfully.',
+               visibilityTime: 3000,
+               autoHide: true,
+               topOffset: 30,
+               bottomOffset: 40
+             });
+             //goHome();
+
+             //Cookies.set("username", username)
+         } else {
+           Toast.show({
+             type: 'error',
+             position: 'bottom',
+             text1: 'Join Error',
+             text2: 'There was an error joining the program. Please try again.',
+             visibilityTime: 2000,
+             autoHide: true,
+             topOffset: 30,
+             bottomOffset: 40
+           });
+         }
+         setIsJoined(true);
+         setParticipants(participantCount+1);
+
+       };
+
+  const handleLeave = async() => {
+           const response = await apiInstance(sessionToken).delete(`api/training-programs/${programId}/leave`, {
+
+             })
+               console.log(response)
+
+             if (response.status === 200) {
+
+               Toast.show({
+                 type: 'success',
+                 position: 'bottom',
+                 text1: 'Program Left',
+                 text2: 'Program Left successfully.',
+                 visibilityTime: 3000,
+                 autoHide: true,
+                 topOffset: 30,
+                 bottomOffset: 40
+               });
+               //goHome();
+
+               //Cookies.set("username", username)
+           } else {
+             Toast.show({
+               type: 'error',
+               position: 'bottom',
+               text1: 'Leave Error',
+               text2: 'There was an error leaving the program. Please try again.',
+               visibilityTime: 2000,
+               autoHide: true,
+               topOffset: 30,
+               bottomOffset: 40
+             });
+           }
+           setIsJoined(false);
+           setParticipants(participantCount-1);
+
+         };
+
   const renderWeek = ({ item, index }) => {
     const workoutCount = item.workouts.length;
     return (
@@ -51,8 +138,8 @@ const ProgramDetail = ({ route }) => {
         keyExtractor={(item, index) => index.toString()}
       />
 
-      <TouchableOpacity style={styles.commitButton}>
-        <Text style={styles.commitButtonText}>Join Program</Text>
+      <TouchableOpacity style={styles.commitButton} onPress={isJoined?handleLeave:handleJoin}>
+        <Text style={styles.commitButtonText}>{isJoined?"Leave Program":"Join Program"}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.detailButton} onPress = {()=>navigation.navigate("WorkoutDetails",{weeks,navigation})}>

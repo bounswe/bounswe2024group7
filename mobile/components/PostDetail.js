@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,18 +13,34 @@ import { useSelector } from 'react-redux';
 import { userName, userProfile, userSessionToken } from '../user.js';
 import { useQuery } from "@tanstack/react-query"
 import apiInstance from '../Api';
+import ProgramCard from './ProgramCard';
+
 import Toast from 'react-native-toast-message';
 
 const PostDetail = ({route}) => {
   // Post data
-  const {title, description, owner, post_id, date, likeCount, liked, commentList, navigation} = route.params;
+  const { program_id,tags, description, owner, post_id, date, likeCount, liked, commentList, navigation} = route.params;
   const [likes, setLikes] = useState(likeCount);
   /*const [comments, setComments] = useState([
     { id: '1', user: 'jshine1337', text: 'Nope, that’s not a concept...' },
     { id: '2', user: 'sqlpro23', text: 'You could try batching your statements!' },
   ]);*/
+ console.log("Program id is: "+program_id);
+
   const [comments, setComments] = useState(commentList)
   const [newComment, setNewComment] = useState('');
+  // Initiate Program With Default Values
+  const [program, setProgram] = useState({"title":"", "description":"",
+      "trainerUsername":"",
+      "weeks":[],
+      "participants" : [],
+      "date" : "00/00/0000",
+      "level": 0,
+      "rating" : 0,
+      "navigation": {navigation},
+      "programId": 0,
+      "type": "BEGINNER",
+      "interval": 0});
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isLiked, setIsLiked] = useState(liked);
   const username = useSelector(userName);
@@ -42,6 +58,30 @@ const PostDetail = ({route}) => {
       setNewComment('');
     }
   };
+
+  const {
+          data: programData,
+          isFetching: programsIsFetching,
+          isLoading: programsIsLoading,
+      } = useQuery({
+          queryKey: ['training-program'],
+          queryFn: async () => {
+              const response = await apiInstance().get(`api/training-programs/${program_id}`)
+              console.log(response.data);
+              return response.data
+          },
+          refetchOnWindowFocus:false,
+      })
+
+
+
+      useEffect(() => {
+          if (programData && !programsIsFetching) {
+              setProgram(programData)
+              console.log(programData);
+
+          }
+      }, [programData, programsIsFetching])
 
   /*const {
         data: ownFollowingData,
@@ -222,21 +262,36 @@ const PostDetail = ({route}) => {
         {/* Post Header */}
         <View style={styles.postContainer}>
           <View style={styles.postHeader}>
-          <Text style={styles.title}>{title}</Text>
           <Text style={styles.date}>Posted in {date}</Text>
           </View>
           <View style={styles.ownerContainer}>
                       <Text style={styles.owner}>{owner}</Text>
           </View>
           <View style={styles.tagContainer}>
-            <Text style={styles.tag}>Bodybuilding</Text>
+            {tags.filter(tag => typeof tag === 'string' && tag).map((tag, index) => (
+
+                <Text style={styles.tag}>{tag}</Text>
+
+            ))}
           </View>
+
           <Text style={styles.postDescription}>
             {description}
           </Text>
         </View>
 
-        {/* Interaction Buttons */}
+        <ProgramCard title={program.title} description={program.description}
+      trainerUsername={program.trainer}
+      weeks={program.weeks}
+      participants = {program.participants}
+      date = {program.createdAt}
+      level = {program.level}
+      rating = {program.rating}
+      navigation = {navigation}
+      programId = {program.id}
+      type = {program.type}
+      interval = {program.interval}/>
+
         <View style={styles.interactionContainer}>
           <TouchableOpacity style={styles.interactionButton} onPress={isLiked?handleUnlikeToggle:handleLikeToggle}>
             <Icon name="heart" size={20} color="#FF4500" />
@@ -255,8 +310,7 @@ const PostDetail = ({route}) => {
           </TouchableOpacity>
         </View>
 
-        {/* Comments Section */}
-        <View style={styles.commentsSection}>
+        {/*<View style={styles.commentsSection}>
           <Text style={styles.commentsTitle}>Comments</Text>
           <FlatList
             data={comments}
@@ -271,7 +325,6 @@ const PostDetail = ({route}) => {
           />
         </View>
 
-        {/* Add Comment Input */}
         <View style={styles.commentInputContainer}>
           <TextInput
             style={styles.commentInput}
@@ -282,7 +335,7 @@ const PostDetail = ({route}) => {
           <TouchableOpacity style={styles.submitButton} onPress={handleCommentSubmit}>
             <Icon name="send" size={20} color="#FFFFFF" />
           </TouchableOpacity>
-        </View>
+        </View>*/}
       </ScrollView>
     );
 };
@@ -334,6 +387,10 @@ postHeader: {
     borderRadius: 6,
     marginRight: 8,
   },
+  badgeContainer: {
+      fontSize: 14,
+      backgroundColor: 'purple'
+    },
   owner: {
       fontSize: 14,
       fontWeight: 'bold',
