@@ -1,36 +1,3 @@
-
-
-const programData = {
-    title: 'Heavy Gym Instruments Fitness Program',
-    steps: [
-        {
-            title: 'Step 1: Deadlift',
-            description: 'Use the barbell for deadlifting. Ensure your feet are shoulder-width apart, grip the bar just outside your knees, and lift the bar while keeping your back straight.',
-            gif: 'https://gymvisual.com/img/p/4/7/3/1/4731.gif',
-        },
-        {
-            title: 'Step 2: Squat',
-            description: 'Set the barbell on your upper back. Lower your body by bending your knees and hips, keeping your chest up, until your thighs are parallel to the ground. Push back up to standing position.',
-            gif: 'https://gymvisual.com/img/p/4/7/3/1/4731.gif',
-        },
-        {
-            title: 'Step 3: Bench Press',
-            description: 'Lie flat on the bench, grip the barbell with both hands slightly wider than shoulder-width, and press the bar up and down, ensuring control and a full range of motion.',
-            gif: 'https://gymvisual.com/img/p/4/7/3/1/4731.gif',
-        },
-        {
-            title: 'Step 4: Overhead Press',
-            description: 'Stand with your feet shoulder-width apart, grip the barbell just outside your shoulders, and press the bar above your head while keeping your core tight.',
-            gif: 'https://gymvisual.com/img/p/4/7/3/1/4731.gif',
-        },
-        {
-            title: 'Step 5: Pull-ups',
-            description: 'Hang from a pull-up bar with your palms facing away from you. Pull your body upwards until your chin is above the bar, then slowly lower yourself back down.',
-            gif: 'https://gymvisual.com/img/p/4/7/3/1/4731.gif',
-        },
-    ],
-};
-
 import React, { useState, useEffect } from 'react';
 import {
     Box,
@@ -50,9 +17,20 @@ import {
     Image,
     useDisclosure,
     Text,
-    List
+    List,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalCloseButton,
+    Stack,
+    Badge,
+    Button,
+    Divider,
+    SimpleGrid
 } from '@chakra-ui/react';
-import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query'
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import apiInstance from '../instance/apiInstance';
 import { useRouter } from '@tanstack/react-router';
 import { userSessionToken } from '../context/user';
@@ -70,7 +48,7 @@ const ProgramCard = () => {
     const sessionToken = useSelector(userSessionToken);
     const programId = router.parseLocation().search['programId'];
 
-    const { onClose } = useDisclosure();
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const {
         data: programData,
@@ -80,7 +58,6 @@ const ProgramCard = () => {
         queryKey: ['programs', programId],
         queryFn: async () => {
             const response = await apiInstance(sessionToken).get(`/api/training-programs/${programId}`);
-
             return response.data;
         },
         refetchOnWindowFocus: false,
@@ -89,25 +66,25 @@ const ProgramCard = () => {
     // Set program data
     useEffect(() => {
         if (programData && !programIsFetching) {
-            setProgram({
-                title: programData.title,
-                steps: programData.exercises
-            });
-            setSteps(programData.exercises);
-            setCompletedSteps(new Array(programData.exercises.length).fill(false));
+            setProgram(programData);
+            setSteps(programData.weeks.flatMap(week => 
+                week.workouts.flatMap(workout => 
+                    workout.workoutExercises
+                )
+            ));
+            const totalExercises = programData.weeks.reduce((total, week) => 
+                total + week.workouts.reduce((weekTotal, workout) => 
+                    weekTotal + workout.workoutExercises.length, 0
+                ), 0
+            );
+            setCompletedSteps(new Array(totalExercises).fill(false));
         }
     }, [programData]);
-
-    // Log the programs
-    useEffect(() => {
-        console.log(program);
-    }, [program]);
 
     // Handle complete exercise
     const { mutate: completeExercise } = useMutation({
         mutationFn: async (exerciseId) => {
             const response = await apiInstance(sessionToken).post(`/api/training-programs/${programId}/exercises/${exerciseId}/complete`);
-
             return response.data;
         },
         onSuccess: () => {
@@ -119,12 +96,12 @@ const ProgramCard = () => {
     const handleCheckboxChange = (index, step) => {
         const newCompletedSteps = [...completedSteps];
         newCompletedSteps[index] = true;
-        console.log(step)
         completeExercise(step.id);
         setCompletedSteps(newCompletedSteps);
 
-        // Move to next step and set active step
-        if (index + 1 >= steps.length) { setIsAlertVisible(true); }
+        if (index + 1 >= steps.length) {
+            setIsAlertVisible(true);
+        }
         setActiveStep(index + 1);
     };
 
@@ -135,12 +112,12 @@ const ProgramCard = () => {
         setProgressValue(progress);
     }, [completedSteps]);
 
-    // Scroll to the active step
+    // Scroll to active step
     useEffect(() => {
         const activeStepElement = document.getElementById(`step-${activeStep}`);
         if (activeStepElement) {
             window.scrollTo({
-                top: activeStepElement.offsetTop - 50, // Offset to make the step not hidden under the header
+                top: activeStepElement.offsetTop - 50,
                 behavior: 'smooth',
             });
         }
@@ -154,134 +131,137 @@ const ProgramCard = () => {
         return 'gray';
     };
 
+    const getProgramTypeColor = (type) => {
+        const typeColors = {
+            CARDIO: 'red',
+            BODY_BUILDING: 'purple',
+            FLEXIBILITY: 'blue',
+            BALANCE: 'green'
+        };
+        return typeColors[type] || 'gray';
+    };
+
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
     return (
         <>
-            {
-                program && program.steps ? (
-                    <Box
-                        maxWidth="800px"
-                        mx="auto"
-                        mt="5%"
-                        p={6}
-                        border="1px solid"
-                        borderColor="gray.300"
-                        borderRadius="md"
-                    >
-                        {/* Program Title and Progress Bar */}
-                        <Box position="sticky" top={0} zIndex="1" bg="white" p={4}>
-                            {/* Program Title */}
-                            <Heading as='h4' size='lg' mb={4}>
+            <Box
+                onClick={onOpen}
+                cursor="pointer"
+                _hover={{ shadow: 'lg' }}
+                transition="all 0.2s"
+                maxWidth="800px"
+                mx="auto"
+                mt="5%"
+                p={6}
+                border="1px solid"
+                borderColor="gray.300"
+                borderRadius="md"
+            >
+                {program && (
+                    <>
+                        <Stack spacing={4}>
+                            <Heading as='h4' size='lg'>
                                 {program.title}
                             </Heading>
+                            <Text noOfLines={2}>{program.description}</Text>
+                            <Stack direction="row" spacing={2}>
+                                <Badge colorScheme={getProgramTypeColor(program.type)}>
+                                    {program.type.replace('_', ' ')}
+                                </Badge>
+                                <Badge colorScheme="teal">{program.level}</Badge>
+                                <Badge colorScheme="blue">{program.interval} weeks</Badge>
+                            </Stack>
+                            {program.rating > 0 && (
+                                <Text>Rating: {program.rating} ({program.ratingCount} reviews)</Text>
+                            )}
+                        </Stack>
+                    </>
+                )}
+            </Box>
 
-                            {isAlertVisible ? (
-                                <Alert status="success" mb={4}>
-                                    <AlertIcon />
-                                    <Box>
-                                        <AlertTitle>You Nailed It !</AlertTitle>
-                                        <AlertDescription>
-                                            You have completed {program.title} for today. Keep up the good work!
-                                        </AlertDescription>
-                                    </Box>
-                                    <CloseButton
-                                        alignSelf="flex-start"
-                                        position="relative"
-                                        right={-1}
-                                        top={-1}
-                                        onClick={onClose}
-                                    />
-                                </Alert>
-                            ) : null}
+            <Modal isOpen={isOpen} onClose={onClose} size="4xl">
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Program Details</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody pb={6}>
+                        {program && (
+                            <Stack spacing={6}>
+                                <Box>
+                                    <Heading size="lg" mb={2}>{program.title}</Heading>
+                                    <Text>{program.description}</Text>
+                                </Box>
 
-                            {/* Progress Bar */}
-                            <Box display="flex" alignItems="center" mb={4}>
-                                {/* Progress Value */}
-                                <Text mr={2} fontWeight="bold">
-                                    {progressValue}%
-                                </Text>
-                                {/* Progress Bar */}
-                                <Progress
-                                    hasStripe
-                                    value={progressValue}
-                                    colorScheme="green"
-                                    size="lg"
-                                    borderRadius="md"
-                                    flex="1" // Ensure the progress bar takes the remaining width
-                                />
-                            </Box>
-                        </Box>
+                                <Stack direction="row" spacing={4}>
+                                    <Badge colorScheme={getProgramTypeColor(program.type)} fontSize="md" p={2}>
+                                        {program.type.replace('_', ' ')}
+                                    </Badge>
+                                    <Badge colorScheme="teal" fontSize="md" p={2}>
+                                        {program.level}
+                                    </Badge>
+                                    <Badge colorScheme="blue" fontSize="md" p={2}>
+                                        {program.interval} weeks
+                                    </Badge>
+                                </Stack>
 
-                        {/* Accordion for Steps */}
-                        <Accordion allowToggle index={activeStep} onChange={(index) => setActiveStep(activeStep)}>
-                            {steps.map((step, index) => (
-                                <AccordionItem
-                                    key={index}
-                                    id={`step-${index}`}
-                                    isDisabled={index != activeStep}  // Disable non active steps
-                                    border="1px solid"
-                                    borderColor={getStepColor(index)}
-                                    borderRadius="md"
-                                    mb={2}
-                                >
-                                    <h2>
-                                        <AccordionButton
-                                            bg={completedSteps[index] ? 'green' : 'white'}
-                                            color={completedSteps[index] ? 'white' : 'black'}
-                                            _expanded={{
-                                                bg: getStepColor(index),
-                                                color: 'white',
-                                            }}
-                                            _hover={{
+                                <Box>
+                                    <Text fontWeight="bold" mb={2}>Program Information:</Text>
+                                    <SimpleGrid columns={2} spacing={4}>
+                                        <Text>Created by: {program.trainer}</Text>
+                                        <Text>Created on: {formatDate(program.createdAt)}</Text>
+                                        <Text>Rating: {program.rating}/5</Text>
+                                        <Text>Reviews: {program.ratingCount}</Text>
+                                    </SimpleGrid>
+                                </Box>
 
-                                            }}
-                                            px={4}
-                                            py={2}
-                                            isDisabled={index !== activeStep} // Prevent collapsing on non active steps
-                                        >
-                                            <Box as="span" flex="1" textAlign="left">
-                                                {step.exercise.name}
-                                            </Box>
-                                            <AccordionIcon />
-                                        </AccordionButton>
-                                    </h2>
-                                    <AccordionPanel pb={4}>
-                                        {/* Create list of instructions to do the exercise */}
-                                        <List>
-                                            {step.exercise.instructions.map((instruction, index) => (
-                                                <Text key={index}>{index + 1}. {instruction}</Text>
+                                <Divider />
+
+                                <Box>
+                                    <Heading size="md" mb={4}>Program Schedule</Heading>
+                                    {program.weeks.map((week, weekIndex) => (
+                                        <Box key={weekIndex} mb={4}>
+                                            <Heading size="sm" mb={2}>Week {week.weekNumber}</Heading>
+                                            {week.workouts.map((workout, workoutIndex) => (
+                                                <Box key={workoutIndex} ml={4} mb={2}>
+                                                    <Text fontWeight="bold">{workout.name}</Text>
+                                                    <List ml={4}>
+                                                        {workout.workoutExercises.map((exercise, exerciseIndex) => (
+                                                            <Text key={exerciseIndex}>
+                                                                • {exercise.exercise.name} - {exercise.sets} sets × {exercise.repetitions} reps
+                                                            </Text>
+                                                        ))}
+                                                    </List>
+                                                </Box>
                                             ))}
-                                        </List>
-                                        <Image
-                                            boxSize="256px"
-                                            src={step.gifUrl}
-                                            alt={step.title}
-                                        />
-                                        {!completedSteps[index] && (
-                                            <Checkbox
-                                                size="md"
-                                                colorScheme="green"
-                                                onChange={() => handleCheckboxChange(index, step)}
-                                            >
-                                                Done
-                                            </Checkbox>
-                                        )}
-                                    </AccordionPanel>
-                                </AccordionItem>
-                            ))}
-                        </Accordion>
-                    </Box>
-                ) : (
-                    <Box
-                        p={4}
-                        borderRadius="md"
-                        boxShadow="sm"
-                    >
-                        <Heading size="lg" mb={4}>Loading...</Heading>
-                    </Box>
-                )
-            }
+                                        </Box>
+                                    ))}
+                                </Box>
+
+                                <Divider />
+
+                                <Button colorScheme="blue" onClick={() => {
+                                    onClose();
+                                    router.navigate({ 
+                                        to: '/program',
+                                        search: { programId: program.id }
+                                    });
+                                }}>
+                                    Start Program
+                                </Button>
+                            </Stack>
+                        )}
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
         </>
-    )
+    );
 };
 
 export default ProgramCard;

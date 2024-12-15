@@ -20,6 +20,7 @@ const SearchPage = () => {
     const { colorMode } = useColorMode();
     const { exercises, isLoadingExercises } = useContext(AppContext);
     const [selectedMuscle, setSelectedMuscle] = useState(null);
+    console.log(exercises);
 
     // Data for highlighting muscles
     const highlightData = selectedMuscle ? [
