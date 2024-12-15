@@ -209,6 +209,35 @@ export const UserContextProvider = ({ children }) => {
             console.error('Error updating exercise completion:', error);
         }
     };
+    // Function to submit exercise completed sets
+    const completeExerciseSets = async (programId, workoutExerciseId, completedSetsArray) => {
+        try {
+            // API call to complete the exercise sets
+            const response = await apiInstance(sessionToken).post(
+                `api/training-programs/${programId}/workout-exercises/${workoutExerciseId}/complete`,
+                completedSetsArray
+            );
+
+            // Update local state with the response if necessary
+            const updatedProgram = response.data;
+
+            // Update the progress map for the completed sets
+            setExerciseProgress((prev) => {
+                const updatedProgress = { ...prev };
+                if (!updatedProgress[programId]) {
+                    updatedProgress[programId] = {};
+                }
+                updatedProgress[programId][workoutExerciseId] = true;
+
+                return updatedProgress;
+            });
+
+            return updatedProgram;
+        } catch (error) {
+            console.error('Error completing exercise sets:', error);
+            throw error;
+        }
+    };
 
     return (
         <UserContext.Provider value={{
@@ -219,7 +248,8 @@ export const UserContextProvider = ({ children }) => {
             programs,
             joinedPrograms,
             exerciseProgress,
-            updateExerciseCompletion,
+            // updateExerciseCompletion,
+            completeExerciseSets
         }}>
             {children}
         </UserContext.Provider>

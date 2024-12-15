@@ -18,7 +18,7 @@ import {
     Tooltip
 } from '@chakra-ui/react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 import { userSessionToken } from '../context/user';
 import apiInstance from '../instance/apiInstance';
 
@@ -29,7 +29,7 @@ const TrainingCard = () => {
     const location = useLocation();
     const { program } = location.state || {};
     console.log(program);
-    const sessionToken = useSelector(userSessionToken);
+    // const sessionToken = useSelector(userSessionToken);
     const toast = useToast();
     const queryClient = useQueryClient();
     const [isUserJoined, setIsUserJoined] = useState(false);
@@ -278,7 +278,7 @@ const TrainingCard = () => {
                                             {!displayedWorkout && workout.name}
                                             {displayedWorkout = true}
                                         </Td>
-                                        <Td>{exerciseob.exercise.name} : {exerciseob.id}</Td>
+                                        <Td>{exerciseob.exercise.name} : {exerciseob.completedSets}</Td>
                                         <Td>
                                             <Button onClick={() => handleStartSession(exerciseob.id)} colorScheme="green" variant="solid">
                                                 Start Session!

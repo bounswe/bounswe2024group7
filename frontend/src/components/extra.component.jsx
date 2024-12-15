@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -18,23 +18,25 @@ import {
     ListItem,
     Tag,
     TagLabel,
-    TagLeftIcon,
-    Input
+    TagLeftIcon, Input
 } from '@chakra-ui/react';
 import { InfoIcon, StarIcon, RepeatIcon, ArrowRightIcon, SettingsIcon } from '@chakra-ui/icons';
 import apiInstance from '../instance/apiInstance';
 import { userSessionToken } from '../context/user';
 import { toast } from 'react-toastify';
-import { useSelector } from 'react-redux';
+import { UserContext } from '../context/UserContext';
 
 const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
     const [setInputs, setSetInputs] = useState([]);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [exerciseData, setExerciseData] = useState(null);
-    const sessionToken = useSelector(userSessionToken);
+    // const sessionToken = useSelector(userSessionToken);
+    const { completeExerciseSets } = useContext(UserContext);
 
     function getExerciseInfo(excersizeID) {
+        // console.log("Searching for exerciseID:", excersizeID); // Debug log
+
         for (const week of data.weeks) {
             for (const workout of week.workouts) {
                 for (const workoutExercise of workout.workoutExercises) {
@@ -63,6 +65,7 @@ const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
                 setIsSubmitted(false);
                 setIsAlertOpen(false);
             } else {
+                // console.error(`Exercise with ID ${excersizeID} not found`);
                 onClose(); // Close the modal if exercise not found
             }
         }
@@ -94,25 +97,13 @@ const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
     const handleSubmitProgress = async () => {
         if (areAllInputsFilled()) {
             try {
-                // Convert set inputs to numbers
-                const parsedSetInputs = setInputs.map(input => parseInt(input, 10));
 
-                // Log request details for debugging
-                console.log('Submitting Progress:', {
-                    programId: data.id,
-                    workoutExerciseId: excersizeID,
-                    setInputs: parsedSetInputs
-                });
 
-                // Submit exercise sets to backend
-                const response = await apiInstance(sessionToken).post(
-                    `/api/training-programs/${data.id}/workout-exercises/${excersizeID}/complete`,
-                    parsedSetInputs,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    }
+                // Call the completeExerciseSets function
+                const updatedProgram = await completeExerciseSets(
+                    data.id, // Program ID from the data prop
+                    excersizeID, // Workout Exercise ID
+                    setInputs
                 );
 
                 // Show success toast
@@ -124,22 +115,12 @@ const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
                 setIsSubmitted(true);
                 onClose();
             } catch (error) {
-                // Enhanced error logging
-                console.error('Full Error Object:', error);
-                console.error('Error Response:', error.response);
-                console.error('Error Request:', error.request);
-                console.error('Error Config:', error.config);
-
-                // More detailed error message
-                const errorMessage = error.response?.data?.message ||
-                    error.response?.data?.error ||
-                    'Failed to submit exercise sets';
-
-                // Show error toast with more details
-                toast.error(errorMessage, {
+                // Show error toast
+                toast.error('Failed to submit exercise sets. Please try again.', {
                     position: "top-right",
-                    autoClose: 5000,
+                    autoClose: 3000,
                 });
+                console.error('Error submitting progress:', error);
             }
         } else {
             toast.warn('Please fill all set inputs', {
@@ -149,12 +130,12 @@ const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
         }
     };
 
+
     // Render nothing if modal is not open or exercise data not found
     if (!isOpen || !exerciseData) return null;
 
     const { current_ex, weekNumber, workoutNumber } = exerciseData;
     const exercise = current_ex.exercise;
-
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/50">
             <div className="relative w-full max-w-5xl max-h-full">
@@ -174,6 +155,7 @@ const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
                             </span>
                         </div>
                     </div>
+
                     {/* Modal Body */}
                     <div className="p-6 space-y-6">
                         {/* Exercise Details Container */}
@@ -249,6 +231,7 @@ const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
                             </div>
                         </div>
                     </div>
+
                     {/* Modal Footer */}
                     <div className="p-6 space-y-4 border-t">
                         {/* Set Inputs */}
