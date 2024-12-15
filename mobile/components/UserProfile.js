@@ -337,15 +337,18 @@ useEffect(() => {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <PostCard
-              title={item.title}
-              owner={item.username}
-              description={item.content}
-              labels={item.tags}
-              likeCount={item.likeCount}
-              commentList={forumPosts[0].commentList}
-              date={item.createdAt}
-              navigation={navigation}
-            />
+            description={item.content}
+                        owner={item.username}
+                        tags={item.tags}
+                        liked={item.liked}
+                        likeCount={item.likeCount}
+                        imageUrl = {item.imageUrl}
+                        commentList={forumPosts[0].commentList}
+                        date={item.createdAt}
+                        navigation={navigation}
+                        post_id={item.id}
+                        program_id={item.trainingProgram.id}
+          />
           )}
           style={styles.postList}
           showsVerticalScrollIndicator={false}

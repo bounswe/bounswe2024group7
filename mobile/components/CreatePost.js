@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ScrollView,StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import Toast from 'react-native-toast-message';
-import apiInstance from '../Api'
+import { useQuery } from "@tanstack/react-query"
+import apiInstance from '../Api';
+
 import {
   userProfile,
   userPassword,
@@ -12,6 +14,7 @@ import {
 
 const CreatePost = ({ darkMode, setSelectedPage }) => {
   const styles = darkMode ? darkStyles : lightStyles;
+  const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   const [post, setPost] = useState({});
   const [description, setDescription] = useState('');
@@ -21,11 +24,48 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
   const profile = useSelector(userProfile)
   const password = useSelector(userPassword)
   const sessionToken = useSelector(userSessionToken)
+  const [programs, setPrograms] = useState([]);
 
+  const [trainingProgram, setTrainingProgram] = useState('');
+  const [userId, setUserId] = useState('');
+const {
+        data: programsData,
+        isFetching: programsIsFetching,
+        isLoading: programsIsLoading,
+    } = useQuery({
+        queryKey: ['training-programs'],
+        queryFn: async () => {
+            const response = await apiInstance().get('api/training-programs')
+
+            return response.data
+        },
+        refetchOnWindowFocus:true,
+        refetchInterval:60000,
+    })
+
+    useEffect(() => {
+        if (programsData && !programsIsFetching) {
+            setPrograms(programsData)
+            console.log(programs);
+
+        }
+    }, [programsData, programsIsFetching])
+  const trainingPrograms = [
+    { id:1,label: 'Pilates', value: 'pilates' },
+    { id:2,label: 'Cycling', value: 'cycling' },
+    { id:3,label: 'Yoga', value: 'yoga' },
+    { id:4,label: 'Cardio', value: 'cardio' },
+    { id:5,label: 'Strength Training', value: 'strength_training' },
+  ];
+
+
+   const handleGoalSelection = (goal) => {
+          setTrainingProgram(goal);
+        };
   const goHome = () => navigation.navigate('Home');
   const goFeed = () => setSelectedPage('Feed');
   const handlePost = async () => {
-    /*const newPost = { title, description, labels };
+    /*const newPost = { content, tags, imageUrl, trainingProgram };
     console.log('Creating post:', newPost);*/
     if (labels.length === 0) {
       Toast.show({
@@ -58,7 +98,7 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
     console.log(post)
 
     // First create image model and get the image id
-    if (post.image) {
+    /*if (post.image) {
         const imageResponse = await apiInstance(
             profile.username,
             password
@@ -71,11 +111,9 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
         console.log(post)
     } else {
         delete post.image
-    }
-    console.log(post)
+    }*/
     const response = await apiInstance(sessionToken).post(`api/posts`, {
-      ...post,
-      username: profile.username,
+      ...post
   })
     console.log(post)
     console.log(response)
@@ -113,95 +151,6 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
     // Add your logic to handle post submission
   };
 
-  /*const createPostMutation = useMutation(
-    {
-        mutationFn: async (post) => {
-            if (labels.length === 0) {
-              Toast.show({
-                type: 'error',
-                position: 'bottom',
-                text1: 'Create Error',
-                text2: 'No labels selected',
-                visibilityTime: 2000,
-                autoHide: true,
-                topOffset: 30,
-                bottomOffset: 40
-              });
-                return
-            }
-
-            if (!profile) {
-              Toast.show({
-                type: 'error',
-                position: 'bottom',
-                text1: 'Create Error',
-                text2: 'Not logged in',
-                visibilityTime: 2000,
-                autoHide: true,
-                topOffset: 30,
-                bottomOffset: 40
-              });
-                return
-            }
-
-            console.log(post)
-
-            // First create image model and get the image id
-            if (post.image) {
-                const imageResponse = await apiInstance(
-                    profile.username,
-                    password
-                ).post('/images', {
-                    url: post.image,
-                })
-
-                post.image = imageResponse.data.id
-
-                console.log(post)
-            } else {
-                delete post.image
-            }
-            console.log(post)
-
-            const response = await apiInstance().post(`api/posts/user/${profile.username}`, {
-                ...post,
-                username: profile.username,
-            })
-            console.log(post)
-
-            Toast.show({
-              type: 'success',
-              position: 'bottom',
-              text1: 'Post Created',
-              text2: 'Your post has been created successfully.',
-              visibilityTime: 3000,
-              autoHide: true,
-              topOffset: 30,
-              bottomOffset: 40
-            });
-            return response.data
-        },
-        onError: (error) => {
-            toast({
-                title: 'An error occurred.',
-                description: error.message,
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-            })
-        },
-        onSuccess: (data) => {
-            queryClient.invalidateQueries(
-                {
-                    queryKey: ['posts']
-                }
-            )
-            goHome();
-        }
-
-    }
-)*/
-
   const addLabel = () => {
     if (labelText.trim()) {
       setLabels([...labels, labelText.trim()]);
@@ -214,38 +163,22 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Create New Post</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Title"
+        placeholder="Content"
         placeholderTextColor={styles.placeholderColor}
-        value={title}
-        onChangeText={setTitle}
+        value={content}
+        onChangeText={setContent}
       />
 
-      <TextInput
-        style={[styles.input, styles.descriptionInput]}
-        placeholder="Description"
-        placeholderTextColor={styles.placeholderColor}
-        multiline
-        value={description}
-        onChangeText={setDescription}
-      />
-
-      <TextInput
-        style={[styles.input, styles.descriptionInput]}
-        placeholder="Image"
-        placeholderTextColor={styles.placeholderColor}
-        value={image}
-        onChangeText={setImage}
-      />
 
       <View style={styles.labelContainer}>
         <TextInput
           style={styles.labelInput}
-          placeholder="Add Label"
+          placeholder="Add Tag"
           placeholderTextColor={styles.placeholderColor}
           value={labelText}
           onChangeText={setLabelText}
@@ -270,6 +203,29 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
         showsHorizontalScrollIndicator={false}
       />
 
+      <Text style={styles.fitnessGoal}> Select Training Program</Text>
+        <View style={styles.optionsContainer}>
+          {programs.map((option) => (
+             <TouchableOpacity
+                 key={option.title}
+                 style={[
+                    styles.trainingOption,
+                    trainingProgram == option.id && styles.selectedTrainingOption,
+                 ]}
+                  onPress={() => handleGoalSelection(option.id)}
+              >
+              <Text
+                style={[
+                  styles.trainingOptionText,
+                  trainingProgram == option.id && styles.selectedTrainingOptionText,
+               ]}
+               >
+              {option.title}
+              </Text>
+            </TouchableOpacity>
+           ))}
+        </View>
+
       <TouchableOpacity style={styles.postButton} onPress={() => {
                             /*createPostMutation.mutate({
                                 title: title,
@@ -278,26 +234,52 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
                                 labels: labels,
                             })*/
                            setPost({
-                            title: title,
-                            content: description,
-                            image: image,
-                            tags: labels
+
+                            content: content,
+
+                            tags: labels,
+                            trainingProgramId: trainingProgram,
                         });
                            handlePost();
                         }}>
         <Text style={styles.postButtonText}>Post</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 // Light Mode Styles
 const lightStyles = StyleSheet.create({
+  trainingOption: {
+    backgroundColor: '#f9f9f9',
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  selectedTrainingOption: {
+    backgroundColor: '#007bff',
+    borderColor: '#007bff',
+  },
+  traininggOptionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  selectedTrainingOptionText: {
+    color: '#fff',
+  },
   container: {
     padding: 20,
     backgroundColor: '#f5f5f5',
     flex: 1,
   },
+  optionsContainer: {
+            padding: 10,
+            flexDirection:'column',
+            justifyContent:'space-between',
+            marginBottom: 20
+          },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
@@ -379,6 +361,13 @@ const lightStyles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
+  fitnessGoal: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        flex: 0.8, // Set equal flex for alignment
+        textAlign: 'center',
+      },
   postButtonText: {
     color: '#fff',
     fontSize: 16,
@@ -434,6 +423,13 @@ const darkStyles = StyleSheet.create({
     backgroundColor: '#ff4081',
     shadowColor: '#ff4081',
   },
+  fitnessGoal: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        flex: 0.8, // Set equal flex for alignment
+        textAlign: 'center',
+      },
   postButtonText: {
     ...lightStyles.postButtonText,
     color: '#fff',

@@ -242,36 +242,19 @@ useEffect(() => {
 
   const renderPosts = () => {
     if (selectedTab === 'forum') {
-      /*return (
-        <FlatList
-          data={forumPosts}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <PostCard
-              title={item.title}
-              owner={item.owner}
-              description={item.description}
-              labels={item.labels}
-              likeCount={item.likeCount}
-              commentList={item.commentList}
-              date={item.date}
-              navigation={navigation}
-            />
-          )}
-          style={styles.postList}
-          showsVerticalScrollIndicator={false}
-        />
-      );*/
+
       return(<FlatList
         data={posts}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <PostCard
-            title={item.title}
-            owner={item.username}
+            program_id={item.trainingProgram.id}
             description={item.content}
-            labels={item.tags}
+            owner={item.username}
+            tags={item.tags}
+            liked={item.liked}
             likeCount={item.likeCount}
+            imageUrl = {item.imageUrl}
             commentList={forumPosts[0].commentList}
             date={item.createdAt}
             navigation={navigation}
