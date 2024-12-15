@@ -42,7 +42,7 @@ function ProgramFeedCard({
     } = useContext(UserContext)
 
     const [isProgramOwnerFollowed, setIsProgramOwnerFollowed] = useState(
-        user && following && following.includes(program.trainerUsername)
+        user && following && following.includes(program.trainer)
     )
     const [isUserJoined, setIsUserJoined] = useState(
         user && user.joinedPrograms && user.joinedPrograms
@@ -54,7 +54,7 @@ function ProgramFeedCard({
 
     useEffect(() => {
         if (user && following) {
-            setIsProgramOwnerFollowed(following.includes(program.trainerUsername))
+            setIsProgramOwnerFollowed(following.includes(program.trainer))
         }
     }, [user, following])
 
@@ -236,12 +236,12 @@ function ProgramFeedCard({
                         <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
                             <Avatar
                                 size='sm'
-                                name={program.trainerUsername}
+                                name={program.trainer}
                             />
 
                             <Box>
                                 <Heading size='sm'>
-                                    {program.trainerUsername}
+                                    {program.trainer}
                                 </Heading>
                             </Box>
                         </Flex>
@@ -255,11 +255,11 @@ function ProgramFeedCard({
                                     size={"sm"}
                                     colorScheme='purple'
                                     leftIcon={<PlusIcon />}
-                                    display={user && program.trainerUsername === user.username ? 'none' : 'flex'}
+                                    display={user && program.trainer === user.username ? 'none' : 'flex'}
                                     alignItems='center'
                                     onClick={() => {
                                         if (user) {
-                                            followUser(program.trainerUsername)
+                                            followUser(program.trainer)
                                         }
                                     }}
                                     disabled={followUser.isLoading}
@@ -271,10 +271,10 @@ function ProgramFeedCard({
                                     variant='ghost'
                                     size={"sm"}
                                     colorScheme='gray'
-                                    display={user && program.trainerUsername === user.username ? 'none' : 'block'}
+                                    display={user && program.trainer === user.username ? 'none' : 'block'}
                                     onClick={() => {
                                         if (user) {
-                                            unfollowUser(program.trainerUsername)
+                                            unfollowUser(program.trainer)
                                         }
                                     }}
                                     disabled={unfollowUser.isLoading}
@@ -328,7 +328,7 @@ function ProgramFeedCard({
                     <Flex gap={2} width="full">
                         <Tooltip
                             label={
-                                user && program.trainerUsername === user.username ? null : (
+                                user && program.trainer === user.username ? null : (
                                     isUserJoined ? 'Leave the program' : 'Join the program'
                                 )
                             }
@@ -355,20 +355,20 @@ function ProgramFeedCard({
                                     }
                                 }}
                                 disabled={
-                                    user && program.trainerUsername === user.username
+                                    user && program.trainer === user.username
                                     || joinProgram.isLoading
                                     || unjoinProgram.isLoading
                                 }
                             >
                                 {
-                                    user && program.trainerUsername === user.username ? 'You are the trainer' : (
+                                    user && program.trainer === user.username ? 'You are the trainer' : (
                                         isUserJoined ? 'Joined' : 'Join'
                                     )
                                 }
                             </Button>
                         </Tooltip>
 
-                        {isUserJoined && user && program.trainerUsername !== user.username && (
+                        {isUserJoined && user && program.trainer !== user.username && (
                             <Button
                                 flex='1'
                                 variant='solid'
