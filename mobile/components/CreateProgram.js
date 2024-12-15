@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Pressable, FlatList, Modal } from 'react-native';
+import React, { useState, useEffect} from 'react';
+import { ScrollView,StyleSheet, Text, View, TextInput, TouchableOpacity, Pressable, FlatList, Modal } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // Using Picker for the dropdown
 import apiInstance from "../Api";
 import { useQuery } from "@tanstack/react-query";
+import { useSelector } from 'react-redux';
+import { userSessionToken } from '../user.js';
 import Toast from 'react-native-toast-message';
+import SpinboxInput from "./common/SpinboxInput";
 
 const CreateProgram = ({ darkMode }) => {
   const styles = darkMode ? darkStyles : lightStyles;
@@ -15,8 +18,21 @@ const CreateProgram = ({ darkMode }) => {
   const [selectedWorkoutIndex, setSelectedWorkoutIndex] = useState(null);
   const [selectedExercise, setSelectedExercise] = useState('');
   const [sets, setSets] = useState('');
+  const [type, setType] = useState('BODY_BUILDING');
+  const [level, setLevel] = useState('BEGINNER');
+  const [interval, setInterval] = useState(0);
+
   const [reps, setReps] = useState('');
-  /*const [exerciseOptions, setExerciseOptions] = useState([])
+
+  const SpinBoxComponent = () => {
+
+    return (
+      <View>
+        <SpinboxInput onChange={setInterval} />
+      </View>
+    );
+  };
+  const [exerciseOptions, setExerciseOptions] = useState([])
 
         const {
             data: exercisesData,
@@ -25,7 +41,7 @@ const CreateProgram = ({ darkMode }) => {
         } = useQuery({
             queryKey: ['exercises'],
             queryFn: async () => {
-                const response = await apiInstance().get('api/exercises')
+                const response = await apiInstance(sessionToken).get('api/exercises')
 
                 return response.data
             },
@@ -34,15 +50,25 @@ const CreateProgram = ({ darkMode }) => {
 
         useEffect(() => {
             if (exercisesData && !exercisesIsFetching) {
-                setExercises(exercisesData)
+                setExerciseOptions(exercisesData)
             }
-        }, [exercisesData, exercisesIsFetching])*/
+        }, [exercisesData, exercisesIsFetching])
 
+  const sessionToken = useSelector(userSessionToken)
 
-  const exerciseOptions = [
-    { id: 0, name: 'push-up' },
-    { id: 1, name: 'pull-up' },
-  ];
+  /*const exerciseOptions = [
+    { id: 1, name: 'push-up' },
+    { id: 2, name: 'pull-up' },
+  ];*/
+  const types = [
+      { id: 0, label: 'Body Building', value:'BODY_BUILDING' }
+
+    ];
+    const levels = [
+        { id: 0, label: 'Beginner', value:'BEGINNER' },
+        { id: 1, label: 'Intermediate', value:'INTERMEDIATE' },
+        { id: 2, label: 'Professional', value:'PROFESSIONAL' }
+      ];
 
   // Add Week
   const addWeek = () => {
@@ -56,9 +82,16 @@ const CreateProgram = ({ darkMode }) => {
 
   // Add Workout
   const addWorkout = (weekIndex) => {
-    const updatedWeeks = [...weeks];
-    updatedWeeks[weekIndex].workouts.push({ exercises: [] });
-    setWeeks(updatedWeeks);
+    setWeeks((prevWeeks) =>
+        prevWeeks.map((week, i) =>
+          i === weekIndex
+            ? {
+                ...week,
+                workouts: [...week.workouts, { name: '', exercises: [] }],
+              }
+            : week
+        )
+      );
   };
 
   // Remove Workout
@@ -74,6 +107,7 @@ const CreateProgram = ({ darkMode }) => {
             setTitle('');
             setDescription('');
             setWeeks([]);
+            setType('');
             setSelectedExercise('');
             setSets('');
             setReps('');
@@ -82,8 +116,28 @@ const CreateProgram = ({ darkMode }) => {
     const handleProgramCreation = async () => {
       /*const newProgram = { title, description, labels, exercises };
       console.log('Creating program:', newProgram);*/
-      console.log(weeks);
-      if (!title || !description || weeks.length === 0 || weeks.some((item)=>{return item.workouts.length==0||item.workouts.some((workout)=>{return workout.exercises.length==0})})) {
+      console.log(title);
+      console.log(description);
+      console.log(type);
+      console.log(level);
+      console.log(interval);
+      weeks.forEach((week)=>{
+        console.log("Week "+weeks.indexOf(week));
+        console.log("Workout count: "+week.workouts.length);
+        week.workouts.forEach((workout)=>{
+            console.log("Workout "+week.workouts.indexOf(workout));
+            console.log("Workout name: "+workout.name);
+            console.log("Exercise count: "+workout.exercises.length);
+            workout.exercises.forEach((exercise)=>{
+                console.log("Exercise "+exercise.exerciseId);
+                console.log("Sets: "+exercise.sets);
+                console.log("Reps: "+exercise.repetitions);
+
+            });
+        });
+      });
+
+      if (!title || !description || weeks.length === 0 || weeks.some((item)=>{return item.workouts.length==0||item.workouts.some((workout)=>{return workout.name.length == 0 || workout.exercises.length==0})})) {
                       Toast.show({
                                 type: 'error',
                                 position: 'bottom',
@@ -97,13 +151,16 @@ const CreateProgram = ({ darkMode }) => {
                       return;
                   }
 
-                  /*const response = await apiInstance(sessionToken).post('api/training-programs', {
+                  const response = await apiInstance(sessionToken).post('api/training-programs', {
                       title,
                       description,
-                      exercises,
+                      type,
+                      level,
+                      interval,
+                      weeks
                   });
 
-                  if (response.status === 200) {
+                  if (response.status === 201) {
                       Toast.show({
                     type: 'success',
                     position: 'bottom',
@@ -113,9 +170,9 @@ const CreateProgram = ({ darkMode }) => {
                     autoHide: true,
                     topOffset: 30,
                     bottomOffset: 40
-                                                  });*/
+                                                  });
                   clearFields();
-   /* }
+    }
                  else{
                      Toast.show({
                        type: 'error',
@@ -129,17 +186,31 @@ const CreateProgram = ({ darkMode }) => {
                     });
                                          return;
 
-                 }*/
+                 }
     };
-
+  const handleWorkoutNameChange = (weekIndex, workoutIndex, newName) => {
+    setWeeks((prevWeeks) =>
+      prevWeeks.map((week, i) =>
+        i === weekIndex
+          ? {
+              ...week,
+              workouts: week.workouts.map((workout, j) =>
+                j === workoutIndex ? { ...workout, name: newName } : workout
+              ),
+            }
+          : week
+      )
+    );
+  };
   // Add Exercise
   const addExercise = () => {
     if (selectedExercise && sets && reps) {
       const updatedWeeks = [...weeks];
+      const selectedExerciseId = exerciseOptions.find((element)=>element.name===selectedExercise).id;
       updatedWeeks[selectedWeekIndex].workouts[selectedWorkoutIndex].exercises.push({
-        name: selectedExercise,
+        exerciseId: selectedExerciseId,
         sets,
-        reps,
+        repetitions:reps,
       });
       setWeeks(updatedWeeks);
       setSelectedExercise('');
@@ -159,7 +230,7 @@ const CreateProgram = ({ darkMode }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Create New Program</Text>
 
       <TextInput
@@ -176,6 +247,29 @@ const CreateProgram = ({ darkMode }) => {
         value={description}
         onChangeText={setDescription}
       />
+
+      <Picker style={styles.picker}
+                    selectedValue={type}
+                    onValueChange={(value) => setType(value)}
+                  >
+                    {types.map((item) => (
+                      <Picker.Item label={item.label} value={item.value} key={item.id} />
+                    ))}
+                  </Picker>
+
+      <Picker style={styles.picker}
+                          selectedValue={level}
+                          onValueChange={(value) => setLevel(value)}
+                        >
+                          {levels.map((item) => (
+                            <Picker.Item label={item.label} value={item.value} key={item.id} />
+                          ))}
+                        </Picker>
+      <View style={styles.spinBoxContainer}>
+      <Text style={styles.sectionTitle}> Select Interval </Text>
+      <SpinBoxComponent/>
+
+      </View>
 
       <FlatList
         data={weeks}
@@ -198,6 +292,14 @@ const CreateProgram = ({ darkMode }) => {
                   <Text style={styles.sectionTitle}>
                     Workout {workoutIndex + 1}
                   </Text>
+                  <TextInput
+                        style={styles.input}
+                        placeholder="Workout Name"
+                        placeholderTextColor={styles.placeholderColor}
+                        value={workout.name}
+                        onChangeText={(text) => handleWorkoutNameChange(weekIndex, workoutIndex, text)}
+                      />
+
                   <TouchableOpacity
                     style={styles.addButton}
                     onPress={() => {
@@ -215,7 +317,7 @@ const CreateProgram = ({ darkMode }) => {
                     renderItem={({ item: exercise, index: exerciseIndex }) => (
                       <View style={styles.exerciseItem}>
                         <Text>
-                          {exercise.name} - {exercise.reps} reps x {exercise.sets}{' '}
+                          {exerciseOptions.find((i)=>i.id===exercise.exerciseId).name} - {exercise.repetitions} reps x {exercise.sets}{' '}
                           sets
                         </Text>
                         <TouchableOpacity
@@ -304,7 +406,7 @@ const CreateProgram = ({ darkMode }) => {
       <TouchableOpacity style={styles.postButton} onPress={handleProgramCreation}>
               <Text style={styles.postButtonText}>Create Program</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -314,6 +416,11 @@ const lightStyles = StyleSheet.create({
         backgroundColor: '#f5f5f5',
         flex: 1,
       },
+
+      container: {
+              padding: 10,
+              flex: 1,
+            },
       title: {
         fontSize: 26,
         fontWeight: 'bold',
