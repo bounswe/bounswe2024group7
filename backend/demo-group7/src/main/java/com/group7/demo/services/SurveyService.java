@@ -9,6 +9,8 @@ import com.group7.demo.models.User;
 import com.group7.demo.repository.SurveyRepository;
 import com.group7.demo.repository.TagRepository;
 import com.group7.demo.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +31,8 @@ public class SurveyService {
     }
 
     // Add a new survey
-    public SurveyResponse addSurvey(SurveyRequest request) {
+    @Transactional
+    public SurveyResponse addSurvey(SurveyRequest request, HttpServletRequest httpServletRequest) {
         // Validate the user
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));

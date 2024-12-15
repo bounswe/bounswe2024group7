@@ -3,6 +3,7 @@ package com.group7.demo.controllers;
 import com.group7.demo.dtos.SurveyRequest;
 import com.group7.demo.dtos.SurveyResponse;
 import com.group7.demo.services.SurveyService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,8 @@ public class SurveyController {
 
     // Add a new survey
     @PostMapping
-    public ResponseEntity<SurveyResponse> addSurvey(@RequestBody SurveyRequest request) {
-        SurveyResponse response = surveyService.addSurvey(request);
+    public ResponseEntity<SurveyResponse> addSurvey(@RequestBody SurveyRequest request, HttpServletRequest httpServletRequest) {
+        SurveyResponse response = surveyService.addSurvey(request, httpServletRequest);
         return ResponseEntity.ok(response);
     }
 
