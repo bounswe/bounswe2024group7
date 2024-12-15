@@ -22,10 +22,21 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
   const password = useSelector(userPassword)
   const sessionToken = useSelector(userSessionToken)
 
+  const [trainingProgram, setTrainigProgram] = useState('');
+  const [userId, setUserId] = useState('');
+
+  const trainingPrograms = [
+    { label: 'Pilates', value: 'pilates' },
+    { label: 'Cycling', value: 'cycling' },
+    { label: 'Yoga', value: 'yoga' },
+    { label: 'Cardio', value: 'cardio' },
+    { label: 'Strength Training', value: 'strength_training' },
+  ];
+
   const goHome = () => navigation.navigate('Home');
   const goFeed = () => setSelectedPage('Feed');
   const handlePost = async () => {
-    /*const newPost = { title, description, labels };
+    /*const newPost = { content, tags, imageUrl, trainingProgram };
     console.log('Creating post:', newPost);*/
     if (labels.length === 0) {
       Toast.show({
@@ -270,6 +281,29 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
         showsHorizontalScrollIndicator={false}
       />
 
+      <Text style={styles.fitnessGoal}> Select Training Programs</Text>
+        <View style={styles.optionsContainer}>      
+          {trainingPrograms.map((option) => (
+             <TouchableOpacity
+                 key={option.value}
+                 style={[
+                    styles.trainingOption,
+                    goals.includes(option.value) && styles.selectedTrainingOption,
+                 ]}
+                  onPress={() => handleGoalSelection(option.value)}
+              >
+              <Text
+                style={[
+                  styles.trainingOptionText,
+                  goals.includes(option.value) && styles.selectedTrainingOptionText,
+               ]}
+               >
+              {option.label}
+              </Text>
+            </TouchableOpacity>
+           ))}
+        </View>
+
       <TouchableOpacity style={styles.postButton} onPress={() => {
                             /*createPostMutation.mutate({
                                 title: title,
@@ -281,7 +315,9 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
                             title: title,
                             content: description,
                             image: image,
-                            tags: labels
+                            tags: labels,
+                            trainingProgram: trainingProgram,
+                            user: userId
                         });
                            handlePost();
                         }}>
@@ -293,6 +329,25 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
 
 // Light Mode Styles
 const lightStyles = StyleSheet.create({
+  trainingOption: {
+    backgroundColor: '#f9f9f9',
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  selectedTrainingOption: {
+    backgroundColor: '#007bff',
+    borderColor: '#007bff',
+  },
+  traininggOptionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  selectedTrainingOptionText: {
+    color: '#fff',
+  },
   container: {
     padding: 20,
     backgroundColor: '#f5f5f5',
