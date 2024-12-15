@@ -27,29 +27,30 @@ public class SurveyController {
     }
 
     // Get survey by username
-    @GetMapping("/user/{username}")
-    public ResponseEntity<SurveyResponse> getSurveyByUser(@PathVariable String username) {
-        SurveyResponse response = surveyService.getSurveyByUser(username);
+    @GetMapping("/user")
+    public ResponseEntity<SurveyResponse> getSurveyByUser(HttpServletRequest request) {
+        SurveyResponse response = surveyService.getSurveyForAuthenticatedUser(request);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{username}/fitness-goals")
-    public ResponseEntity<List<String>> getUserFitnessGoals(@PathVariable String username) {
-        List<String> fitnessGoals = surveyService.getUserFitnessGoals(username);
+    @GetMapping("/fitness-goals")
+    public ResponseEntity<List<String>> getUserFitnessGoals(HttpServletRequest request) {
+        List<String> fitnessGoals = surveyService.getUserFitnessGoals(request);
         return ResponseEntity.ok(fitnessGoals);
     }
 
     // Add multiple fitness goals
-    @PostMapping("/{username}/fitness-goals")
-    public ResponseEntity<List<String>> addFitnessGoals(@PathVariable String username, @RequestBody List<String> goals) {
-        List<String> addedGoals = surveyService.addFitnessGoals(username, goals);
+    @PostMapping("/fitness-goals")
+    public ResponseEntity<List<String>> addFitnessGoals(@RequestBody List<String> goals, HttpServletRequest request) {
+        List<String> addedGoals = surveyService.addFitnessGoals(goals, request);
         return ResponseEntity.ok(addedGoals);
     }
 
+
     // Remove multiple fitness goals
-    @DeleteMapping("/{username}/fitness-goals")
-    public ResponseEntity<Void> removeFitnessGoals(@PathVariable String username, @RequestBody List<String> goals) {
-        surveyService.removeFitnessGoals(username, goals);
+    @DeleteMapping("/fitness-goals")
+    public ResponseEntity<Void> removeFitnessGoals(@RequestBody List<String> goals, HttpServletRequest request) {
+        surveyService.removeFitnessGoals(goals, request);
         return ResponseEntity.ok().build();
     }
 }
