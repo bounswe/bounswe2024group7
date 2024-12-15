@@ -26,6 +26,7 @@ import apiInstance from '../instance/apiInstance';
 import { userSessionToken } from '../context/user';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
     const [setInputs, setSetInputs] = useState([]);
@@ -33,6 +34,8 @@ const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [exerciseData, setExerciseData] = useState(null);
     const sessionToken = useSelector(userSessionToken);
+
+    const queryClient = useQueryClient();
 
     function getExerciseInfo(excersizeID) {
         for (const week of data.weeks) {
@@ -90,6 +93,29 @@ const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
         }
     };
 
+    const submitMutation = useMutation(
+        {
+            mutationFn: async ({ id, setInputs }) => {
+                const response = await apiInstance(sessionToken).post(`/api/training-programs/${id}/workout-exercises/${excersizeID}/complete`,
+                setInputs
+            );
+                return response.data;
+            },
+            onSuccess: () => {
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['training-programs']
+                    }
+                )
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['joinedPrograms']
+                    }
+                )
+            }
+        },
+    )
+
     // Handle progress submission
     const handleSubmitProgress = async () => {
         if (areAllInputsFilled()) {
@@ -105,15 +131,10 @@ const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
                 });
 
                 // Submit exercise sets to backend
-                const response = await apiInstance(sessionToken).post(
-                    `/api/training-programs/${data.id}/workout-exercises/${excersizeID}/complete`,
-                    parsedSetInputs,
-                    {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
+                const response = await submitMutation.mutateAsync({
+                    id: data.id,
+                    setInputs: parsedSetInputs
+                });
 
                 // Show success toast
                 toast.success('Exercise sets completed successfully!', {
