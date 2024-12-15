@@ -221,7 +221,7 @@ function ProgramFeedCard({
     )
 
     const navigate = useNavigate()
-    const handleStartPracticing = (program_data) => {
+    const handleStartPracticing = (program_id) => {
         navigate(
             {
                 to: `/program?programId=${program_id}`,
@@ -230,7 +230,7 @@ function ProgramFeedCard({
     }
     return (
         <>
-            <Card maxW='lg'>
+            <Card maxW='lg' marginY={3}>
                 <CardHeader>
                     <Flex spacing='4'>
                         <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
@@ -373,7 +373,7 @@ function ProgramFeedCard({
                                 flex='1'
                                 variant='solid'
                                 colorScheme='green'
-                                onClick={() => handleStartPracticing(program.title)}
+                                onClick={() => handleStartPracticing(program.id)}
                             >
                                 Start Practicing
                             </Button>
