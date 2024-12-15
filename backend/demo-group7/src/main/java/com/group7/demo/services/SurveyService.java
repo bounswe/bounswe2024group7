@@ -9,6 +9,8 @@ import com.group7.demo.models.User;
 import com.group7.demo.repository.SurveyRepository;
 import com.group7.demo.repository.TagRepository;
 import com.group7.demo.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,18 +23,20 @@ public class SurveyService {
     private final SurveyRepository surveyRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
+    private final AuthenticationService authenticationService;
 
-    public SurveyService(SurveyRepository surveyRepository, TagRepository tagRepository, UserRepository userRepository) {
+    public SurveyService(SurveyRepository surveyRepository, TagRepository tagRepository, UserRepository userRepository, AuthenticationService authenticationService) {
         this.surveyRepository = surveyRepository;
         this.tagRepository = tagRepository;
         this.userRepository = userRepository;
+        this.authenticationService = authenticationService;
     }
 
     // Add a new survey
-    public SurveyResponse addSurvey(SurveyRequest request) {
+    @Transactional
+    public SurveyResponse addSurvey(SurveyRequest request, HttpServletRequest httpServletRequest) {
         // Validate the user
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = authenticationService.getAuthenticatedUserInternal(httpServletRequest);
 
         // Map tag names to Tag entities (convert input to lowercase)
         Set<Tag> tags = request.getFitnessGoals().stream()
@@ -54,12 +58,18 @@ public class SurveyService {
     }
 
 
-    // Get survey by user username
-    public SurveyResponse getSurveyByUser(String username) {
-        Long userId = getUserIdFromUsername(username);
-        Survey survey = surveyRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Survey not found for user ID: " + userId));
+    // Get survey of authenticated user
+    public SurveyResponse getSurveyForAuthenticatedUser(HttpServletRequest request) {
+        // Fetch the authenticated user
+        User user = authenticationService.getAuthenticatedUserInternal(request);
 
+        Long userId = getUserIdFromUsername(user.getUsername());
+
+        // Find the survey for the authenticated user
+        Survey survey = surveyRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Survey not found for the authenticated user."));
+
+        // Map the survey to SurveyResponse DTO
         return mapToResponse(survey);
     }
 
@@ -75,26 +85,38 @@ public class SurveyService {
                 .build();
     }
 
-    public List<String> getUserFitnessGoals(String username) {
-        Long userId = getUserIdFromUsername(username);
+    public List<String> getUserFitnessGoals(HttpServletRequest request) {
+        // Fetch the authenticated user
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+        Long userId = getUserIdFromUsername(user.getUsername());
+        // Find the survey for the authenticated user
         Survey survey = surveyRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Survey not found for user ID: " + userId));
+                .orElseThrow(() -> new IllegalArgumentException("Survey not found for the authenticated user."));
 
+        // Extract and return the fitness goals as a list of strings
         return survey.getFitnessGoals().stream()
-                .map(Tag::getName)
+                .map(Tag::getName) // Assuming fitness goals are stored as a collection of Tag entities
                 .collect(Collectors.toList());
     }
 
 
-    public List<String> addFitnessGoals(String username, List<String> goals) {
-        Long userId = getUserIdFromUsername(username);
-        Survey survey = surveyRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Survey not found for user ID: " + userId));
 
-        // Find and collect Tag entities for the provided goal names
+    @Transactional
+    public List<String> addFitnessGoals(List<String> goals, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+        Long userId = getUserIdFromUsername(user.getUsername());
+
+        Survey survey = surveyRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Survey not found for user name: " + user.getUsername()));
+
         Set<Tag> tagsToAdd = goals.stream()
                 .map(goal -> tagRepository.findByName(goal.toLowerCase())
-                        .orElseThrow(() -> new IllegalArgumentException("Tag not found: " + goal)))
+                        .orElseGet(() -> {
+                            // Create and save a new Tag if not found
+                            Tag newTag = new Tag();
+                            newTag.setName(goal.toLowerCase());
+                            return tagRepository.save(newTag);
+                        }))
                 .collect(Collectors.toSet());
 
         // Add the new tags to the survey
@@ -111,8 +133,11 @@ public class SurveyService {
                 .collect(Collectors.toList());
     }
 
-    public void removeFitnessGoals(String username, List<String> goals) {
-        Long userId = getUserIdFromUsername(username);
+    @Transactional
+    public void removeFitnessGoals(List<String> goals, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        Long userId = getUserIdFromUsername(user.getUsername());
         Survey survey = surveyRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Survey not found for user ID: " + userId));
 
