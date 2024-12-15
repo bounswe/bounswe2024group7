@@ -221,12 +221,12 @@ function ProgramFeedCard({
     )
 
     const navigate = useNavigate()
-    const handleStartPracticing = (program) => {
+    const handleStartPracticing = (program_id) => {
         console.log(program);
         navigate(
             {
-                to: `/training?trainingId=${program.id}`,
-                state: { program },
+                to: `/training?trainingId=${program_id}`,
+                // state: { program_id },
             }
         )
     }
@@ -375,7 +375,7 @@ function ProgramFeedCard({
                                 flex='1'
                                 variant='solid'
                                 colorScheme='green'
-                                onClick={() => handleStartPracticing(program)}
+                                onClick={() => handleStartPracticing(program.id)}
                             >
                                 Start Practicing
                             </Button>
