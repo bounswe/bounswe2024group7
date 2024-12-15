@@ -8,7 +8,7 @@ import Detailed_Ex_Modal from './Detailed_Ex_Modal.component';
 import apiInstance from '../instance/apiInstance';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
-import { userProfile, userSessionToken } from '../context/user';
+import { userSessionToken } from '../context/user';
 import {
     Box,
     Card,
@@ -19,96 +19,35 @@ import {
     Heading,
     Text,
     useToast,
-    Tooltip,
-    Spinner,
-    Button
+    Tooltip, Spinner
 } from '@chakra-ui/react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton } from '@chakra-ui/react';
-import { Table, TableCaption, Thead, Tbody, Tfoot, Tr, Th, Td, UnorderedList, ListItem } from '@chakra-ui/react';
-import PlusIcon from '../icons/PlusIcon';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+// import { useSelector } from 'react-redux';
 
+import { useParams } from 'react-router-dom';
+
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button } from '@chakra-ui/react';
+import { Table, TableCaption, Thead, Tbody, Tfoot, Tr, Th, Td, UnorderedList, ListItem } from '@chakra-ui/react';
 const TrainingCard = () => {
     const location = useLocation();
+    // const { programID } = location.state || {};
+
+
+    // Extract the query parameters from the URL
     const queryParams = new URLSearchParams(location.search);
     const programID = queryParams.get("trainingId");
 
+    console.log(programID);
     const [trainingProgram, setTrainingProgram] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [isUserJoined, setIsUserJoined] = useState(false);
-
     const sessionToken = useSelector(userSessionToken);
-    const user = useSelector(userProfile);
-    console.log(user);
-    const queryClient = useQueryClient();
-    const toast = useToast();
-
     const weekColors = ['#f7f9fc', '#e3f2fd', '#e8f5e9', '#fff3e0', '#ede7f6'];
     const { isOpen, onOpen, onClose } = useDisclosure();
     const navigate = useNavigate();
+    const router = useRouter();
+    // State to track the selected exercise ID
     const [selectedExerciseId, setSelectedExerciseId] = useState(null);
-
-    // Join to a program Mutation
-    const { mutate: joinProgram } = useMutation({
-        mutationFn: async (postId) => {
-            const response = await apiInstance(sessionToken).post(`api/training-programs/${postId}/join`)
-
-            toast({
-                title: 'Joined the program',
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
-            })
-
-            return response.data
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['training-programs'] })
-            queryClient.invalidateQueries({ queryKey: ['user'] })
-            setIsUserJoined(true)
-        },
-        onError: (error) => {
-            console.log(error)
-            toast({
-                title: 'An error occurred.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            })
-        },
-    })
-
-    // Unjoin to a program Mutation
-    const { mutate: unjoinProgram } = useMutation({
-        mutationFn: async (postId) => {
-            const response = await apiInstance(sessionToken).delete(`api/training-programs/${postId}/leave`)
-
-            toast({
-                title: 'Unjoined the program',
-                status: 'success',
-                duration: 3000,
-                isClosable: true,
-            })
-
-            return response.data
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['training-programs'] })
-            queryClient.invalidateQueries({ queryKey: ['user'] })
-            setIsUserJoined(false)
-        },
-        onError: (error) => {
-            console.log(error)
-            toast({
-                title: 'An error occurred.',
-                status: 'error',
-                duration: 3000,
-                isClosable: true,
-            })
-        },
-    })
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchTrainingProgram = async () => {
@@ -120,27 +59,14 @@ const TrainingCard = () => {
 
             try {
                 setLoading(true);
-                // Fetch the training program details
                 const response = await apiInstance(sessionToken).get(
                     `/api/training-programs/${programID}`,
                     {
                         headers: { 'Content-Type': 'application/json' },
                     }
                 );
-                // console.log(user.profile.username);
-                // Check if user has joined programs
-                if (user) {
-                    const joinedProgramsResponse = await apiInstance(sessionToken).get(
-                        `/api/training-programs/joined/${user.profile.username}`
-                    );
-                    // console.log(joinedProgramsResponse);
-                    // Check if the current program is in the user's joined programs
-                    const isJoined = joinedProgramsResponse.data.some(
-                        program => program.id === parseInt(programID)
-                    );
-                    setIsUserJoined(isJoined);
-                }
 
+                // Add comprehensive null checks
                 if (!response.data) {
                     throw new Error('No training program data received');
                 }
@@ -149,11 +75,9 @@ const TrainingCard = () => {
                 setError(null);
             } catch (error) {
                 console.error('Error fetching training program:', error);
-                toast({
-                    title: 'Failed to fetch training program details',
-                    status: 'error',
-                    duration: 5000,
-                    isClosable: true,
+                toast.error('Failed to fetch training program details.', {
+                    position: 'top-right',
+                    autoClose: 5000,
                 });
                 setError(error);
             } finally {
@@ -162,7 +86,7 @@ const TrainingCard = () => {
         };
 
         fetchTrainingProgram();
-    }, [programID, sessionToken, user]);
+    }, [programID, sessionToken]);
 
     // Loading state
     if (loading) {
@@ -184,16 +108,25 @@ const TrainingCard = () => {
         );
     }
 
+
+
+
+    console.log(trainingProgram);
+
+
+
+
+
+
+
     const handleStartSession = (exerciseId) => {
+        // Set the selected exercise ID
         setSelectedExerciseId(exerciseId);
+        // Open the modal
         onOpen();
     };
 
-    const handleStartPracticing = (program_id) => {
-        navigate({
-            to: `/training?trainingId=${program_id}`,
-        })
-    };
+
 
     const renderRatingStars = (rating) => {
         return (
@@ -239,9 +172,8 @@ const TrainingCard = () => {
         );
     };
 
-    console.log(isUserJoined);
-
     return (
+
         <div className="w-full max-w-[60%] mx-auto p-4 bg-white shadow-lg rounded-lg text-sm">
 
             <h1 className="
@@ -332,51 +264,7 @@ const TrainingCard = () => {
                 {renderRatingStars(trainingProgram.rating)}
             </div>
 
-            {/* Join/Unjoin Button Section */}
-            <div className="flex justify-center mb-4">
-                <Tooltip
-                    label={
-                        user && trainingProgram.trainer === user.username ? null : (
-                            isUserJoined ? 'Leave the program' : 'Join the program'
-                        )
-                    }
-                >
-                    <Button
-                        variant='ghost'
-                        leftIcon={isUserJoined ? null : <PlusIcon />}
-                        colorScheme='purple'
-                        onClick={() => {
-                            if (user) {
-                                if (!isUserJoined) {
-                                    joinProgram(programID)
-                                } else {
-                                    unjoinProgram(programID)
-                                }
-                            } else {
-                                toast({
-                                    title: 'You need to login to join a program',
-                                    status: 'error',
-                                    duration: 3000,
-                                    isClosable: true,
-                                })
-                            }
-                        }}
-                        disabled={
-                            user && trainingProgram.trainer === user.username
-                            || joinProgram.isLoading
-                            || unjoinProgram.isLoading
-                        }
-                    >
-                        {
-                            user && trainingProgram.trainer === user.username ? 'You are the trainer' : (
-                                isUserJoined ? 'Joined' : 'Join'
-                            )
-                        }
-                    </Button>
-                </Tooltip>
-            </div>
-
-            {/* Weeks Table */}
+            {/* Weeks Table and Commit Button - Unchanged */}
             <div className="bg-white shadow-md rounded-lg overflow-hidden mb-4">
                 <Table variant="simple" width="100%">
                     <Thead>
@@ -404,16 +292,9 @@ const TrainingCard = () => {
                                         </Td>
                                         <Td>{exerciseob.exercise.name} : {exerciseob.completedSets}</Td>
                                         <Td>
-
-                                            {isUserJoined && user && (
-                                                <Button
-                                                    onClick={() => handleStartSession(exerciseob.id)}
-                                                    colorScheme="green"
-                                                    variant="solid"
-                                                >
-                                                    Start Session!
-                                                </Button>
-                                            )}
+                                            <Button onClick={() => handleStartSession(exerciseob.id)} colorScheme="green" variant="solid">
+                                                Start Session!
+                                            </Button>
                                         </Td>
                                     </Tr>
                                 ));
@@ -424,6 +305,17 @@ const TrainingCard = () => {
                 </Table>
             </div>
 
+            {/* 
+    <Button colorScheme="purple" variant="solid"
+                mb="20px"
+                width="500px"
+                m="auto"
+                display="block">
+                Commit to Program
+            </Button>
+             */}
+
+
             <Detailed_Ex_Modal
                 isOpen={isOpen}
                 onClose={onClose}
@@ -431,6 +323,7 @@ const TrainingCard = () => {
                 excersizeID={selectedExerciseId}
             />
         </div>
+
     );
 };
 
