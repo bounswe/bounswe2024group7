@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,7 @@ public class TrainingProgramWithTrackingResponse {
     private TrainingProgramWithTrackingStatus status;
     private LocalDateTime joinedAt;
     private LocalDateTime completedAt;
+    private LocalDate lastCompletedWorkoutDate;
     private List<WeekWithTrackingResponse> weeks;
     private Set<String> participants;
 }
