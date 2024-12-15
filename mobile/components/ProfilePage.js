@@ -27,7 +27,7 @@ const ProfilePage = ({ darkMode }) => {
   const fetchJoinedPrograms = async (userJoinedData) => {
         const programArr = [];
 
-        console.log(userJoinedData);
+        //console.log(userJoinedData);
 
         for (const item of userJoinedData) {
           try {
@@ -66,7 +66,7 @@ const ProfilePage = ({ darkMode }) => {
     refetchOnWindowFocus: false,
     refetchInterval:60000
 });
-const {
+/*const {
             data: joinedData,
             isFetching: programsIsFetching,
             isLoading: programsIsLoading,
@@ -84,7 +84,7 @@ const {
             programArr = fetchJoinedPrograms(joinedData);
             setPrograms(programArr);
             }
-        }, [joinedData, programsIsFetching])
+        }, [joinedData, programsIsFetching])*/
 const {
   data: postsData,
   isFetching: postsIsFetching,
@@ -142,7 +142,7 @@ const {
   refetchOnWindowFocus: false,
   refetchInterval:60000
 })
-/*const {
+const {
   data: programsData,
   isFetching: programsIsFetching,
   isLoading: programsIsLoading,
@@ -150,20 +150,22 @@ const {
   queryKey: ['programs'],
   queryFn: async () => {
       try {
-          const response = await apiInstance(token).get(`api/training-programs/trainer/${username}`)
-
+          const response = await apiInstance(sessionToken).get(`api/training-programs/joined/${username}`);
+          console.log("Joined programs response:")
+          console.log(response.data);
+          //response.data.weeks.forEach((workout)=>console.log(workout.workoutExercises));
           return response.data
       } catch (error) {
           return []
       }
   },
   refetchOnWindowFocus: false,
-})*/
-/*useEffect(() => {
+})
+useEffect(() => {
   if (programsData && !programsIsFetching) {
       setPrograms(programsData)
   }
-}, [programsData, programsIsFetching])*/
+}, [programsData, programsIsFetching])
 
 useEffect(() => {
   if (profileData && !profileIsFetching) {
@@ -190,8 +192,8 @@ useEffect(() => {
 }, [followingData, followingIsFetching]);
 
 
-  console.log(username);
-  console.log(profile);
+  //console.log(username);
+  //console.log(profile);
   
   
 
@@ -247,7 +249,8 @@ useEffect(() => {
         data={posts}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <PostCard
+          <View style={styles.header}>
+            <PostCard
             program_id={item.trainingProgram.id}
             description={item.content}
             owner={item.username}
@@ -258,7 +261,9 @@ useEffect(() => {
             commentList={forumPosts[0].commentList}
             date={item.createdAt}
             navigation={navigation}
-          />
+            />
+            <Text style={styles.profileName}>{username}</Text>
+          <View/>
         )}
         style={styles.postList}
         showsVerticalScrollIndicator={false}

@@ -10,8 +10,11 @@ import {
 
 const JoinedWorkout = ({ route }) => {
   const {programId,weekId,weekNumber,workoutId,name,workoutNumber,workoutExercises, navigation} = route.params;
+  console.log("Response for JoinedWorkout:");
+  console.log(workoutExercises);
   const {expandedState,setExpandedState} = useState(0);
   const renderExercise = ({ item, index, navigation }) => {
+    
     return (
       <View style={styles.exerciseContainer}>
        <View style={styles.exerciseNameContainer}>
@@ -26,8 +29,7 @@ const JoinedWorkout = ({ route }) => {
         <TouchableOpacity style={styles.startButton} onPress={()=>navigation.navigate('JoinedExercise',{programId,weekId,weekNumber,workoutId,workoutNumber,exerciseNumber:item.exerciseNumber,exerciseId:item.id,exercise:item.exercise,sets:item.sets,repetitions:item.repetitions})}>
           <Text style={styles.startButtonText}>Start</Text>
         </TouchableOpacity>
-        <Text style={styles.completionText}>0%</Text>
-
+        <Text style={styles.completionText}>%{ (100 *( item.completedSets?(item.completedSets.reduce((accumulator, currentValue) => accumulator + currentValue, 0))/((item.sets) * (item.repetitions)):0))}</Text>
       </View>
     );
   };
