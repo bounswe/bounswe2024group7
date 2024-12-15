@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ScrollView,StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import Toast from 'react-native-toast-message';
-import apiInstance from '../Api'
+import { useQuery } from "@tanstack/react-query"
+import apiInstance from '../Api';
+
 import {
   userProfile,
   userPassword,
@@ -22,10 +24,32 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
   const profile = useSelector(userProfile)
   const password = useSelector(userPassword)
   const sessionToken = useSelector(userSessionToken)
+  const [programs, setPrograms] = useState([]);
 
   const [trainingProgram, setTrainingProgram] = useState('');
   const [userId, setUserId] = useState('');
+const {
+        data: programsData,
+        isFetching: programsIsFetching,
+        isLoading: programsIsLoading,
+    } = useQuery({
+        queryKey: ['training-programs'],
+        queryFn: async () => {
+            const response = await apiInstance().get('api/training-programs')
 
+            return response.data
+        },
+        refetchOnWindowFocus:true,
+        refetchInterval:60000,
+    })
+
+    useEffect(() => {
+        if (programsData && !programsIsFetching) {
+            setPrograms(programsData)
+            console.log(programs);
+
+        }
+    }, [programsData, programsIsFetching])
   const trainingPrograms = [
     { id:1,label: 'Pilates', value: 'pilates' },
     { id:2,label: 'Cycling', value: 'cycling' },
@@ -33,6 +57,8 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
     { id:4,label: 'Cardio', value: 'cardio' },
     { id:5,label: 'Strength Training', value: 'strength_training' },
   ];
+
+
    const handleGoalSelection = (goal) => {
           setTrainingProgram(goal);
         };
@@ -137,7 +163,7 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Create New Post</Text>
 
       <TextInput
@@ -178,10 +204,10 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
       />
 
       <Text style={styles.fitnessGoal}> Select Training Program</Text>
-        <View style={styles.optionsContainer}>      
-          {trainingPrograms.map((option) => (
+        <View style={styles.optionsContainer}>
+          {programs.map((option) => (
              <TouchableOpacity
-                 key={option.value}
+                 key={option.title}
                  style={[
                     styles.trainingOption,
                     trainingProgram == option.id && styles.selectedTrainingOption,
@@ -194,7 +220,7 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
                   trainingProgram == option.id && styles.selectedTrainingOptionText,
                ]}
                >
-              {option.label}
+              {option.title}
               </Text>
             </TouchableOpacity>
            ))}
@@ -218,7 +244,7 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
                         }}>
         <Text style={styles.postButtonText}>Post</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -248,6 +274,12 @@ const lightStyles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     flex: 1,
   },
+  optionsContainer: {
+            padding: 10,
+            flexDirection:'column',
+            justifyContent:'space-between',
+            marginBottom: 20
+          },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
@@ -329,6 +361,13 @@ const lightStyles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
+  fitnessGoal: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        flex: 0.8, // Set equal flex for alignment
+        textAlign: 'center',
+      },
   postButtonText: {
     color: '#fff',
     fontSize: 16,
@@ -384,6 +423,13 @@ const darkStyles = StyleSheet.create({
     backgroundColor: '#ff4081',
     shadowColor: '#ff4081',
   },
+  fitnessGoal: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        flex: 0.8, // Set equal flex for alignment
+        textAlign: 'center',
+      },
   postButtonText: {
     ...lightStyles.postButtonText,
     color: '#fff',
