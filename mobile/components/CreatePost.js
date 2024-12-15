@@ -12,6 +12,7 @@ import {
 
 const CreatePost = ({ darkMode, setSelectedPage }) => {
   const styles = darkMode ? darkStyles : lightStyles;
+  const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   const [post, setPost] = useState({});
   const [description, setDescription] = useState('');
@@ -22,17 +23,19 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
   const password = useSelector(userPassword)
   const sessionToken = useSelector(userSessionToken)
 
-  const [trainingProgram, setTrainigProgram] = useState('');
+  const [trainingProgram, setTrainingProgram] = useState('');
   const [userId, setUserId] = useState('');
 
   const trainingPrograms = [
-    { label: 'Pilates', value: 'pilates' },
-    { label: 'Cycling', value: 'cycling' },
-    { label: 'Yoga', value: 'yoga' },
-    { label: 'Cardio', value: 'cardio' },
-    { label: 'Strength Training', value: 'strength_training' },
+    { id:1,label: 'Pilates', value: 'pilates' },
+    { id:2,label: 'Cycling', value: 'cycling' },
+    { id:3,label: 'Yoga', value: 'yoga' },
+    { id:4,label: 'Cardio', value: 'cardio' },
+    { id:5,label: 'Strength Training', value: 'strength_training' },
   ];
-
+   const handleGoalSelection = (goal) => {
+          setTrainingProgram(goal);
+        };
   const goHome = () => navigation.navigate('Home');
   const goFeed = () => setSelectedPage('Feed');
   const handlePost = async () => {
@@ -69,7 +72,7 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
     console.log(post)
 
     // First create image model and get the image id
-    if (post.image) {
+    /*if (post.image) {
         const imageResponse = await apiInstance(
             profile.username,
             password
@@ -82,11 +85,9 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
         console.log(post)
     } else {
         delete post.image
-    }
-    console.log(post)
+    }*/
     const response = await apiInstance(sessionToken).post(`api/posts`, {
-      ...post,
-      username: profile.username,
+      ...post
   })
     console.log(post)
     console.log(response)
@@ -124,95 +125,6 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
     // Add your logic to handle post submission
   };
 
-  /*const createPostMutation = useMutation(
-    {
-        mutationFn: async (post) => {
-            if (labels.length === 0) {
-              Toast.show({
-                type: 'error',
-                position: 'bottom',
-                text1: 'Create Error',
-                text2: 'No labels selected',
-                visibilityTime: 2000,
-                autoHide: true,
-                topOffset: 30,
-                bottomOffset: 40
-              });
-                return
-            }
-
-            if (!profile) {
-              Toast.show({
-                type: 'error',
-                position: 'bottom',
-                text1: 'Create Error',
-                text2: 'Not logged in',
-                visibilityTime: 2000,
-                autoHide: true,
-                topOffset: 30,
-                bottomOffset: 40
-              });
-                return
-            }
-
-            console.log(post)
-
-            // First create image model and get the image id
-            if (post.image) {
-                const imageResponse = await apiInstance(
-                    profile.username,
-                    password
-                ).post('/images', {
-                    url: post.image,
-                })
-
-                post.image = imageResponse.data.id
-
-                console.log(post)
-            } else {
-                delete post.image
-            }
-            console.log(post)
-
-            const response = await apiInstance().post(`api/posts/user/${profile.username}`, {
-                ...post,
-                username: profile.username,
-            })
-            console.log(post)
-
-            Toast.show({
-              type: 'success',
-              position: 'bottom',
-              text1: 'Post Created',
-              text2: 'Your post has been created successfully.',
-              visibilityTime: 3000,
-              autoHide: true,
-              topOffset: 30,
-              bottomOffset: 40
-            });
-            return response.data
-        },
-        onError: (error) => {
-            toast({
-                title: 'An error occurred.',
-                description: error.message,
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-            })
-        },
-        onSuccess: (data) => {
-            queryClient.invalidateQueries(
-                {
-                    queryKey: ['posts']
-                }
-            )
-            goHome();
-        }
-
-    }
-)*/
-
   const addLabel = () => {
     if (labelText.trim()) {
       setLabels([...labels, labelText.trim()]);
@@ -230,33 +142,17 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
 
       <TextInput
         style={styles.input}
-        placeholder="Title"
+        placeholder="Content"
         placeholderTextColor={styles.placeholderColor}
-        value={title}
-        onChangeText={setTitle}
+        value={content}
+        onChangeText={setContent}
       />
 
-      <TextInput
-        style={[styles.input, styles.descriptionInput]}
-        placeholder="Description"
-        placeholderTextColor={styles.placeholderColor}
-        multiline
-        value={description}
-        onChangeText={setDescription}
-      />
-
-      <TextInput
-        style={[styles.input, styles.descriptionInput]}
-        placeholder="Image"
-        placeholderTextColor={styles.placeholderColor}
-        value={image}
-        onChangeText={setImage}
-      />
 
       <View style={styles.labelContainer}>
         <TextInput
           style={styles.labelInput}
-          placeholder="Add Label"
+          placeholder="Add Tag"
           placeholderTextColor={styles.placeholderColor}
           value={labelText}
           onChangeText={setLabelText}
@@ -281,21 +177,21 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
         showsHorizontalScrollIndicator={false}
       />
 
-      <Text style={styles.fitnessGoal}> Select Training Programs</Text>
+      <Text style={styles.fitnessGoal}> Select Training Program</Text>
         <View style={styles.optionsContainer}>      
           {trainingPrograms.map((option) => (
              <TouchableOpacity
                  key={option.value}
                  style={[
                     styles.trainingOption,
-                    goals.includes(option.value) && styles.selectedTrainingOption,
+                    trainingProgram == option.id && styles.selectedTrainingOption,
                  ]}
-                  onPress={() => handleGoalSelection(option.value)}
+                  onPress={() => handleGoalSelection(option.id)}
               >
               <Text
                 style={[
                   styles.trainingOptionText,
-                  goals.includes(option.value) && styles.selectedTrainingOptionText,
+                  trainingProgram == option.id && styles.selectedTrainingOptionText,
                ]}
                >
               {option.label}
@@ -312,12 +208,11 @@ const CreatePost = ({ darkMode, setSelectedPage }) => {
                                 labels: labels,
                             })*/
                            setPost({
-                            title: title,
+
                             content: description,
-                            image: image,
+
                             tags: labels,
-                            trainingProgram: trainingProgram,
-                            user: userId
+                            trainingProgramId: trainingProgram,
                         });
                            handlePost();
                         }}>
