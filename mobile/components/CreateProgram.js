@@ -1,51 +1,241 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, FlatList, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import React, { useState, useEffect} from 'react';
+import { ScrollView,StyleSheet, Text, View, TextInput, TouchableOpacity, Pressable, FlatList, Modal } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; // Using Picker for the dropdown
+import apiInstance from "../Api";
+import { useQuery } from "@tanstack/react-query";
+import { useSelector } from 'react-redux';
+import { userSessionToken } from '../user.js';
+import Toast from 'react-native-toast-message';
+import SpinboxInput from "./common/SpinboxInput";
 
-const CreateProgram = ({ darkMode, setSelectedPage }) => {
+const CreateProgram = ({ darkMode }) => {
   const styles = darkMode ? darkStyles : lightStyles;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [labels, setLabels] = useState([]);
-  const [labelText, setLabelText] = useState('');
-  const [exercises, setExercises] = useState([]);
-  const [exercise, setExercise] = useState({ name: '', repetitions: '', sets: '' });
+  const [weeks, setWeeks] = useState([]);
+  const [exerciseModalVisible, setExerciseModalVisible] = useState(false);
+  const [selectedWeekIndex, setSelectedWeekIndex] = useState(null);
+  const [selectedWorkoutIndex, setSelectedWorkoutIndex] = useState(null);
+  const [selectedExercise, setSelectedExercise] = useState('');
+  const [sets, setSets] = useState('');
+  const [type, setType] = useState('BODY_BUILDING');
+  const [level, setLevel] = useState('BEGINNER');
+  const [interval, setInterval] = useState(0);
 
-  const handleProgramCreation = () => {
-    const newProgram = { title, description, labels, exercises };
-    console.log('Creating program:', newProgram);
-    // Add your logic to handle program submission
+  const [reps, setReps] = useState('');
+
+  const SpinBoxComponent = () => {
+
+    return (
+      <View>
+        <SpinboxInput onChange={setInterval} />
+      </View>
+    );
+  };
+  const [exerciseOptions, setExerciseOptions] = useState([])
+
+        const {
+            data: exercisesData,
+            isFetching: exercisesIsFetching,
+            isLoading: exercisesIsLoading,
+        } = useQuery({
+            queryKey: ['exercises'],
+            queryFn: async () => {
+                const response = await apiInstance(sessionToken).get('api/exercises')
+
+                return response.data
+            },
+            refetchOnWindowFocus: false,
+        })
+
+        useEffect(() => {
+            if (exercisesData && !exercisesIsFetching) {
+                setExerciseOptions(exercisesData)
+            }
+        }, [exercisesData, exercisesIsFetching])
+
+  const sessionToken = useSelector(userSessionToken)
+
+  /*const exerciseOptions = [
+    { id: 1, name: 'push-up' },
+    { id: 2, name: 'pull-up' },
+  ];*/
+  const types = [
+      { id: 0, label: 'Body Building', value:'BODY_BUILDING' }
+
+    ];
+    const levels = [
+        { id: 0, label: 'Beginner', value:'BEGINNER' },
+        { id: 1, label: 'Intermediate', value:'INTERMEDIATE' },
+        { id: 2, label: 'Professional', value:'PROFESSIONAL' }
+      ];
+
+  // Add Week
+  const addWeek = () => {
+    setWeeks([...weeks, { workouts: [] }]);
   };
 
-  const addLabel = () => {
-    if (labelText.trim()) {
-      setLabels([...labels, labelText.trim()]);
-      setLabelText('');
+  // Remove Week
+  const removeWeek = (index) => {
+    setWeeks(weeks.filter((_, i) => i !== index));
+  };
+
+  // Add Workout
+  const addWorkout = (weekIndex) => {
+    setWeeks((prevWeeks) =>
+        prevWeeks.map((week, i) =>
+          i === weekIndex
+            ? {
+                ...week,
+                workouts: [...week.workouts, { name: '', exercises: [] }],
+              }
+            : week
+        )
+      );
+  };
+
+  // Remove Workout
+  const removeWorkout = (weekIndex, workoutIndex) => {
+    const updatedWeeks = [...weeks];
+    updatedWeeks[weekIndex].workouts = updatedWeeks[weekIndex].workouts.filter(
+      (_, i) => i !== workoutIndex
+    );
+    setWeeks(updatedWeeks);
+  };
+
+  const clearFields = () => {
+            setTitle('');
+            setDescription('');
+            setWeeks([]);
+            setType('');
+            setSelectedExercise('');
+            setSets('');
+            setReps('');
+        };
+
+    const handleProgramCreation = async () => {
+      /*const newProgram = { title, description, labels, exercises };
+      console.log('Creating program:', newProgram);*/
+      console.log(title);
+      console.log(description);
+      console.log(type);
+      console.log(level);
+      console.log(interval);
+      weeks.forEach((week)=>{
+        console.log("Week "+weeks.indexOf(week));
+        console.log("Workout count: "+week.workouts.length);
+        week.workouts.forEach((workout)=>{
+            console.log("Workout "+week.workouts.indexOf(workout));
+            console.log("Workout name: "+workout.name);
+            console.log("Exercise count: "+workout.exercises.length);
+            workout.exercises.forEach((exercise)=>{
+                console.log("Exercise "+exercise.exerciseId);
+                console.log("Sets: "+exercise.sets);
+                console.log("Reps: "+exercise.repetitions);
+
+            });
+        });
+      });
+
+      if (!title || !description || weeks.length === 0 || weeks.some((item)=>{return item.workouts.length==0||item.workouts.some((workout)=>{return workout.name.length == 0 || workout.exercises.length==0})})) {
+                      Toast.show({
+                                type: 'error',
+                                position: 'bottom',
+                                text1: 'Create Program Error',
+                                text2: 'Fill all the fields to create a program.',
+                                visibilityTime: 2000,
+                                autoHide: true,
+                                topOffset: 30,
+                                bottomOffset: 40
+                              });
+                      return;
+                  }
+
+                  const response = await apiInstance(sessionToken).post('api/training-programs', {
+                      title,
+                      description,
+                      type,
+                      level,
+                      interval,
+                      weeks
+                  });
+
+                  if (response.status === 201) {
+                      Toast.show({
+                    type: 'success',
+                    position: 'bottom',
+                    text1: 'Program Created',
+                    text2: 'Successfully created the program.',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                    topOffset: 30,
+                    bottomOffset: 40
+                                                  });
+                  clearFields();
     }
-  };
+                 else{
+                     Toast.show({
+                       type: 'error',
+                       position: 'bottom',
+                       text1: 'Create Program Error',
+                       text2: 'There was an error while creating the program. Please try again.',
+                       visibilityTime: 2000,
+                       autoHide: true,
+                       topOffset: 30,
+                       bottomOffset: 40
+                    });
+                                         return;
 
-  const removeLabel = (index) => {
-    setLabels(labels.filter((_, i) => i !== index));
+                 }
+    };
+  const handleWorkoutNameChange = (weekIndex, workoutIndex, newName) => {
+    setWeeks((prevWeeks) =>
+      prevWeeks.map((week, i) =>
+        i === weekIndex
+          ? {
+              ...week,
+              workouts: week.workouts.map((workout, j) =>
+                j === workoutIndex ? { ...workout, name: newName } : workout
+              ),
+            }
+          : week
+      )
+    );
   };
-
+  // Add Exercise
   const addExercise = () => {
-    if (exercise.name.trim() && exercise.repetitions && exercise.sets) {
-      setExercises([...exercises, exercise]);
-      setExercise({ name: '', repetitions: '', sets: '' });
+    if (selectedExercise && sets && reps) {
+      const updatedWeeks = [...weeks];
+      const selectedExerciseId = exerciseOptions.find((element)=>element.name===selectedExercise).id;
+      updatedWeeks[selectedWeekIndex].workouts[selectedWorkoutIndex].exercises.push({
+        exerciseId: selectedExerciseId,
+        sets,
+        repetitions:reps,
+      });
+      setWeeks(updatedWeeks);
+      setSelectedExercise('');
+      setSets('');
+      setReps('');
+      setExerciseModalVisible(false);
     }
   };
 
-  const removeExercise = (index) => {
-    setExercises(exercises.filter((_, i) => i !== index));
+  // Remove Exercise
+  const removeExercise = (weekIndex, workoutIndex, exerciseIndex) => {
+    const updatedWeeks = [...weeks];
+    updatedWeeks[weekIndex].workouts[workoutIndex].exercises = updatedWeeks[
+      weekIndex
+    ].workouts[workoutIndex].exercises.filter((_, i) => i !== exerciseIndex);
+    setWeeks(updatedWeeks);
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Create New Program</Text>
 
       <TextInput
         style={styles.input}
         placeholder="Title"
-        placeholderTextColor={styles.placeholderColor}
         value={title}
         onChangeText={setTitle}
       />
@@ -53,362 +243,326 @@ const CreateProgram = ({ darkMode, setSelectedPage }) => {
       <TextInput
         style={[styles.input, styles.descriptionInput]}
         placeholder="Description"
-        placeholderTextColor={styles.placeholderColor}
         multiline
         value={description}
         onChangeText={setDescription}
       />
 
-      <View style={styles.labelContainer}>
-        <TextInput
-          style={styles.labelInput}
-          placeholder="Add Label"
-          placeholderTextColor={styles.placeholderColor}
-          value={labelText}
-          onChangeText={setLabelText}
-        />
-        <TouchableOpacity style={styles.addButton} onPress={addLabel}>
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
+      <Picker style={styles.picker}
+                    selectedValue={type}
+                    onValueChange={(value) => setType(value)}
+                  >
+                    {types.map((item) => (
+                      <Picker.Item label={item.label} value={item.value} key={item.id} />
+                    ))}
+                  </Picker>
+
+      <Picker style={styles.picker}
+                          selectedValue={level}
+                          onValueChange={(value) => setLevel(value)}
+                        >
+                          {levels.map((item) => (
+                            <Picker.Item label={item.label} value={item.value} key={item.id} />
+                          ))}
+                        </Picker>
+      <View style={styles.spinBoxContainer}>
+      <Text style={styles.sectionTitle}> Select Interval </Text>
+      <SpinBoxComponent/>
+
       </View>
 
       <FlatList
-        data={labels}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.labelItem}>
-            <Text style={styles.labelItemText}>{item}</Text>
-            <TouchableOpacity onPress={() => removeLabel(index)}>
-              <Text style={styles.removeLabel}>✕</Text>
+        data={weeks}
+        keyExtractor={(_, index) => index.toString()}
+        renderItem={({ item: week, index: weekIndex }) => (
+          <View style={styles.weekContainer}>
+            <Text style={styles.sectionTitle}>Week {weekIndex + 1}</Text>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => addWorkout(weekIndex)}
+            >
+              <Text style={styles.addButtonText}>Add Workout</Text>
+            </TouchableOpacity>
+
+            <FlatList
+              data={week.workouts}
+              keyExtractor={(_, i) => i.toString()}
+              renderItem={({ item: workout, index: workoutIndex }) => (
+                <View style={styles.workoutContainer}>
+                  <Text style={styles.sectionTitle}>
+                    Workout {workoutIndex + 1}
+                  </Text>
+                  <TextInput
+                        style={styles.input}
+                        placeholder="Workout Name"
+                        placeholderTextColor={styles.placeholderColor}
+                        value={workout.name}
+                        onChangeText={(text) => handleWorkoutNameChange(weekIndex, workoutIndex, text)}
+                      />
+
+                  <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={() => {
+                      setSelectedWeekIndex(weekIndex);
+                      setSelectedWorkoutIndex(workoutIndex);
+                      setExerciseModalVisible(true);
+                    }}
+                  >
+                    <Text style={styles.addButtonText}>Add Exercise</Text>
+                  </TouchableOpacity>
+
+                  <FlatList
+                    data={workout.exercises}
+                    keyExtractor={(_, i) => i.toString()}
+                    renderItem={({ item: exercise, index: exerciseIndex }) => (
+                      <View style={styles.exerciseItem}>
+                        <Text>
+                          {exerciseOptions.find((i)=>i.id===exercise.exerciseId).name} - {exercise.repetitions} reps x {exercise.sets}{' '}
+                          sets
+                        </Text>
+                        <TouchableOpacity
+                          onPress={() =>
+                            removeExercise(
+                              weekIndex,
+                              workoutIndex,
+                              exerciseIndex
+                            )
+                          }
+                        >
+                          <Text style={styles.removeLabel}>✕</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  />
+                  <TouchableOpacity
+                    onPress={() => removeWorkout(weekIndex, workoutIndex)}
+                  >
+                    <Text style={styles.removeLabel}>Remove Workout</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+            <TouchableOpacity onPress={() => removeWeek(weekIndex)}>
+              <Text style={styles.removeLabel}>Remove Week</Text>
             </TouchableOpacity>
           </View>
         )}
-        horizontal
-        showsHorizontalScrollIndicator={false}
       />
-
-      <Text style={styles.sectionTitle}>Exercises</Text>
-
-      <View style={styles.exerciseContainer}>
-        <TextInput
-          style={styles.exerciseInput}
-          placeholder="Exercise Name"
-          placeholderTextColor={styles.placeholderColor}
-          value={exercise.name}
-          onChangeText={(text) => setExercise({ ...exercise, name: text })}
-        />
-        <TextInput
-          style={styles.exerciseInput}
-          placeholder="Repetitions"
-          placeholderTextColor={styles.placeholderColor}
-          keyboardType="numeric"
-          value={exercise.repetitions}
-          onChangeText={(text) => setExercise({ ...exercise, repetitions: text })}
-        />
-        <TextInput
-          style={styles.exerciseInput}
-          placeholder="Sets"
-          placeholderTextColor={styles.placeholderColor}
-          keyboardType="numeric"
-          value={exercise.sets}
-          onChangeText={(text) => setExercise({ ...exercise, sets: text })}
-        />
-        <TouchableOpacity style={styles.addButton} onPress={addExercise}>
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={exercises}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.exerciseItem}>
-            <Text style={styles.exerciseItemText}>
-              {item.name} - {item.repetitions} reps x {item.sets} sets
-            </Text>
-            <TouchableOpacity onPress={() => removeExercise(index)}>
-              <Text style={styles.removeLabel}>✕</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
-
-      <TouchableOpacity style={styles.postButton} onPress={handleProgramCreation}>
-        <Text style={styles.postButtonText}>Create Program</Text>
+      <View style={styles.addWeekButtonContainer}>
+      <TouchableOpacity style={styles.addWeekButton} onPress={addWeek}>
+        <Text style={styles.addButtonText}>Add Week</Text>
       </TouchableOpacity>
-    </KeyboardAvoidingView>
+      </View>
+
+      <Modal
+        visible={exerciseModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setExerciseModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Add Exercise</Text>
+
+            <Picker style={styles.picker}
+              selectedValue={selectedExercise}
+              onValueChange={(value) => setSelectedExercise(value)}
+            >
+              <Picker.Item label="Select..." value="" />
+              {exerciseOptions.map((exercise) => (
+                <Picker.Item label={exercise.name} value={exercise.name} key={exercise.id} />
+              ))}
+            </Picker>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Sets"
+              keyboardType="numeric"
+              value={sets}
+              onChangeText={setSets}
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Reps"
+              keyboardType="numeric"
+              value={reps}
+              onChangeText={setReps}
+            />
+
+
+            <View style={styles.modalButtons}>
+                          <Pressable style={styles.addButton} onPress={addExercise}>
+                            <Text style={styles.addButtonText}>Add</Text>
+                          </Pressable>
+
+                          <Pressable style={styles.cancelButton} onPress={() => setExerciseModalVisible(false)}>
+                            <Text style={styles.cancelButtonText}>Cancel</Text>
+                          </Pressable>
+                        </View>
+          </View>
+        </View>
+      </Modal>
+      <TouchableOpacity style={styles.postButton} onPress={handleProgramCreation}>
+              <Text style={styles.postButtonText}>Create Program</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
-// Reusing similar styles from CreatePost component with additional styling for exercises
 const lightStyles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-    flex: 1,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  input: {
-    height: 50,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 10,
-    fontSize: 16,
-    color: '#333',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  descriptionInput: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  labelContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  labelInput: {
-    flex: 1,
-    height: 50,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  addButton: {
-    marginLeft: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#007bff',
-    borderRadius: 10,
-    elevation: 3,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  labelItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#e0e0e0',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15,
-    marginRight: 5,
-  },
-  labelItemText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  removeLabel: {
-    color: '#ff3b30',
-    marginLeft: 5,
-    fontWeight: 'bold',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginVertical: 10,
-    color: '#333',
-  },
-  exerciseContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  exerciseInput: {
-    flex: 1,
-    height: 50,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    marginRight: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  exerciseItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 5,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginVertical: 5,
-  },
-  exerciseItemText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  postButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
-    shadowColor: '#007bff',
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  postButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  placeholderColor: 'gray',
-});
+        padding: 20,
+        backgroundColor: '#f5f5f5',
+        flex: 1,
+      },
 
-const darkStyles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#121212',
-    flex: 1,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 15,
-  },
-  input: {
-    height: 50,
-    backgroundColor: '#333333',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 10,
-    fontSize: 16,
-    color: '#ffffff',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  descriptionInput: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  labelContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  labelInput: {
-    flex: 1,
-    height: 50,
-    backgroundColor: '#333333',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: '#ffffff',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  addButton: {
-    marginLeft: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#007bff',
-    borderRadius: 10,
-    elevation: 3,
-  },
-  addButtonText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-  },
-  labelItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#555555',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15,
-    marginRight: 5,
-  },
-  labelItemText: {
-    fontSize: 14,
-    color: '#ffffff',
-  },
-  removeLabel: {
-    color: '#ff3b30',
-    marginLeft: 5,
-    fontWeight: 'bold',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginVertical: 10,
-    color: '#ffffff',
-  },
-  exerciseContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  exerciseInput: {
-    flex: 1,
-    height: 50,
-    backgroundColor: '#333333',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: '#ffffff',
-    marginRight: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  exerciseItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 5,
-    backgroundColor: '#555555',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginVertical: 5,
-  },
-  exerciseItemText: {
-    fontSize: 14,
-    color: '#ffffff',
-  },
-  postButton: {
-    backgroundColor: '#007bff',
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 20,
-    shadowColor: '#007bff',
-    shadowOpacity: 0.6,
-    shadowRadius: 5,
-    elevation: 5,
-  },
-  postButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  placeholderColor: '#aaaaaa',
-});
+      container: {
+              padding: 10,
+              flex: 1,
+            },
+      title: {
+        fontSize: 26,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 15,
+      },
+      input: {
+        height: 50,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        marginBottom: 10,
+        fontSize: 16,
+        color: '#333',
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3,
+      },
+      descriptionInput: {
+        height: 100,
+        textAlignVertical: 'top',
+      },
 
-// Define darkStyles similarly as lightStyles with color changes for dark mode
+  addButton: {
+        marginLeft: 10,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        backgroundColor: '#007bff',
+        borderRadius: 10,
+        elevation: 3,
+      },
+      addButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+      },
+      addWeekButton: {
+              marginLeft: 10,
+              paddingVertical: 12,
+              paddingHorizontal: 16,
+              backgroundColor: '#007bff',
+              borderRadius: 10,
+              alignItems: 'center',
+              width:100,
+              elevation: 3,
+            },
+            addWeekButtonContainer: {
+              alignItems: 'center',
+            },
+      postButton: {
+            backgroundColor: '#007bff',
+            paddingVertical: 15,
+            borderRadius: 10,
+            alignItems: 'center',
+            marginTop: 20,
+            shadowColor: '#007bff',
+            shadowOpacity: 0.5,
+            shadowRadius: 5,
+            elevation: 5,
+          },
+          postButtonText: {
+            color: '#fff',
+            fontSize: 16,
+            fontWeight: 'bold',
+          },
+  weekContainer: { marginBottom: 20 },
+  workoutContainer: { marginBottom: 15 },
+  sectionTitle: { fontSize: 18 },
+   exerciseContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+      },
+      exerciseInput: {
+        flex: 1,
+        height: 50,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        fontSize: 16,
+        marginRight: 5,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3,
+      },
+      exerciseItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 5,
+        backgroundColor: '#e0e0e0',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        marginVertical: 5,
+      },
+      exerciseItemText: {
+        fontSize: 14,
+        color: '#333',
+      },
+  removeLabel: { color: 'red' },
+  modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      padding: 20,
+      width: '90%',
+      alignItems: 'center',
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 15,
+    },
+     placeholderColor: 'gray',
+    picker: {
+      width: '100%',
+      height: 50,
+      backgroundColor: '#f0f0f0',
+      marginBottom: 15,
+      borderRadius: 5,
+    },
+    modalButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      width: '100%',
+    },
+    cancelButton: {
+        backgroundColor: '#ff3b30',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 10,
+      },
+      cancelButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+      },
+});
 
 export default CreateProgram;
