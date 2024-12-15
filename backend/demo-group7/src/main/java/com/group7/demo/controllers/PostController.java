@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -98,10 +99,30 @@ public class PostController {
         return ResponseEntity.ok(bookmarkedPosts);
     }
 
-    @GetMapping("/fitness-goals")
-    public ResponseEntity<List<PostResponse>> fetchPostsByFitnessGoals(HttpServletRequest request) {
-        List<PostResponse> posts = postService.getPostsByFitnessGoals(request);
-        return ResponseEntity.ok(posts);
+    @GetMapping("/for-you")
+    public ResponseEntity<Map<String, Object>> fetchPostsByFitnessGoals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        Map<String, Object> response = postService.getPostsByFitnessGoalsWithPagination(page, size, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/explore")
+    public ResponseEntity<Map<String, Object>> fetchPostsWithPagination(
+            @RequestParam(required = false) Set<String> tags,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+
+        Map<String, Object> response;
+        if (tags != null) {
+            response = postService.getPostsByTagsWithPagination(tags, page, size, request);
+        } else {
+            response = postService.getAllPostsWithPagination(page, size, request);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
 }

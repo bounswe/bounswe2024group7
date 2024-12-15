@@ -10,6 +10,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -196,7 +199,7 @@ public class PostService {
     }
 
 
-    public List<PostResponse> getPostsByFitnessGoals(HttpServletRequest request) {
+    public Map<String, Object> getPostsByFitnessGoalsWithPagination(int page, int size, HttpServletRequest request) {
         // Get the authenticated user
         User user = authenticationService.getAuthenticatedUserInternal(request);
 
@@ -207,15 +210,60 @@ public class PostService {
         // Extract fitness goals (tags) from the survey
         Set<Tag> fitnessGoals = survey.getFitnessGoals();
 
-        // Fetch posts with tags matching fitness goals
-        List<Post> posts = postRepository.findAllByTagsIn(fitnessGoals);
+        // Create Pageable object
+        Pageable paging = PageRequest.of(page, size);
 
-        // Convert posts to PostResponse
-        return posts.stream()
+        // Fetch posts with pagination
+        Page<Post> pagePost = postRepository.findAllByTagsIn(fitnessGoals, paging);
+
+        // Get content for current page
+        List<PostResponse> posts = pagePost.getContent().stream()
                 .map(post -> mapper.mapToPostResponse(post, request))
                 .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("posts", posts);
+        response.put("currentPage", pagePost.getNumber());
+        response.put("totalItems", pagePost.getTotalElements());
+        response.put("totalPages", pagePost.getTotalPages());
+
+        return response;
     }
 
+    @Transactional
+    public Map<String, Object> getAllPostsWithPagination(int page, int size, HttpServletRequest request) {
+        Pageable paging = PageRequest.of(page, size);
+        Page<Post> pagePost = postRepository.findAll(paging);
 
+        List<PostResponse> posts = pagePost.getContent().stream()
+                .map(post -> mapper.mapToPostResponse(post, request))
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("posts", posts);
+        response.put("currentPage", pagePost.getNumber());
+        response.put("totalItems", pagePost.getTotalElements());
+        response.put("totalPages", pagePost.getTotalPages());
+
+        return response;
+    }
+
+    @Transactional
+    public Map<String, Object> getPostsByTagsWithPagination(Set<String> tagNames, int page, int size, HttpServletRequest request) {
+        Pageable paging = PageRequest.of(page, size);
+        Page<Post> pagePost = postRepository.findPostsByTagsWithPagination(tagNames, paging);
+
+        List<PostResponse> posts = pagePost.getContent().stream()
+                .map(post -> mapper.mapToPostResponse(post, request))
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("posts", posts);
+        response.put("currentPage", pagePost.getNumber());
+        response.put("totalItems", pagePost.getTotalElements());
+        response.put("totalPages", pagePost.getTotalPages());
+
+        return response;
+    }
 
 }
