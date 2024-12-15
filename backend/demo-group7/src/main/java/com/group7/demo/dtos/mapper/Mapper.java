@@ -96,6 +96,7 @@ public class Mapper {
         TrainingProgram program = trainingProgramWithTracking.getTrainingProgram();
         return TrainingProgramWithTrackingResponse.builder()
                 .id(program.getId())
+                .trackingId(trainingProgramWithTracking.getId())
                 .title(program.getTitle())
                 .description(program.getDescription())
                 .trainer(program.getTrainer().getUsername())

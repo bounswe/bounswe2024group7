@@ -17,6 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class TrainingProgramWithTrackingResponse {
     private Long id;
+    private Long trackingId;
     private String title;
     private String description;
     private String trainer;
