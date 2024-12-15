@@ -220,7 +220,7 @@ function CreatePostModal({
                         </FormLabel>
                         <Input type="text"
                             focusBorderColor='purple.500'
-                            onChange={(e) => setImage(e.target.value)}
+                            onChange={(e) => setImageURL(e.target.value)}
                         />
                     </FormControl>
                     <FormControl id="trainingProgram">
@@ -287,7 +287,7 @@ function CreatePostModal({
                     <Button variant="ghost"
                         onClick={() => {
                             setContent('')
-                            setImage('')
+                            setImageURL('')
                             setSelectedTags([])
                             setSelectedProgram(null)
                             onClose()
