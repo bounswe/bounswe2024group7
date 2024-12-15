@@ -349,6 +349,11 @@ useEffect(() => {
             <Text style={styles.statLabel}>Following</Text>
           </View>
         </View>
+<View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ProgressTracker', { username })}>
+                            <Text style={styles.buttonText}>See Your Progress</Text>
+         </TouchableOpacity>
+</View>
         {/*<TouchableOpacity style={styles.followButton} onPress={handleFollowToggle}>
           <Text style={styles.followButtonText}>
             {isFollowing ? 'Following' : 'Follow'}
@@ -430,6 +435,21 @@ const lightStyles = StyleSheet.create({
     fontSize: 14,
     color: 'gray',
   },
+  buttonContainer: {
+
+        alignItems:'center'
+      },
+  button: {
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      backgroundColor: '#6366F1',
+      borderRadius: 10,
+      elevation: 3,
+    },
+   buttonText: {
+      color: '#ffffff',
+      fontWeight: 'bold',
+    },
   followButton: {
     backgroundColor: '#007bff',
     paddingVertical: 10,
