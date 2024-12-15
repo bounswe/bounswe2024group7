@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import React, {  useState, useRef } from 'react';
+import {Dimensions, View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
-import { LineChart, BarChart, PieChart, ProgressChart, ContributionGraph, StackedBarChart } from "react-native-chart-kit";
+import { LineChart, BarChart, PieChart, ProgressChart, StackedBarChart } from "react-native-chart-kit";
 
-const ProgressTracker = () => {
+const ProgressTracker = ({username}) => {
   const currentDayIndex = 2; // Let's assume today is Monday (index 2)
   const [selectedDay, setSelectedDay] = useState(currentDayIndex); // Default to today
 
@@ -21,17 +21,23 @@ const ProgressTracker = () => {
   const progressData = [30, 50, 80, 40, 60, 70, 90];
 
   const ProgressGraph = ({progress}) => {
-    return (
-              <View>
-          <Text>Your Progress Graph</Text>
+    const [graphWidth, setGraphWidth] = useState(0);
+      const parentViewRef = useRef(null);
+
+      const handleParentLayout = (event) => {
+        const { width } = event.nativeEvent.layout;
+        setGraphWidth(width); // 80% of parent width
+      };
+
+      return (
+        <View ref={parentViewRef} onLayout={handleParentLayout} style={styles.parentContainer}>
           <LineChart
             data={{
               labels: ["Sat", "Sun", "Mon", "Tues", "Wes", "Thurs", "Fri"],
               datasets: [{ data: progressData }]}}
-            width={Dimensions.get("window").width} 
-            height={220}
-            yAxisLabel="Days"
-            yAxisSuffix="Days"
+            width={0.9*Dimensions.get('window').width} // Use the calculated width
+            height={200}
+            yAxisLabel="%"
             yAxisInterval={1} // optional, defaults to 1
             chartConfig={{
               backgroundColor: "#e26a00",
@@ -41,7 +47,7 @@ const ProgressTracker = () => {
               color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               style: {
-                borderRadius: 16
+                borderRadius: 6
               },
               propsForDots: {
                 r: "6",
@@ -56,7 +62,7 @@ const ProgressTracker = () => {
             }}
           />
         </View>
-    )
+      );
   }
 
   const ProgressCircle = ({ progress }) => {
@@ -120,11 +126,10 @@ const ProgressTracker = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Fitness Fact</Text>
+      <Text style={styles.title}>Your Progress</Text>
 
       <View style={styles.card}>
         <ProgressCircle progress={progressData[selectedDay]} />
-        <ProgressGraph progress={progressData[selectedDay]} />
         <View style={styles.progressContent}>
           <Text style={styles.progressTitle}>{getProgressTitle()}</Text>
           <TouchableOpacity style={styles.continueButton}>
@@ -132,6 +137,7 @@ const ProgressTracker = () => {
           </TouchableOpacity>
         </View>
       </View>
+
 
       <FlatList
         data={days}
@@ -147,10 +153,10 @@ const ProgressTracker = () => {
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.daysList}
       />
-
-      <TouchableOpacity style={styles.createPostButton}>
-        <Text style={styles.createPostText}>+ Create New Post</Text>
-      </TouchableOpacity>
+      <View style = {styles.graphCard}>
+           <Text style={styles.progressTitle}>Weekly Progress</Text>
+            <ProgressGraph progress={progressData[selectedDay]} />
+        </View>
     </View>
   );
 };
@@ -168,8 +174,8 @@ const styles = StyleSheet.create({
     color: '#4A4A4A',
     marginBottom: 30,
   },
-  card: {
-    width: '80%',
+  graphCard: {
+    width: '100%',
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     shadowColor: '#000',

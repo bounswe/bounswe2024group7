@@ -34,7 +34,7 @@ const Home = ({ navigation }) => {
   console.log(sessionToken);
   const ProfilePageContainer = () => (
     <View style={currentStyles.page}>
-      <ProfilePage darkMode={darkMode}/>
+      <ProfilePage darkMode={darkMode} navigation/>
     </View>
   );
 
