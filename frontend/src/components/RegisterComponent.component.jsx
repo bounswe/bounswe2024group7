@@ -26,6 +26,10 @@ import { useNavigate } from "@tanstack/react-router"
 import { useDispatch } from "react-redux";
 import { userActions, userProfile } from '../context/user.js'
 import Cookies from "js-cookie"
+import { Select as Selector} from 'chakra-react-select';
+import { PostContext } from '../context/PostContext.jsx'
+import { useContext } from 'react'
+import { useSelector } from 'react-redux'
 
 const userRoles = [
     {
@@ -36,10 +40,21 @@ const userRoles = [
         value: "TRAINER",
         label: "Trainer"
     },
+]
+
+const userLevels = [
     {
-        value: "DIETICIAN",
-        label: "Dietician"
-    }
+        value: "BEGINNER",
+        label: "Beginner"
+    },
+    {
+        value: "INTERMEDIATE",
+        label: "Intermediate"
+    },
+    {
+        value: "ADVANCED",
+        label: "Advanced"
+    },
 ]
 
 export default function RegisterComponent() {
@@ -49,12 +64,16 @@ export default function RegisterComponent() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [role, setRole] = useState("")
+    const [level, setLevel] = useState("")
+    const [interestAreas, setInterestAreas] = useState([])
     const navigate = useNavigate()
     const toast = useToast()
     const dispatch = useDispatch();
+    const { tags } = useContext(PostContext)
 
     const handleUserRegister = async () => {
         try {
+            console.log(username, email, password, role, level, interestAreas)
             const response = await apiInstance().post(
                 "auth/register",
                 {
@@ -79,6 +98,16 @@ export default function RegisterComponent() {
                 )
 
                 Cookies.set("username", username)
+
+                // Save the level and interest areas
+                const fitnessGoals = await apiInstance(token).post(
+                    `api/surveys`,
+                    {
+                        username,
+                        fitnessLevel: level,
+                        fitnessGoals: interestAreas
+                    }
+                )
 
                 navigate(
                     {
@@ -187,6 +216,48 @@ export default function RegisterComponent() {
                                     )
                                 }
                             </Select>
+                        </FormControl>
+                        <FormControl id="level" isRequired>
+                            <FormLabel>Level</FormLabel>
+                            <Select
+                                placeholder="Select level"
+                                focusBorderColor='purple.500'
+                                onChange={
+                                    (e) => {
+                                        setLevel(e.target.value)
+                                    }
+                                }
+                            >
+                                {
+                                    userLevels.map(
+                                        (level, index) => {
+                                            return (
+                                                <option key={index} value={level.value}>{level.label}</option>
+                                            )
+                                        }
+                                    )
+                                }
+                            </Select>
+                        </FormControl>
+                        <FormControl id="interestAreas" isRequired>
+                            <FormLabel>Interest Areas</FormLabel>
+                            <Selector
+                                placeholder="Select interest areas"
+                                focusBorderColor='purple.500'
+                                isMulti
+                                options={tags.map((tag) => {
+                                    return {    
+                                        value: tag,
+                                        label: tag
+                                    }
+                                }
+                                )}
+                                onChange={
+                                    (e) => {
+                                        setInterestAreas(e.map((item) => item.value))
+                                    }
+                                }
+                            />
                         </FormControl>
                         <Stack spacing={10} pt={2}>
                             <Button
