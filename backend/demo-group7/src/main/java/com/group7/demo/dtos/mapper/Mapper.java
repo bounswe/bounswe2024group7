@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -107,6 +108,7 @@ public class Mapper {
                 .joinedAt(trainingProgramWithTracking.getJoinedAt())
                 .status(trainingProgramWithTracking.getStatus())
                 .completedAt(trainingProgramWithTracking.getCompletedAt())
+                .lastCompletedWorkoutDate(getLastCompletedWorkoutDate(trainingProgramWithTracking))
                 .weeks(trainingProgramWithTracking.getWeeksWithTracking().stream()
                         .map(this::mapToWeekWithTrackingResponse)
                         .sorted(Comparator.comparing(WeekWithTrackingResponse::getWeekNumber))
@@ -155,6 +157,15 @@ public class Mapper {
                 .completedAt(workoutExerciseWithTracking.getCompletedAt())
                 .completedSets(workoutExerciseWithTracking.getCompletedSets())
                 .build();
+    }
+
+    private LocalDate getLastCompletedWorkoutDate(TrainingProgramWithTracking trainingProgramWithTracking) {
+        return trainingProgramWithTracking.getWeeksWithTracking().stream()
+                .flatMap(weekWithTracking -> weekWithTracking.getWorkoutsWithTracking().stream())
+                .filter(workoutWithTracking -> workoutWithTracking.getCompletedAt() != null)
+                .map(workoutWithTracking -> workoutWithTracking.getCompletedAt().toLocalDate())
+                .max(LocalDate::compareTo)
+                .orElse(null);
     }
 
 
