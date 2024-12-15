@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,7 +49,7 @@ public class SurveyService {
         Survey survey = Survey.builder()
                 .user(user)
                 .fitnessGoals(tags)
-                .fitnessLevel(ProgramLevel.valueOf(request.getFitnessLevel().toUpperCase())) // Convert to enum
+                .fitnessLevel(ProgramLevel.valueOf(request.getFitnessLevel().toUpperCase(Locale.ENGLISH)))
                 .build();
 
         Survey savedSurvey = surveyRepository.save(survey);
