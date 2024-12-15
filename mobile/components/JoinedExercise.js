@@ -9,6 +9,12 @@ import {
   ScrollView,
 } from 'react-native';
 
+import Toast from 'react-native-toast-message';
+import { useQuery } from "@tanstack/react-query"
+import { useSelector } from 'react-redux';
+import { userPassword, userProfile, userSessionToken } from '../user.js';
+import apiInstance from '../Api'
+
 const ExerciseDetail = ({ route }) => {
   const {programId,weekId,weekNumber,workoutId,workoutNumber,exerciseNumber,exerciseId,exercise,sets,repetitions} =route.params;
 
@@ -28,14 +34,47 @@ const ExerciseDetail = ({ route }) => {
     setRepInputs(updatedInputs);
   };
 
+  const sessionToken = useSelector(userSessionToken);
+
   // Function to handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if(repInputs.some((rep)=>{return rep.length==0})){
         ToastAndroid.show('Please fill all set fields!', ToastAndroid.SHORT);
         return;
         }
+    
+    var newInputs = repInputs.map(i=>parseInt(i,10));
+    console.log(repInputs);
+    const response = await apiInstance(sessionToken).post(`/api/training-programs/${programId}/workout-exercises/${exerciseId}/complete`, newInputs);
+    console.log(response);
+
+  if (response.status === 200) {
     setIsSubmitted(true);
-    ToastAndroid.show('Successfully submitted!', ToastAndroid.SHORT);
+    Toast.show({
+      type: 'success',
+      position: 'bottom',
+      text1: 'Progress Submitted',
+      text2: 'Your progress has been submitted successfully.',
+      visibilityTime: 3000,
+      autoHide: true,
+      topOffset: 30,
+      bottomOffset: 40
+    });
+    //goHome();
+
+    //Cookies.set("username", username)
+} else {
+  Toast.show({
+    type: 'error',
+    position: 'bottom',
+    text1: 'Submit Error',
+    text2: 'There was an error submitting progress. Please try again.',
+    visibilityTime: 2000,
+    autoHide: true,
+    topOffset: 30,
+    bottomOffset: 40
+  });
+}
   };
 
   return (

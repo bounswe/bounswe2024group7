@@ -138,8 +138,8 @@ const {
   Toast.show({
     type: 'error',
     position: 'bottom',
-    text1: 'Login Error',
-    text2: 'There was an error creating post. Please try again.',
+    text1: 'Create Post Error',
+    text2: 'There was an error while creating post. Please try again.',
     visibilityTime: 2000,
     autoHide: true,
     topOffset: 30,

@@ -10,6 +10,7 @@ import { UserContext } from "../UserContext";
 import { useSelector } from 'react-redux';
 import { userName, userProfile, userSessionToken } from '../user.js';
 import { useQuery } from "@tanstack/react-query"
+import Toast from 'react-native-toast-message';
 import apiInstance from '../Api';
 
 const ProfilePage = ({ darkMode }) => {
@@ -19,15 +20,57 @@ const ProfilePage = ({ darkMode }) => {
   const profile = useSelector(userProfile);
   const [user, setUser] = useState({})
   const [posts, setPosts] = useState([]);
+  const [isDeleted, setIsDeleted] = useState(false);
   const [programs, setPrograms] = useState([]);
   const [followers, setFollowers] = useState([]);
 
   const [following, setFollowing] = useState([]);
-
+  const deletePost = async(id) =>{
+    try {
+      const response = await apiInstance(sessionToken).delete(`api/posts/${id}`);
+      if (Math.floor(response.status/100) == 2) {
+        setIsDeleted(true);
+        Toast.show({
+          type: 'success',
+          position: 'bottom',
+          text1: 'Post Deleted',
+          text2: 'Your post has been deleted successfully.',
+          visibilityTime: 3000,
+          autoHide: true,
+          topOffset: 30,
+          bottomOffset: 40
+        });
+      }
+      else{
+        Toast.show({
+          type: 'error',
+          position: 'bottom',
+          text1: 'Delete Post Error',
+          text2: 'There was an error while deleting this post. Please try again.',
+          visibilityTime: 2000,
+          autoHide: true,
+          topOffset: 30,
+          bottomOffset: 40
+        });
+      }
+    } catch (e) {
+      Toast.show({
+        type: 'error',
+        position: 'bottom',
+        text1: 'Delete Post Error',
+        text2: 'There was an error while deleting this post. Please try again.',
+        visibilityTime: 2000,
+        autoHide: true,
+        topOffset: 30,
+        bottomOffset: 40
+      });
+      console.log(e);
+    }
+  }
   const fetchJoinedPrograms = async (userJoinedData) => {
         const programArr = [];
 
-        console.log(userJoinedData);
+        //console.log(userJoinedData);
 
         for (const item of userJoinedData) {
           try {
@@ -66,7 +109,7 @@ const ProfilePage = ({ darkMode }) => {
     refetchOnWindowFocus: false,
     refetchInterval:60000
 });
-const {
+/*const {
             data: joinedData,
             isFetching: programsIsFetching,
             isLoading: programsIsLoading,
@@ -84,7 +127,7 @@ const {
             programArr = fetchJoinedPrograms(joinedData);
             setPrograms(programArr);
             }
-        }, [joinedData, programsIsFetching])
+        }, [joinedData, programsIsFetching])*/
 const {
   data: postsData,
   isFetching: postsIsFetching,
@@ -102,8 +145,8 @@ const {
     }
 
   },
-  refetchOnWindowFocus: false,
-  refetchInterval:60000
+  refetchOnWindowFocus: true,
+  refetchInterval:1000
 });
 const {
   data: followersData,
@@ -142,7 +185,7 @@ const {
   refetchOnWindowFocus: false,
   refetchInterval:60000
 })
-/*const {
+const {
   data: programsData,
   isFetching: programsIsFetching,
   isLoading: programsIsLoading,
@@ -150,20 +193,22 @@ const {
   queryKey: ['programs'],
   queryFn: async () => {
       try {
-          const response = await apiInstance(token).get(`api/training-programs/trainer/${username}`)
-
+          const response = await apiInstance(sessionToken).get(`api/training-programs/joined/${username}`);
+          console.log("Joined programs response:")
+          console.log(response.data);
+          //response.data.weeks.forEach((workout)=>console.log(workout.workoutExercises));
           return response.data
       } catch (error) {
           return []
       }
   },
   refetchOnWindowFocus: false,
-})*/
-/*useEffect(() => {
+})
+useEffect(() => {
   if (programsData && !programsIsFetching) {
       setPrograms(programsData)
   }
-}, [programsData, programsIsFetching])*/
+}, [programsData, programsIsFetching])
 
 useEffect(() => {
   if (profileData && !profileIsFetching) {
@@ -174,10 +219,12 @@ useEffect(() => {
   }
 }, [profileData, profileIsFetching])
 useEffect(() => {
-  if (postsData && !postsIsFetching) setPosts(postsData);
+  if (postsData && !postsIsFetching){ setPosts(postsData);
+    setIsDeleted(false);
+  }
 //console.log(posts);
 
-}, [postsData, postsIsFetching]);
+}, [postsData, isDeleted, postsIsFetching]);
 useEffect(() => {
   if (followersData && !followersIsFetching) setFollowers(followersData);
   //console.log(followers);
@@ -190,8 +237,8 @@ useEffect(() => {
 }, [followingData, followingIsFetching]);
 
 
-  console.log(username);
-  console.log(profile);
+  //console.log(username);
+  //console.log(profile);
   
   
 
@@ -247,7 +294,8 @@ useEffect(() => {
         data={posts}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <PostCard
+          <View style={styles.header}>
+            <PostCard
             program_id={item.trainingProgram.id}
             description={item.content}
             owner={item.username}
@@ -258,7 +306,11 @@ useEffect(() => {
             commentList={forumPosts[0].commentList}
             date={item.createdAt}
             navigation={navigation}
-          />
+            />
+            <TouchableOpacity style={styles.deleteButton} onPress={()=>deletePost(item.id)}>
+              <Text>Delete Post</Text>
+             </TouchableOpacity>
+            </View>
         )}
         style={styles.postList}
         showsVerticalScrollIndicator={false}
@@ -473,6 +525,12 @@ const lightStyles = StyleSheet.create({
   postList: {
     marginTop: 10,
   },
+  deleteButton: {
+    backgroundColor: '#FF0000',
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderRadius: 20,
+  }
 });
 
 const darkStyles = StyleSheet.create({
@@ -565,6 +623,12 @@ const darkStyles = StyleSheet.create({
   },
   postList: {
     marginTop: 10,
+  },
+  deleteButton: {
+    backgroundColor: '#FF0000',
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderRadius: 20,
   },
 });
 

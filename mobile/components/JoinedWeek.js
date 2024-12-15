@@ -10,6 +10,8 @@ import {
 
 const JoinedWeek = ({ route }) => {
   const {programId,programTitle,weekId,weekNumber,workouts,navigation} = route.params;
+  console.log("Response for JoinedWeek:");
+  console.log(workouts);
   const {expandedState,setExpandedState} = useState(0);
   const renderWorkout = ({ item, index, navigation }) => {
     return (
