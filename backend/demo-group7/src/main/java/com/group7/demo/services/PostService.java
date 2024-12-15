@@ -214,8 +214,8 @@ public class PostService {
         return posts.stream()
                 .map(post -> mapper.mapToPostResponse(post, request))
                 .collect(Collectors.toList());
-
     }
+
 
 
 }
