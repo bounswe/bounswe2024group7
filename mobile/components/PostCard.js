@@ -2,11 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const PostCard = ({ title, post_id, description, owner, date, likeCount, commentList, liked, navigation }) => {
+const PostCard = ({ tags, program_id,post_id, description, owner, date, likeCount, commentList, liked, navigation }) => {
   return (
     <TouchableOpacity
               style={styles.card}
-              onPress={() => navigation.navigate('PostDetail', { title, post_id, description, owner, date, likeCount, liked, commentList, navigation })}
+              onPress={() => navigation.navigate('PostDetail', { program_id, tags, post_id, description, owner, date, likeCount, liked, commentList, navigation })}
             >
       {/* Post Image */}
       <Image
@@ -16,7 +16,6 @@ const PostCard = ({ title, post_id, description, owner, date, likeCount, comment
       
       {/* Post Title and Description */}
       <View style={styles.content}>
-        <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
 
         {/* Post Owner and Date */}

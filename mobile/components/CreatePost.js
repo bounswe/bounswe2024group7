@@ -235,7 +235,7 @@ const {
                             })*/
                            setPost({
 
-                            content: description,
+                            content: content,
 
                             tags: labels,
                             trainingProgramId: trainingProgram,

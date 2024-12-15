@@ -137,16 +137,17 @@ const FeedPage = ({ darkMode }) => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <PostCard
-            post_id={item.id}
-            title={item.title}
-            owner={item.username}
             description={item.content}
-            labels={item.tags}
-            liked={item.liked}
-            likeCount={item.likeCount}
-            commentList={forumPosts[0].commentList}
-            date={item.createdAt}
-            navigation={navigation}
+                        owner={item.username}
+                        tags={item.tags}
+                        liked={item.liked}
+                        likeCount={item.likeCount}
+                        imageUrl = {item.imageUrl}
+                        commentList={forumPosts[0].commentList}
+                        date={item.createdAt}
+                        navigation={navigation}
+                        post_id={item.id}
+                        program_id={item.trainingProgram.id}
           />
         )}
         style={styles.postList}
