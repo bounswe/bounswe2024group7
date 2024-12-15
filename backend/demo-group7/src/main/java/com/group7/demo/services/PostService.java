@@ -5,14 +5,14 @@ import com.group7.demo.dtos.PostResponse;
 import com.group7.demo.dtos.mapper.Mapper;
 import com.group7.demo.exceptions.UnauthorizedException;
 import com.group7.demo.models.*;
-import com.group7.demo.repository.PostRepository;
-import com.group7.demo.repository.TagRepository;
-import com.group7.demo.repository.TrainingProgramRepository;
-import com.group7.demo.repository.UserRepository;
+import com.group7.demo.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -36,6 +36,8 @@ public class PostService {
     private AuthenticationService authenticationService;
 
     private Mapper mapper;
+
+    private SurveyRepository surveyRepository;
 
     @Transactional
     public PostResponse createPost(PostRequest postRequest, HttpServletRequest request) {
@@ -195,4 +197,73 @@ public class PostService {
                 .map(post -> mapper.mapToPostResponse(post, request))
                 .collect(Collectors.toList());
     }
+
+
+    public Map<String, Object> getPostsByFitnessGoalsWithPagination(int page, int size, HttpServletRequest request) {
+        // Get the authenticated user
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        // Fetch the user's survey
+        Survey survey = surveyRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Survey not found for user"));
+
+        // Extract fitness goals (tags) from the survey
+        Set<Tag> fitnessGoals = survey.getFitnessGoals();
+
+        // Create Pageable object
+        Pageable paging = PageRequest.of(page, size);
+
+        // Fetch posts with pagination
+        Page<Post> pagePost = postRepository.findAllByTagsIn(fitnessGoals, paging);
+
+        // Get content for current page
+        List<PostResponse> posts = pagePost.getContent().stream()
+                .map(post -> mapper.mapToPostResponse(post, request))
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("posts", posts);
+        response.put("currentPage", pagePost.getNumber());
+        response.put("totalItems", pagePost.getTotalElements());
+        response.put("totalPages", pagePost.getTotalPages());
+
+        return response;
+    }
+
+    @Transactional
+    public Map<String, Object> getAllPostsWithPagination(int page, int size, HttpServletRequest request) {
+        Pageable paging = PageRequest.of(page, size);
+        Page<Post> pagePost = postRepository.findAll(paging);
+
+        List<PostResponse> posts = pagePost.getContent().stream()
+                .map(post -> mapper.mapToPostResponse(post, request))
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("posts", posts);
+        response.put("currentPage", pagePost.getNumber());
+        response.put("totalItems", pagePost.getTotalElements());
+        response.put("totalPages", pagePost.getTotalPages());
+
+        return response;
+    }
+
+    @Transactional
+    public Map<String, Object> getPostsByTagsWithPagination(Set<String> tagNames, int page, int size, HttpServletRequest request) {
+        Pageable paging = PageRequest.of(page, size);
+        Page<Post> pagePost = postRepository.findPostsByTagsWithPagination(tagNames, paging);
+
+        List<PostResponse> posts = pagePost.getContent().stream()
+                .map(post -> mapper.mapToPostResponse(post, request))
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("posts", posts);
+        response.put("currentPage", pagePost.getNumber());
+        response.put("totalItems", pagePost.getTotalElements());
+        response.put("totalPages", pagePost.getTotalPages());
+
+        return response;
+    }
+
 }
