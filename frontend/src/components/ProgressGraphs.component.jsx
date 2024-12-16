@@ -206,8 +206,7 @@ const processExerciseData = (programsList) => {
 };
 
 const ProgressGraphs = ({ programsList }) => {
-    console.log("hi");
-    console.log(programsList);
+
     const [selectedExercise, setSelectedExercise] = useState(null);
 
     // Process exercise data with error handling

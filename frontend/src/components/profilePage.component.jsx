@@ -26,7 +26,7 @@ export default function ProfilePage() {
     const { user, followers, following, posts, programs, progressDataForAllPrograms, joinedPrograms } = useContext(UserContext);
     const { bookmarkedPosts, isLoadingBookmarks } = useContext(PostContext);
     const [view, setView] = useState('posts');
-    console.log(joinedPrograms);
+
     return (
         <Box p={6} maxW="1200px" mx="auto" borderRadius="md">
             <Flex direction="column" align="center">
