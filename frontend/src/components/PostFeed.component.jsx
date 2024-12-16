@@ -34,7 +34,12 @@ function PostFeed() {
             <VStack // Use VStack to stack components vertically
                 spacing={6} // Add space between the boxes
                 align="stretch" // Make children stretch to full width
-                w="40%" // Full width of the parent container
+                w={
+                    useBreakpointValue({
+                        base: 'full', // Full width on small screens
+                        lg: 'md', // Larger width on desktop
+                    })
+                }
             >
                 {/* Today's Programs */}
                 {/* {programs.length > 0 && (
@@ -54,6 +59,7 @@ function PostFeed() {
                     borderRadius="md"
                     p={4}
                     boxShadow="sm"
+                    width={'full'} // Full width on small screens, larger on desktop
                 >
                     <Heading size="lg" mb={4}>Recommended Programs</Heading>
                     {programs.length > 0 ? (
