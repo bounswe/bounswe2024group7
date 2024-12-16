@@ -102,6 +102,41 @@ const TrainingCard = () => {
     const [workoutNumber, setWorkoutNumber] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState(null);
 
+    window.onload = () => {
+        const trackingId = 27; // Replace with the actual programId
+        const url = `/api/training-programs/${trackingId}/completion-rates`;
+
+        // Retrieve the session token from localStorage (or cookies, depending on your setup)
+        const sessionToken = localStorage.getItem('sessionToken'); // Or document.cookie for cookies
+
+        if (!sessionToken) {
+            console.error('Session token is missing');
+            return;
+        }
+
+        // Fetch request to get completion rates with session token in Authorization header
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionToken}`, // Include session token in Authorization header
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                console.log(response.data);
+                return response.json();  // Parse the JSON response
+            })
+            .then(data => {
+                console.log('Completion Rates Data:', data);  // Log the response data to the console
+            })
+            .catch(error => {
+                console.error('Error fetching completion rates:', error);  // Handle any errors
+            });
+    };
+
     // Join to a program Mutation
     const { mutate: joinProgram } = useMutation({
         mutationFn: async (postId) => {
@@ -179,13 +214,14 @@ const TrainingCard = () => {
                         headers: { 'Content-Type': 'application/json' },
                     }
                 );
-                // console.log(user.profile.username);
+                console.log(user.profile.username);
+                console.log("ji");
                 // Check if user has joined programs
                 if (user) {
                     const joinedProgramsResponse = await apiInstance(sessionToken).get(
                         `/api/training-programs/joined/${user.profile.username}`
                     );
-                    // console.log(joinedProgramsResponse);
+                    console.log(joinedProgramsResponse.data);
                     // Check if the current program is in the user's joined programs
                     const isJoined = joinedProgramsResponse.data.some(
                         program => program.id === parseInt(programID)
@@ -407,26 +443,29 @@ const TrainingCard = () => {
 
                                     <Table variant="simple" width="100%" mt={2}>
                                         <Tbody>
-                                            {workout.workoutExercises.map((exerciseob) => (
-                                                <Tr key={exerciseob.id} bgColor="#f7f9fc">
-                                                    <Td>
-                                                        <Text>
-                                                            {exerciseob.exercise.name}
-                                                        </Text>
-                                                    </Td>
-                                                    <Td textAlign="right">
-                                                        {isUserJoined && user && (
-                                                            <Button
-                                                                onClick={() => handleStartSession(exerciseob.id)}
-                                                                colorScheme="green"
-                                                                size="sm"
-                                                            >
-                                                                Start Session!
-                                                            </Button>
-                                                        )}
-                                                    </Td>
-                                                </Tr>
-                                            ))}
+                                            {workout.workoutExercises.map((exerciseob) => {
+                                                console.log(exerciseob); // Log exerciseob to the console
+                                                return (
+                                                    <Tr key={exerciseob.id} bgColor="#f7f9fc">
+                                                        <Td>
+                                                            <Text>
+                                                                {exerciseob.exercise.name}: {exerciseob.completedSets}
+                                                            </Text>
+                                                        </Td>
+                                                        <Td textAlign="right">
+                                                            {isUserJoined && user && (
+                                                                <Button
+                                                                    onClick={() => handleStartSession(exerciseob.id)}
+                                                                    colorScheme="green"
+                                                                    size="sm"
+                                                                >
+                                                                    Start Session!
+                                                                </Button>
+                                                            )}
+                                                        </Td>
+                                                    </Tr>
+                                                );
+                                            })}
                                         </Tbody>
                                     </Table>
                                 </ListItem>

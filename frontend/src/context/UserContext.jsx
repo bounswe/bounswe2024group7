@@ -38,35 +38,51 @@ export const UserContextProvider = ({ children }) => {
         },
         refetchOnWindowFocus: false,
     });
-
     // New query for joined programs
     const {
         data: joinedProgramsData,
         isFetching: joinedProgramsIsFetching,
-        isLoading: joinedProgramsIsLoading,
+        isLoading: joinedProgramsIsLoading
     } = useQuery({
         queryKey: ['joinedPrograms'],
         queryFn: async () => {
             try {
-                const response = await apiInstance(sessionToken).get(`api/training-programs/joined/${username}`);
+                const response = await apiInstance(sessionToken).get(
+                    `api/training-programs/joined/${username}`
+                );
 
-                // Process the response to include exercise progress
+                // Process the response to include exercise progress for the new structure
                 const programsWithProgress = response.data.map(program => ({
                     ...program,
-                    exercises: program.exercises.map(exercise => ({
-                        ...exercise,
-                        completed: exercise.completed || false
+                    weeks: program.weeks.map(week => ({
+                        ...week,
+                        workouts: week.workouts.map(workout => ({
+                            ...workout,
+                            workoutExercises: (workout.workoutExercises || []).map(
+                                workoutExercise => ({
+                                    ...workoutExercise
+                                })
+                            )
+                        }))
                     }))
                 }));
 
-                // Build exercise progress map
+                // Build exercise progress map for the new structure
                 const progressMap = {};
                 programsWithProgress.forEach(program => {
-                    progressMap[program.id] = program.exercises.reduce((acc, exercise) => {
-                        acc[exercise.id] = exercise.completed;
-                        return acc;
-                    }, {});
+                    progressMap[program.id] = {};
+                    program.weeks.forEach(week => {
+                        week.workouts.forEach(workout => {
+                            workout.workoutExercises.forEach(workoutExercise => {
+                                progressMap[program.id][workoutExercise.id] =
+                                    workoutExercise.completed;
+                            });
+                        });
+                    });
                 });
+
+                console.log('progressMap:', progressMap);
+                console.log('programsWithProgress:', programsWithProgress);
 
                 setExerciseProgress(progressMap);
                 return programsWithProgress;
@@ -75,8 +91,47 @@ export const UserContextProvider = ({ children }) => {
                 return [];
             }
         },
-        refetchOnWindowFocus: false,
+        refetchOnWindowFocus: false
     });
+
+    // // New query for joined programs
+    // const {
+    //     data: joinedProgramsData,
+    //     isFetching: joinedProgramsIsFetching,
+    //     isLoading: joinedProgramsIsLoading,
+    // } = useQuery({
+    //     queryKey: ['joinedPrograms'],
+    //     queryFn: async () => {
+    //         try {
+    //             const response = await apiInstance(sessionToken).get(`api/training-programs/joined/${username}`);
+
+    //             // Process the response to include exercise progress
+    //             const programsWithProgress = response.data.map(program => ({
+    //                 ...program,
+    //                 exercises: program.exercises.map(exercise => ({
+    //                     ...exercise,
+    //                     completed: exercise.completed || false
+    //                 }))
+    //             }));
+
+    //             // Build exercise progress map
+    //             const progressMap = {};
+    //             programsWithProgress.forEach(program => {
+    //                 progressMap[program.id] = program.exercises.reduce((acc, exercise) => {
+    //                     acc[exercise.id] = exercise.completed;
+    //                     return acc;
+    //                 }, {});
+    //             });
+
+    //             setExerciseProgress(progressMap);
+    //             return programsWithProgress;
+    //         } catch (error) {
+    //             console.error('Error fetching joined programs:', error);
+    //             return [];
+    //         }
+    //     },
+    //     refetchOnWindowFocus: false,
+    // });
 
     const {
         data: followersData,
