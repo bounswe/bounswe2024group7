@@ -18,6 +18,8 @@ import Home from '../components/Home'
 import Login from '../components/Login'
 import Register from '../components/Register';
 import SearchPage from '../components/SearchPage'
+import SearchResults from '../components/SearchResults'
+import SearchBar from '../components/SearchBar'
 import CreatePost from '../components/CreatePost'
 import CreateProgram from '../components/CreateProgram'
 import CreateFeedback from '../components/CreateFeedback';
@@ -71,6 +73,16 @@ test('Registers Correctly', async () => {
 
 test('Renders Search Page Correctly', () => {
     const tree = renderer.create(<SearchPage  />).toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+test('Renders Search Results Correctly', () => {
+    const tree = renderer.create(<SearchResults  />).toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+test('Renders Search Bar Correctly', () => {
+    const tree = renderer.create(<SearchBar  />).toJSON();
     expect(tree).toMatchSnapshot();
 });
 
