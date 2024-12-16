@@ -7,6 +7,8 @@ import apiInstance from "../Api";
 import { useSelector } from "react-redux";
 import { userSessionToken } from "../user";
 import { Badge, Card } from 'react-native-paper';
+import PostCard from './PostCard';
+import ProgramCard from './ProgramCard';
 
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -21,7 +23,7 @@ const titleString = (str) => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const sessionToken = useSelector(userSessionToken);
-
+  console.log("Navigation object:", navigation);
 
   const renderPost = ({ item }) => (
     <PostCard
@@ -88,6 +90,11 @@ const titleString = (str) => {
   return (
           <SafeAreaProvider>
               <SafeAreaView style={styles.container}>
+                  <View style={styles.pageButtonContainer}>
+                                        <TouchableOpacity style={styles.pageButton} onPress={()=> navigation.navigate('SearchPage')} >
+                                        <Text style={styles.pageButtonText}>Search By Muscle</Text>
+                                        </TouchableOpacity>
+                  </View>
                   <View style={styles.searchBarContainer}>
                       <SearchBar setResults={setSearchResults} setLoading={setLoading} loading={loading} />
                   </View>
@@ -145,6 +152,10 @@ const titleString = (str) => {
       searchBarContainer: {
           marginBottom: 10,
       },
+      pageButtonContainer: {
+                marginBottom: 10,
+                alignItems:'center',
+            },
       tabsContainer: {
           flexDirection: "row",
           justifyContent: "space-around",
@@ -160,6 +171,20 @@ const titleString = (str) => {
           borderRadius: 5,
           marginHorizontal: 4,
       },
+      pageButton: {
+                 backgroundColor: "#6B46C1",
+                height:50,
+                padding:5,
+                alignItems:'center',
+                justifyContent:'center',
+                borderWidth: 1,
+                borderColor: "#ccc",
+                borderRadius: 5,
+            },
+            pageButtonText: {
+                      color: "#FFF",
+                      fontWeight: "bold",
+                  },
       activeTabButton: {
           backgroundColor: "#6B46C1",
           borderColor: "#6B46C1",

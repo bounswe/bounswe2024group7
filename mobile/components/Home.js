@@ -47,7 +47,7 @@ const Home = ({ navigation }) => {
 
   const SearchPageContainer = () => (
       <View style={currentStyles.page}>
-        <SearchResults/>
+        <SearchResults navigation={navigation}/>
       </View>
     );
     const handleLogOut = async () => {
