@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from 'react-redux';
-import { userName, userProfile } from '../context/user.js';
+import { userName, userProfile, userSessionToken } from '../context/user.js';
 import {
     Box,
     Flex,
@@ -22,8 +22,7 @@ import ProgressBoard from "./ProgressBoard.component.jsx";
 export default function ProfilePage() {
     const username = useSelector(userName);
     const profile = useSelector(userProfile);
-    const { colorMode, toggleColorMode } = useColorMode();
-    const { user, followers, following, posts, programs } = useContext(UserContext);
+    const { user, followers, following, posts, programs, progressDataForAllPrograms, joinedPrograms } = useContext(UserContext);
     const { bookmarkedPosts, isLoadingBookmarks } = useContext(PostContext);
     const [view, setView] = useState('posts');
 

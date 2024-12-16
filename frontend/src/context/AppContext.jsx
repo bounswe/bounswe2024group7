@@ -30,7 +30,6 @@ export const AppContextProvider = ({ children }) => {
       try {
         // Pass sessionToken to apiInstance
         const response = await apiInstance(sessionToken).get('/api/exercises');
-        console.log('Exercises API Response:', response.data);
         
         // Validate response data structure
         if (!Array.isArray(response.data)) {
@@ -51,7 +50,6 @@ export const AppContextProvider = ({ children }) => {
   // Update exercises state when data changes
   useEffect(() => {
     if (exercisesData && !exercisesIsFetching) {
-      console.log('Setting exercises:', exercisesData);
       setExercises(exercisesData);
     }
   }, [exercisesData, exercisesIsFetching]);
