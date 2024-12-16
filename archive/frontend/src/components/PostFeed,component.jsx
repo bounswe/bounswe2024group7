@@ -17,8 +17,6 @@ import PostFeedCard from './PostFeedCard.component'
 function PostFeed() {
     const { posts, isLoadingPosts, isFetchingPosts } = useContext(PostContext)
 
-    console.log(posts)
-
     return (
         <Box
             w="full"

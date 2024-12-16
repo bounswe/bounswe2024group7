@@ -73,7 +73,6 @@ export default function RegisterComponent() {
 
     const handleUserRegister = async () => {
         try {
-            console.log(username, email, password, role, level, interestAreas)
             const response = await apiInstance().post(
                 "auth/register",
                 {

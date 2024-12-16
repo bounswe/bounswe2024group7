@@ -13,6 +13,7 @@ export const UserContext = createContext({
     joinedPrograms: [],
     progressDataForAllPrograms: [],
     exerciseProgress: {},
+    fitnessGoals: [],
 })
 
 export const UserContextProvider = ({ children }) => {
@@ -24,6 +25,7 @@ export const UserContextProvider = ({ children }) => {
     const [joinedPrograms, setJoinedPrograms] = useState([])
     const [progressDataForAllPrograms, setProgressDataForAllPrograms] = useState([])
     const [exerciseProgress, setExerciseProgress] = useState({})
+    const [fitnessGoals, setFitnessGoals] = useState([])
 
     const sessionToken = useSelector(userSessionToken)
     const username = useSelector(userName)
@@ -154,6 +156,24 @@ export const UserContextProvider = ({ children }) => {
         enabled: !!joinedPrograms,
     });
 
+    const {
+        data: fitnessGoalsData,
+        isFetching: fitnessGoalsIsFetching,
+        isLoading: fitnessGoalsIsLoading,
+    } = useQuery({
+        queryKey: ['fitnessGoals'],
+        queryFn: async () => {
+            try {
+                const response = await apiInstance(sessionToken).get(`api/surveys/fitness-goals`)
+
+                return response.data
+            } catch (error) {
+                return []
+            }
+        },
+        refetchOnWindowFocus: false,
+    })
+
     useEffect(() => {
         if (followersData && !followersIsFetching) {
             setFollowers(followersData)
@@ -197,6 +217,12 @@ export const UserContextProvider = ({ children }) => {
         }
     }, [progressData, progressIsFetching]);
 
+    useEffect(() => {
+        if (fitnessGoalsData && !fitnessGoalsIsFetching) {
+            setFitnessGoals(fitnessGoalsData)
+        }
+    }, [fitnessGoalsData, fitnessGoalsIsFetching])
+
     // Function to update exercise completion status
     const updateExerciseCompletion = async (programId, exerciseId, completed) => {
         try {
@@ -229,6 +255,7 @@ export const UserContextProvider = ({ children }) => {
             exerciseProgress,
             progressDataForAllPrograms,
             updateExerciseCompletion,
+            fitnessGoals,
         }}>
             {children}
         </UserContext.Provider>

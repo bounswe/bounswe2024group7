@@ -98,11 +98,6 @@ const ProgramCard = () => {
         }
     }, [programData]);
 
-    // Log the programs
-    useEffect(() => {
-        console.log(program);
-    }, [program]);
-
     // Handle complete exercise
     const { mutate: completeExercise } = useMutation({
         mutationFn: async (exerciseId) => {
@@ -119,7 +114,6 @@ const ProgramCard = () => {
     const handleCheckboxChange = (index, step) => {
         const newCompletedSteps = [...completedSteps];
         newCompletedSteps[index] = true;
-        console.log(step)
         completeExercise(step.id);
         setCompletedSteps(newCompletedSteps);
 

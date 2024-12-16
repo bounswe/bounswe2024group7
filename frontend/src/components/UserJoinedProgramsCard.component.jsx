@@ -15,7 +15,8 @@ import {
     VStack,
     Heading,
     Spinner,
-    useToast
+    useToast,
+    Link
 } from '@chakra-ui/react';
 import Detailed_Ex_Modal from './Detailed_Ex_Modal.component';
 import { useDisclosure } from '@chakra-ui/react';
@@ -44,7 +45,7 @@ const UserJoinedProgramsCard = () => {
     const { data: joinedProgramsData, isLoading: joinedProgramsIsLoading } = useQuery({
         queryKey: ['joinedPrograms'],
         queryFn: async () => {
-            if (!user || !sessionToken) {
+            if (!user || !sessionToken || !user.username) {
                 return [];
             }
 
@@ -149,7 +150,9 @@ const UserJoinedProgramsCard = () => {
                 Your Active Programs
             </Heading> */}
 
-            {joinedPrograms.map((program) => {
+            {joinedPrograms
+            .filter(program => program.status === 'ONGOING')
+            .map((program) => {
                 // Find the first uncompleted exercise to determine week and workout
                 let firstUncompletedExercise = null;
                 program.weeks.some(week =>
@@ -177,7 +180,9 @@ const UserJoinedProgramsCard = () => {
                         <Heading size="md" mb={4} color="gray.700" display="flex" alignItems="flex-start" gap={3}
                             flexDirection={"column"}
                         >
-                            {program.title}
+                            <Link href={`/training?trainingId=${program.id}`}>
+                                {program.title}
+                            </Link>
                             <div className="flex space-x-2">
                                 <span className="inline-flex items-center px-2 py-1 text-sm font-medium text-blue-800 bg-blue-100 rounded">
                                     <StarIcon className="w-4 h-4 mr-1" />

@@ -17,6 +17,8 @@ import UserJoinedProgramsCard from './UserJoinedProgramsCard.component'
 import { useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { userSessionToken } from '../context/user';
+import { useEffect } from 'react';
+import { useState } from 'react';
 
 function PostFeed() {
     const { 
@@ -35,13 +37,21 @@ function PostFeed() {
         isLoadingExplore,
     } = useContext(PostContext);
 
-    const { user } = useContext(UserContext);
+    const { user, joinedPrograms } = useContext(UserContext);
+    const [ongoingJoinedPrograms, setOngoingJoinedPrograms] = useState([]);
     const sessionToken = useSelector(userSessionToken);
 
     const isLoading = isLoadingPosts || isFetchingPrograms;
 
     const observerForYou = useRef();
     const observerExplore = useRef();
+
+    useEffect(() => {
+        if (joinedPrograms.length > 0) {
+            const ongoingPrograms = joinedPrograms.filter((program) => program.status === 'ONGOING');
+            setOngoingJoinedPrograms(ongoingPrograms);
+        }
+    }, [joinedPrograms]);
 
     // Observer for "For You" posts
     const lastForYouPostRef = (node) => {
@@ -89,7 +99,7 @@ function PostFeed() {
                     })
                 }
             >
-                {programs.length > 0 && (
+                {ongoingJoinedPrograms.length > 0 && user && (
                     <Box>
                         <Heading size="lg" mb={4}>Your Active Programs:</Heading>
                         <UserJoinedProgramsCard />

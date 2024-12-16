@@ -19,7 +19,7 @@ import FeedbackModal from './FeedbackModal.component';
 import { ViewIcon } from '@chakra-ui/icons';
 // import { useNavigate } from 'react-router-dom';
 import { useNavigate } from '@tanstack/react-router'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { userProfile, userPassword, userSessionToken } from '../context/user'
@@ -34,7 +34,6 @@ import { useDisclosure } from '@chakra-ui/react';
 function ProgramFeedCard({
     program
 }) {
-
     const { isOpen, onOpen, onClose } = useDisclosure();
     const {
         isOpen: isFeedbackOpen,
@@ -45,11 +44,14 @@ function ProgramFeedCard({
     const sessionToken = useSelector(userSessionToken)
     const toast = useToast()
     const queryClient = useQueryClient()
+    const [isProgramCompleted, setIsProgramCompleted] = useState(false)
+    const [programWithTracking, setProgramWithTracking] = useState(program)
 
     const {
         followers,
         following,
         user,
+        joinedPrograms,
     } = useContext(UserContext)
 
     const [isProgramOwnerFollowed, setIsProgramOwnerFollowed] = useState(
@@ -64,6 +66,15 @@ function ProgramFeedCard({
     )
 
     useEffect(() => {
+        if (user && joinedPrograms) {
+            // Check the ongoing programs
+            const isProgramCompleted = programWithTracking.status === 'COMPLETED'
+
+            setIsProgramCompleted(isProgramCompleted)
+        }
+    }, [user, joinedPrograms])
+
+    useEffect(() => {
         if (user && following) {
             setIsProgramOwnerFollowed(following.includes(program.trainer))
         }
@@ -71,11 +82,7 @@ function ProgramFeedCard({
 
     useEffect(() => {
         if (user && user.joinedPrograms) {
-            setIsUserJoined(user.joinedPrograms
-                .filter(
-                    (joinedProgram) => joinedProgram.status !== 'LEFT'
-                )
-                .map((joinedProgram) => joinedProgram.id).includes(program.id))
+            setIsUserJoined(programWithTracking.status !== 'LEFT')
         }
     }, [user])
 
@@ -183,6 +190,9 @@ function ProgramFeedCard({
                 queryClient.invalidateQueries({
                     queryKey: ['user']
                 })
+                queryClient.invalidateQueries({
+                    queryKey: ['joinedPrograms']
+                })
             },
             onError: (error) => {
                 console.log(error)
@@ -229,6 +239,9 @@ function ProgramFeedCard({
                 queryClient.invalidateQueries({
                     queryKey: ['user']
                 })
+                queryClient.invalidateQueries({
+                    queryKey: ['joinedPrograms']
+                })
             },
             onError: (error) => {
                 console.log(error)
@@ -241,6 +254,26 @@ function ProgramFeedCard({
             },
         }
     )
+
+    const {
+        data: programData,
+        isLoading: programIsLoading,
+    } = useQuery({
+        queryKey: ['training-programs', program.id],
+        queryFn: async () => {
+            const response = await apiInstance(sessionToken).get(`api/training-programs/tracking/${program.id}`)
+
+            return response.data
+        },
+        refetchOnWindowFocus: false,
+    })
+
+    useEffect(() => {
+        if (programData && !programIsLoading) {
+            console.log(programData)
+            setProgramWithTracking(programData)
+        }
+    }, [programData])
 
     const navigate = useNavigate()
     const handleStartPracticing = (program_id) => {
@@ -343,13 +376,6 @@ function ProgramFeedCard({
                         {program.description}
                     </Text>
 
-                    {/* <Text>
-                        {program.exercises.map((exercise) => (
-                            <li key={exercise.id}>
-                                {exercise.name} - {exercise.exerciseDetail.sets} sets of {exercise.exerciseDetail.repetitions} reps for {exercise.muscleGroup.toLowerCase()}
-                            </li>
-                        ))}
-                    </Text> */}
                     <Button
                         onClick={onOpen}
                         colorScheme="gray"
@@ -376,7 +402,9 @@ function ProgramFeedCard({
                         <Tooltip
                             label={
                                 user && program.trainer === user.username ? null : (
-                                    isUserJoined ? 'Leave the program' : 'Join the program'
+                                    isUserJoined ? (
+                                        isProgramCompleted ? 'You have completed this program. Click to rejoin' : 'Leave the program'
+                                    ) : 'Join the program'
                                 )
                             }
                         >
@@ -389,8 +417,10 @@ function ProgramFeedCard({
                                     if (user) {
                                         if (!isUserJoined) {
                                             joinProgram(program.id)
-                                        } else {
+                                        } else if (isUserJoined && !isProgramCompleted) {
                                             unjoinProgram(program.id)
+                                        } else if (isUserJoined && isProgramCompleted) {
+                                            joinProgram(program.id)
                                         }
                                     } else {
                                         toast({
@@ -409,13 +439,15 @@ function ProgramFeedCard({
                             >
                                 {
                                     user && program.trainer === user.username ? 'You are the trainer' : (
-                                        isUserJoined ? 'Joined' : 'Join'
+                                        isUserJoined ? (
+                                            isProgramCompleted ? 'Completed' : 'Leave'
+                                        ) : 'Join'
                                     )
                                 }
                             </Button>
                         </Tooltip>
 
-                        {isUserJoined && user && program.trainer !== user.username && (
+                        {isUserJoined && user && program.trainer !== user.username && !isProgramCompleted && (
                             <Flex gap={2} flex="1">
                                 <Button
                                     flex='1'

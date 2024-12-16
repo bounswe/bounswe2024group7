@@ -207,13 +207,9 @@ const TrainingCard = () => {
 
                 if (user) {
                     const joinedProgramsResponse = await apiInstance(sessionToken).get(
-                        `/api/training-programs/joined/${user.username}`
+                        `/api/training-programs/ongoing/${programID}`
                     );
-                    // console.log(joinedProgramsResponse);
-                    // Get the current program if the user has joined
-                    const joinedProgram = joinedProgramsResponse.data.find(
-                        (program) => program.id === parseInt(programID)
-                    );
+                    const joinedProgram = joinedProgramsResponse.data;
 
                     setIsUserJoined(joinedProgram ? true : false);
                     setError(null);

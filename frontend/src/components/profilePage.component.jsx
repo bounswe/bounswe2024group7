@@ -11,6 +11,7 @@ import {
     Divider,
     Button,
     Center,
+    Badge
 } from '@chakra-ui/react';
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
@@ -24,7 +25,7 @@ import TrainerProgramCard from './TrainerProgramCard.component.jsx';
 export default function ProfilePage() {
     const username = useSelector(userName);
     const profile = useSelector(userProfile);
-    const { user, followers, following, posts, programs, progressDataForAllPrograms, joinedPrograms } = useContext(UserContext);
+    const { user, followers, following, posts, programs, progressDataForAllPrograms, joinedPrograms, fitnessGoals } = useContext(UserContext);
     const { bookmarkedPosts, isLoadingBookmarks } = useContext(PostContext);
     const [view, setView] = useState('posts');
 
@@ -43,6 +44,23 @@ export default function ProfilePage() {
                 <Text color="gray.500" mt={2}>
                     {user.role || "Add a bio to tell people about yourself."}
                 </Text>
+                {/* 
+                    Show fitness goals if user has any
+                */}
+                {fitnessGoals.length > 0 && (
+                    <>
+                        <Text mt={4} fontSize="lg" fontWeight="bold">
+                            Fitness Goals
+                        </Text>
+                        <Stack direction="row" mt={4}>
+                            {fitnessGoals.map((goal) => (
+                                <Badge key={goal} colorScheme="teal">
+                                    {goal}
+                                </Badge>
+                            ))}
+                        </Stack>
+                    </>
+                )}
                 <Flex mt={4} justify="center" gap={8}>
                     <Stack textAlign="center">
                         <Text fontSize="sm" color="gray.600">Followers</Text>

@@ -112,6 +112,16 @@ const DetailedExModal = ({ isOpen, onClose, data, setData, excersizeID }) => {
                         queryKey: ['joinedPrograms']
                     }
                 )
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['explore-programs']
+                    }
+                )
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['recommended-programs']
+                    }
+                )
             }
         },
     )
