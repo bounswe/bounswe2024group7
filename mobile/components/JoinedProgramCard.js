@@ -5,12 +5,33 @@ import { useSelector } from 'react-redux';
 import { userName, userSessionToken } from '../user.js';
 import { useQuery } from "@tanstack/react-query"
 import apiInstance from '../Api';
-const JoinedProgramCard = ({ trainerUsername, trackingId, title, description, programId, weeks, rating, level, joined, date, participants, navigation }) => {
+const JoinedProgramCard = ({ trainerUsername, trackingId, title, description, programId, weeks, level, joined, date, participants, navigation }) => {
 
     const sessionToken = useSelector(userSessionToken)
     const [completion,setCompletion] = useState({});
+    const [rating,setRating] = useState(0);
     const username = useSelector(userName)
     console.log(username);
+    const {
+      data: ratingData,
+      isFetching: ratingIsFetching,
+      isLoading: ratingIsLoading,
+  } = useQuery({
+      queryKey: [`training-program-rating-${programId}`],
+      queryFn: async () => {
+          const response = await apiInstance().get(`api/training-programs/${programId}`)
+  
+          return response.data
+      },
+      refetchOnWindowFocus:true,
+      refetchInterval:60000,
+  })
+  
+  useEffect(() => {
+      if (ratingData && !ratingIsFetching) {
+          setRating(ratingData.rating)
+      }
+  }, [ratingData, ratingIsFetching])
     const {
           data: completionData,
           isFetching: programsIsFetching,

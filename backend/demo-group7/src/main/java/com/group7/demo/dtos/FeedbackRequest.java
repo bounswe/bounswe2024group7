@@ -1,6 +1,6 @@
 package com.group7.demo.dtos;
 
-import com.group7.demo.models.enums.BodyPart;
+import com.group7.demo.models.enums.FeedbackMuscle;
 import lombok.Data;
 
 @Data
@@ -10,7 +10,7 @@ public class FeedbackRequest {
 
     private Long userId;
 
-    private BodyPart bodyPart;
+    private FeedbackMuscle feedbackMuscle;
 
     private int weekNumber;
 

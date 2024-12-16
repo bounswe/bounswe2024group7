@@ -18,6 +18,10 @@ export const PostContext = createContext(
         bookmarkedPosts: [],
         isLoadingBookmarks: false,
         isFetchingBookmarks: false,
+        recommendedPrograms: [],
+        explorePrograms: [],
+        forYouPosts: [],
+        explorePosts: [],
     }
 )
 
@@ -26,6 +30,10 @@ export const PhaseContextProvider = ({ children }) => {
     const [programs, setPrograms] = useState([])
     const [bookmarkedPosts, setBookmarkedPosts] = useState([])
     const [tags, setTags] = useState([])
+    const [recommendedPrograms, setRecommendedPrograms] = useState([])
+    const [explorePrograms, setExplorePrograms] = useState([])
+    const [forYouPosts, setForYouPosts] = useState([])
+    const [explorePosts, setExplorePosts] = useState([])
 
     const sessionToken = useSelector(userSessionToken)
 
@@ -89,6 +97,60 @@ export const PhaseContextProvider = ({ children }) => {
         refetchOnWindowFocus: false
     })
 
+    const {
+        data: recommendedProgramsData,
+        isFetching: recommendedProgramsIsFetching,
+        isLoading: recommendedProgramsIsLoading,
+    } = useQuery({
+        queryKey: ['training-programs'],
+        queryFn: async () => {
+            const response = await apiInstance(sessionToken).get('/api/training-programs/recommended')
+            return response.data
+        },
+        refetchOnWindowFocus: false,
+        enabled: !!sessionToken
+    })
+
+    const {
+        data: exploreProgramsData,
+        isFetching: exploreProgramsIsFetching,
+        isLoading: exploreProgramsIsLoading,
+    } = useQuery({
+        queryKey: ['training-programs'],
+        queryFn: async () => {
+            const response = await apiInstance().get('/api/training-programs/explore')
+            return response.data
+        },
+        refetchOnWindowFocus: false
+    })
+
+    const {
+        data: forYouPostsData,
+        isFetching: forYouPostsIsFetching,
+        isLoading: forYouPostsIsLoading,
+    } = useQuery({
+        queryKey: ['posts'],
+        queryFn: async () => {
+            const response = await apiInstance(sessionToken).get('/api/posts/for-you')
+            return response.data
+        },
+        refetchOnWindowFocus: false,
+        enabled: !!sessionToken
+    })
+
+    const {
+        data: explorePostsData,
+        isFetching: explorePostsIsFetching,
+        isLoading: explorePostsIsLoading,
+    } = useQuery({
+        queryKey: ['posts'],
+        queryFn: async () => {
+            const response = await apiInstance().get('/api/posts/explore')
+            return response.data
+        },
+        refetchOnWindowFocus: false
+    })
+
     useEffect(() => {
         if (postsData && !postsIsFetching) {
             // Order posts by createdAt date
@@ -114,6 +176,35 @@ export const PhaseContextProvider = ({ children }) => {
         }
     }, [tagsData, tagsIsFetching])
 
+    useEffect(() => {
+        if (recommendedProgramsData && !recommendedProgramsIsFetching) {
+            setRecommendedPrograms(recommendedProgramsData)
+        }
+    }, [recommendedProgramsData, recommendedProgramsIsFetching])
+
+    useEffect(() => {
+        if (exploreProgramsData && !exploreProgramsIsFetching && recommendedProgramsData) {
+            // Map through the data and set the state. Explore programs are not user-specific not should not include recommendations
+            const explorePrograms = exploreProgramsData.filter(program => !recommendedProgramsData.some(recommendedProgram => recommendedProgram.id === program.id))
+
+            setExplorePrograms(explorePrograms)
+        }
+    }, [exploreProgramsData, exploreProgramsIsFetching, recommendedProgramsData])
+
+    useEffect(() => {
+        if (forYouPostsData && !forYouPostsIsFetching) {
+            setForYouPosts(forYouPostsData)
+        }
+    }, [forYouPostsData, forYouPostsIsFetching])
+
+    useEffect(() => {
+        if (explorePostsData && !explorePostsIsFetching && forYouPostsData) {
+            const explorePosts = explorePostsData.filter(post => !forYouPostsData.some(forYouPost => forYouPost.id === post.id))
+
+            setExplorePosts(explorePosts)
+        }
+    }, [explorePostsData, explorePostsIsFetching, forYouPostsData])
+
     return (
         <PostContext.Provider value={{
             posts,
@@ -127,7 +218,11 @@ export const PhaseContextProvider = ({ children }) => {
             isFetchingBookmarks: bookmarksIsFetching,
             tags: tags,
             isLoadingTags: tagsIsLoading,
-            isFetchingTags: tagsIsFetching
+            isFetchingTags: tagsIsFetching,
+            recommendedPrograms,
+            explorePrograms,
+            forYouPosts,
+            explorePosts,
         }}>
             {children}
         </PostContext.Provider>
