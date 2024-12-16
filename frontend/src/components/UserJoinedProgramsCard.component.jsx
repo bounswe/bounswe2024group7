@@ -21,10 +21,15 @@ import {
 import Detailed_Ex_Modal from './Detailed_Ex_Modal.component';
 import { useDisclosure } from '@chakra-ui/react';
 import { InfoIcon, StarIcon, RepeatIcon, ArrowRightIcon, SettingsIcon } from '@chakra-ui/icons';
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext';
+
 const UserJoinedProgramsCard = () => {
-    const user = useSelector(userProfile);
     const sessionToken = useSelector(userSessionToken);
     const toast = useToast();
+    const {
+        user
+    } = useContext(UserContext);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [joinedPrograms, setJoinedPrograms] = useState([]);
@@ -42,7 +47,7 @@ const UserJoinedProgramsCard = () => {
             try {
                 setLoading(true);
                 const response = await apiInstance(sessionToken).get(
-                    `/api/training-programs/joined/${user.profile.username}`
+                    `/api/training-programs/joined/${user.username}`
                 );
 
                 // Filter programs to only include those with uncompleted exercises
