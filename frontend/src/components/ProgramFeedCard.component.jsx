@@ -355,7 +355,9 @@ function ProgramFeedCard({
                         },
                     }}
                 >
-                    <Flex gap={2} width="full">
+                    <Flex gap={2} width="full"
+                        marginBottom={2}
+                    >
                         <Tooltip
                             label={
                                 user && program.trainer === user.username ? null : (
@@ -408,17 +410,22 @@ function ProgramFeedCard({
                                 >
                                     Start Practicing
                                 </Button>
-                                <Button
-                                    variant='outline'
-                                    colorScheme='purple'
-                                    leftIcon={<ChatIcon />}
-                                    onClick={() => onFeedbackOpen()}
-                                >
-                                    Give Feedback
-                                </Button>
                             </Flex>
                         )}
                     </Flex>
+                    {
+                        isUserJoined && user && program.trainer !== user.username && (
+                    <Button
+                        variant='outline'
+                        colorScheme='purple'
+                        leftIcon={<ChatIcon />}
+                        onClick={() => onFeedbackOpen()}
+                        width={"full"}
+                    >
+                         Give Feedback
+                    </Button>
+                    )
+                    }
                 </CardFooter>
             </Card>
             <FeedbackModal
