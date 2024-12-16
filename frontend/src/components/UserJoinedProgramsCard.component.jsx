@@ -73,7 +73,9 @@ const UserJoinedProgramsCard = () => {
             }
         };
 
-        fetchJoinedPrograms();
+        if (user && user.username) {
+            fetchJoinedPrograms();
+        }
     }, [user, sessionToken]);
 
     const handleStartSession = (program, exerciseId) => {

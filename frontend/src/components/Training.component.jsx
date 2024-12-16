@@ -223,7 +223,9 @@ const TrainingCard = () => {
             }
         };
 
-        fetchTrainingProgram();
+        if (user && user.username) {
+            fetchTrainingProgram();
+        }
     }, [programID, sessionToken, user]);
 
     // Loading state
