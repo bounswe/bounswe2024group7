@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import apiInstance from "../instance/apiInstance";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { userProfile, userPassword, userSessionToken } from "../context/user";
 
@@ -21,7 +21,13 @@ export const PostContext = createContext(
         recommendedPrograms: [],
         explorePrograms: [],
         forYouPosts: [],
+        fetchNextForYouPage: () => {},
+        hasMoreForYou: false,
+        isLoadingForYou: false,
         explorePosts: [],
+        fetchNextExplorePage: () => {},
+        hasMoreExplore: false,
+        isLoadingExplore: false,
     }
 )
 
@@ -102,7 +108,7 @@ export const PhaseContextProvider = ({ children }) => {
         isFetching: recommendedProgramsIsFetching,
         isLoading: recommendedProgramsIsLoading,
     } = useQuery({
-        queryKey: ['training-programs'],
+        queryKey: ['recommended-programs'],
         queryFn: async () => {
             const response = await apiInstance(sessionToken).get('/api/training-programs/recommended')
             return response.data
@@ -116,7 +122,7 @@ export const PhaseContextProvider = ({ children }) => {
         isFetching: exploreProgramsIsFetching,
         isLoading: exploreProgramsIsLoading,
     } = useQuery({
-        queryKey: ['training-programs'],
+        queryKey: ['explore-programs'],
         queryFn: async () => {
             const response = await apiInstance().get('/api/training-programs/explore')
             return response.data
@@ -126,30 +132,36 @@ export const PhaseContextProvider = ({ children }) => {
 
     const {
         data: forYouPostsData,
-        isFetching: forYouPostsIsFetching,
-        isLoading: forYouPostsIsLoading,
-    } = useQuery({
-        queryKey: ['posts'],
-        queryFn: async () => {
-            const response = await apiInstance(sessionToken).get('/api/posts/for-you')
-            return response.data
+        fetchNextPage: fetchNextForYouPage,
+        hasNextPage: hasMoreForYou,
+        isFetchingNextPage: isLoadingForYou,
+    } = useInfiniteQuery({
+        queryKey: ['forYouPosts'],
+        queryFn: async ({ pageParam = 0 }) => {
+            const response = await apiInstance(sessionToken).get(`/api/posts/for-you?page=${pageParam}&size=10`);
+            return response.data;
         },
-        refetchOnWindowFocus: false,
-        enabled: !!sessionToken
-    })
+        getNextPageParam: (lastPage) =>
+            lastPage.currentPage + 1 < lastPage.totalPages ? lastPage.currentPage + 1 : undefined,
+    }
+    );
 
+    // Infinite Query for "Explore" posts
     const {
         data: explorePostsData,
-        isFetching: explorePostsIsFetching,
-        isLoading: explorePostsIsLoading,
-    } = useQuery({
-        queryKey: ['posts'],
-        queryFn: async () => {
-            const response = await apiInstance().get('/api/posts/explore')
-            return response.data
+        fetchNextPage: fetchNextExplorePage,
+        hasNextPage: hasMoreExplore,
+        isFetchingNextPage: isLoadingExplore,
+    } = useInfiniteQuery({
+        queryKey: ['explorePosts'],
+        queryFn: async ({ pageParam = 0 }) => {
+            const response = await apiInstance().get(`/api/posts/explore?page=${pageParam}&size=10`);
+            return response.data;
         },
-        refetchOnWindowFocus: false
-    })
+        getNextPageParam: (lastPage) =>
+            lastPage.currentPage + 1 < lastPage.totalPages ? lastPage.currentPage + 1 : undefined,
+    }
+    );
 
     useEffect(() => {
         if (postsData && !postsIsFetching) {
@@ -177,33 +189,36 @@ export const PhaseContextProvider = ({ children }) => {
     }, [tagsData, tagsIsFetching])
 
     useEffect(() => {
-        if (recommendedProgramsData && !recommendedProgramsIsFetching) {
-            setRecommendedPrograms(recommendedProgramsData)
+        if (recommendedProgramsData && !recommendedProgramsIsLoading) {
+            setRecommendedPrograms(
+                recommendedProgramsData?.programs || []
+            )
         }
-    }, [recommendedProgramsData, recommendedProgramsIsFetching])
+    }, [recommendedProgramsData, recommendedProgramsIsLoading])
 
     useEffect(() => {
-        if (exploreProgramsData && !exploreProgramsIsFetching && recommendedProgramsData) {
-            // Map through the data and set the state. Explore programs are not user-specific not should not include recommendations
-            const explorePrograms = exploreProgramsData.filter(program => !recommendedProgramsData.some(recommendedProgram => recommendedProgram.id === program.id))
-
-            setExplorePrograms(explorePrograms)
+        if (exploreProgramsData && !exploreProgramsIsLoading) {
+            setExplorePrograms(
+                exploreProgramsData?.programs || []
+            )
         }
-    }, [exploreProgramsData, exploreProgramsIsFetching, recommendedProgramsData])
+    }, [exploreProgramsData, exploreProgramsIsLoading])
 
     useEffect(() => {
-        if (forYouPostsData && !forYouPostsIsFetching) {
-            setForYouPosts(forYouPostsData)
+        if (forYouPostsData && !isLoadingForYou) {
+            setForYouPosts(
+                forYouPostsData?.pages?.flatMap((page) => page.posts) || []
+            )
         }
-    }, [forYouPostsData, forYouPostsIsFetching])
+    }, [forYouPostsData, isLoadingForYou])
 
     useEffect(() => {
-        if (explorePostsData && !explorePostsIsFetching && forYouPostsData) {
-            const explorePosts = explorePostsData.filter(post => !forYouPostsData.some(forYouPost => forYouPost.id === post.id))
-
-            setExplorePosts(explorePosts)
+        if (explorePostsData && !isLoadingExplore) {
+            setExplorePosts(
+                explorePostsData?.pages?.flatMap((page) => page.posts) || []
+            )
         }
-    }, [explorePostsData, explorePostsIsFetching, forYouPostsData])
+    }, [explorePostsData, forYouPostsData, isLoadingExplore])
 
     return (
         <PostContext.Provider value={{
@@ -222,7 +237,13 @@ export const PhaseContextProvider = ({ children }) => {
             recommendedPrograms,
             explorePrograms,
             forYouPosts,
+            fetchNextForYouPage,
+            hasMoreForYou,
+            isLoadingForYou,
             explorePosts,
+            fetchNextExplorePage,
+            hasMoreExplore,
+            isLoadingExplore,
         }}>
             {children}
         </PostContext.Provider>

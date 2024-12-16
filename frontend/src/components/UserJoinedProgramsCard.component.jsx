@@ -44,7 +44,7 @@ const UserJoinedProgramsCard = () => {
     const { data: joinedProgramsData, isLoading: joinedProgramsIsLoading } = useQuery({
         queryKey: ['joinedPrograms'],
         queryFn: async () => {
-            if (!user) {
+            if (!user || !sessionToken) {
                 return [];
             }
 
@@ -123,7 +123,7 @@ const UserJoinedProgramsCard = () => {
         );
     }
 
-    if (!user) {
+    if (!user || !sessionToken) {
         return (
             <Box textAlign="center" p={10}>
                 <Text color="gray.500" fontSize="xl">
