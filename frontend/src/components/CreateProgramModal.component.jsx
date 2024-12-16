@@ -332,7 +332,9 @@ function CreateProgramModal({ isOpen, onClose }) {
                             </FormControl>
 
                             <FormControl isRequired>
-                                <FormLabel>Interval (weeks)</FormLabel>
+                                <FormLabel>
+                                    Rest Interval (days)
+                                </FormLabel>
                                 <NumberInput min={1} value={interval} onChange={(value) => setInterval(parseInt(value))}>
                                     <NumberInputField />
                                 </NumberInput>
