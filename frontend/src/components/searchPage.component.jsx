@@ -16,46 +16,126 @@ import {
 } from '@chakra-ui/react';
 import { AppContext } from '../context/AppContext';
 
+// Mapping between exercise muscles and body highlighter muscles
+const muscleMapping = {
+    // Mapping to 'trapezius'
+    'TRAPEZIUS': 'trapezius',
+    'TRAPS': 'trapezius',
+    
+    // Mapping to 'upper-back'
+    'UPPER_BACK': 'upper-back',
+    'LATISSIMUS_DORSI': 'upper-back',
+    'LATS': 'upper-back',
+    'RHOMBOIDS': 'upper-back',
+    
+    // Mapping to 'lower-back'
+    'LOWER_BACK': 'lower-back',
+    'BACK': 'lower-back',
+    
+    // Mapping to 'chest'
+    'CHEST': 'chest',
+    'PECTORALS': 'chest',
+    'UPPER_CHEST': 'chest',
+    
+    // Mapping to 'biceps'
+    'BICEPS': 'biceps',
+    'BRACHIALIS': 'biceps',
+    
+    // Mapping to 'triceps'
+    'TRICEPS': 'triceps',
+    
+    // Mapping to 'forearm'
+    'FOREARMS': 'forearm',
+    'GRIP_MUSCLES': 'forearm',
+    'WRISTS': 'forearm',
+    'WRIST_EXTENSORS': 'forearm',
+    'WRIST_FLEXORS': 'forearm',
+    
+    // Mapping to deltoids
+    'DELTOIDS': 'front-deltoids',
+    'DELTS': 'front-deltoids',
+    'SHOULDERS': 'front-deltoids',
+    'REAR_DELTOIDS': 'back-deltoids',
+    
+    // Mapping to 'abs'
+    'ABDOMINALS': 'abs',
+    'ABS': 'abs',
+    'CORE': 'abs',
+    'LOWER_ABS': 'abs',
+    
+    // Mapping to 'obliques'
+    'OBLIQUES': 'obliques',
+    
+    // Mapping to leg muscles
+    'ADDUCTORS': 'adductor',
+    'INNER_THIGHS': 'adductor',
+    'GROIN': 'adductor',
+    'HAMSTRINGS': 'hamstring',
+    'QUADRICEPS': 'quadriceps',
+    'QUADS': 'quadriceps',
+    'ABDUCTORS': 'abductors',
+    'CALVES': 'calves',
+    'SOLEUS': 'calves',
+    'GLUTES': 'gluteal',
+    
+    // Mapping to head/neck
+    'STERNOCLEIDOMASTOID': 'neck',
+    
+    // Additional muscles that don't have direct mappings will use their closest group
+    'SERRATUS_ANTERIOR': 'chest',
+    'ROTATOR_CUFF': 'front-deltoids',
+    'LEVATOR_SCAPULAE': 'neck',
+    'HIP_FLEXORS': 'gluteal',
+    'SPINE': 'lower-back',
+    'CARDIOVASCULAR_SYSTEM': null, // No direct mapping for cardio
+    'ANKLE_STABILIZERS': 'calves',
+    'ANKLES': 'calves',
+    'FEET': 'calves',
+    'HANDS': 'forearm',
+    'SHINS': 'calves'
+};
+
+// Create reverse mapping for filtering
+const reverseMapping = {};
+Object.entries(muscleMapping).forEach(([exerciseMuscle, highlighterMuscle]) => {
+    if (highlighterMuscle) {
+        if (!reverseMapping[highlighterMuscle]) {
+            reverseMapping[highlighterMuscle] = [];
+        }
+        reverseMapping[highlighterMuscle].push(exerciseMuscle);
+    }
+});
+
 const SearchPage = () => {
     const { colorMode } = useColorMode();
     const { exercises, isLoadingExercises } = useContext(AppContext);
     const [selectedMuscle, setSelectedMuscle] = useState(null);
-    console.log(exercises);
 
     // Data for highlighting muscles
     const highlightData = selectedMuscle ? [
         {
             name: "Selected Muscle",
-            muscles: [selectedMuscle.toLowerCase().replace(/\s+/g, '')]
+            muscles: [selectedMuscle]
         }
     ] : [];
 
-    // Function to convert muscle name format
-    const formatMuscleNameForComparison = (muscleName) => {
-        return muscleName.toUpperCase().replace(/\s+/g, '_');
-    };
-
-    // Handle muscle click
+    // Handle muscle click from the body highlighter
     const handleMuscleClick = (data) => {
         if (data && data.muscle) {
-            // Format muscle name
-            const muscleName = data.muscle
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^./, str => str.toUpperCase())
-                .trim();
-            
-            // Toggle selection if clicking the same muscle
             setSelectedMuscle(prevMuscle => 
-                prevMuscle === muscleName ? null : muscleName
+                prevMuscle === data.muscle ? null : data.muscle
             );
         }
     };
 
     // Filter exercises based on selected muscle
-    const filteredExercises = selectedMuscle ? exercises.filter(exercise => 
-        exercise.targetMuscle === formatMuscleNameForComparison(selectedMuscle) ||
-        exercise.secondaryMuscles.includes(formatMuscleNameForComparison(selectedMuscle))
-    ) : [];
+    const filteredExercises = selectedMuscle ? exercises.filter(exercise => {
+        const matchingMuscles = reverseMapping[selectedMuscle] || [];
+        return matchingMuscles.some(muscle => 
+            exercise.targetMuscle === muscle ||
+            exercise.secondaryMuscles.includes(muscle)
+        );
+    }) : [];
 
     return (
         <Box 
@@ -147,7 +227,9 @@ const SearchPage = () => {
                                 mb={4}
                                 color="purple.500"
                             >
-                                Exercises for {selectedMuscle}
+                                Exercises for {selectedMuscle.split('-').map(word => 
+                                    word.charAt(0).toUpperCase() + word.slice(1)
+                                ).join(' ')}
                             </Text>
                             
                             {isLoadingExercises ? (
