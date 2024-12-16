@@ -30,6 +30,7 @@ import {
     Spinner,
     Button
 } from '@chakra-ui/react';
+import RestModal from './RestModal.component';
 
 const renderRatingStars = (rating, ratingCount) => {
     return (
@@ -97,6 +98,11 @@ const TrainingCard = () => {
         isOpen: isWorkoutOpen,
         onOpen: onWorkoutOpen,
         onClose: onWorkoutClose
+    } = useDisclosure();
+    const {
+        isOpen: isRestOpen,
+        onOpen: onRestOpen,
+        onClose: onRestClose
     } = useDisclosure();
     const [weekNumber, setWeekNumber] = useState(null);
     const [workoutNumber, setWorkoutNumber] = useState(null);
@@ -237,6 +243,12 @@ const TrainingCard = () => {
     }
 
     const handleStartSession = (exerciseId) => {
+        // Check if the user needs a rest day
+        if (checkUserNeedsRestDay(trainingProgram.lastWorkoutDate, trainingProgram.interval)) {
+            onRestOpen();
+            return;
+        }
+
         setSelectedExerciseId(exerciseId);
         onOpen();
     };
@@ -246,7 +258,15 @@ const TrainingCard = () => {
         onWorkoutOpen();
     };
 
-    console.log(isUserJoined);
+    const checkUserNeedsRestDay = (lastWorkoutDate, restIntervalAsDay) => {
+        const lastWorkout = new Date(lastWorkoutDate);
+        const today = new Date();
+        const diffTime = Math.abs(today - lastWorkout);
+
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        return diffDays < restIntervalAsDay;
+    };
 
     return (
         <div className="w-full max-w-[60%] mx-auto p-4 bg-white shadow-lg rounded-lg text-sm">
@@ -448,7 +468,10 @@ const TrainingCard = () => {
                 data={trainingProgram}
                 weekNumber={weekNumber}
                 workoutNumber={workoutNumber}
-
+            />
+            <RestModal
+                isOpen={isRestOpen}
+                onClose={onRestClose}
             />
         </div>
     );
