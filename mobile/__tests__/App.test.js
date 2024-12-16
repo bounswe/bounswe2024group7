@@ -74,9 +74,24 @@ test('Renders Search Page Correctly', () => {
     expect(tree).toMatchSnapshot();
 });
 
-test('Searches Correctly', async () => {
+test('Gets Exercises Correctly', async () => {
   const response  = await apiInstance().get("api/exercises");
     expect(response).not.toBeNull();
+});
+
+test('Searches for a Query Correctly', async () => {
+  const sessionToken = jest.fn();
+  const searchQuery = "BACK";
+  const titleString = (str) => {
+      return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
+  }
+  const response = await apiInstance(sessionToken).get(`/api/search`, {
+                     params: {
+                         q: titleString(searchQuery)
+                     }
+                 });
+
+    expect(response).toBe(200);
 });
 
 test('Renders Create Post Page Correctly', () => {
