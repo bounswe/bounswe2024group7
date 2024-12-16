@@ -30,6 +30,7 @@ public class TrainingProgramWithTrackingResponse {
     private TrainingProgramWithTrackingStatus status;
     private LocalDateTime joinedAt;
     private LocalDateTime completedAt;
+    private double completionPercentage;
     private LocalDate lastCompletedWorkoutDate;
     private List<WeekWithTrackingResponse> weeks;
     private Set<String> participants;
