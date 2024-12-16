@@ -2,10 +2,14 @@ package com.group7.demo.controllers;
 
 import com.group7.demo.dtos.PostRequest;
 import com.group7.demo.dtos.PostResponse;
+import com.group7.demo.dtos.jsonld.PostJsonLd;
+import com.group7.demo.dtos.mapper.Mapper;
+import com.group7.demo.models.Post;
 import com.group7.demo.services.PostService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +21,7 @@ import java.util.Set;
 @RequestMapping("/api/posts")
 @AllArgsConstructor
 public class PostController {
+    private final Mapper mapper;
     private PostService postService;
 
     @PostMapping
@@ -123,6 +128,15 @@ public class PostController {
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/{postId}", produces = "application/ld+json")
+    public ResponseEntity<PostJsonLd> getPostJsonLd(@PathVariable Long postId) {
+        Post post = postService.getPostById(postId);
+        PostJsonLd jsonLd = mapper.mapToPostJsonLd(post);
+        return ResponseEntity.ok()
+            .contentType(MediaType.valueOf("application/ld+json"))
+            .body(jsonLd);
     }
 
 }
