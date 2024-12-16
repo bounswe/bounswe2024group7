@@ -16,6 +16,7 @@ import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody,
 import { Table, TableCaption, Thead, Tbody, Tfoot, Tr, Th, Td, UnorderedList, ListItem } from '@chakra-ui/react';
 import PlusIcon from '../icons/PlusIcon';
 import { ViewIcon } from '@chakra-ui/icons';
+import { Progress } from '@chakra-ui/react'
 import {
     Box,
     Card,
@@ -104,6 +105,7 @@ const TrainingCard = () => {
     const [weekNumber, setWeekNumber] = useState(null);
     const [workoutNumber, setWorkoutNumber] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState(null);
+    const [progressValue, setprogressValue] = useState(66);
 
     // Join to a program Mutation
     const { mutate: joinProgram } = useMutation({
@@ -255,6 +257,16 @@ const TrainingCard = () => {
     };
 
     console.log(isUserJoined);
+    // Add a new utility function to check workout completion
+    const isWorkoutComplete = (workout) => {
+        return workout.workoutExercises.every(exercise => exercise.completedAt !== null);
+    };
+
+    // Add a new utility function to check week completion
+    const isWeekComplete = (week) => {
+        return week.workouts.every(workout => isWorkoutComplete(workout));
+    };
+
 
     return (
         <div className="w-full max-w-[60%] mx-auto p-4 bg-white shadow-lg rounded-lg text-sm">
@@ -389,68 +401,150 @@ const TrainingCard = () => {
                         }
                     </Button>
                 </Tooltip>
+
             </div>
+            <Box width="100%">
+                <Flex align="center" gap={4}>
+                    {/* Progress Bar */}
+                    <Progress
+                        hasStripe
+                        colorScheme="green"
+                        size="md"
+                        value={progressValue}
+                        flex="1"
+                    />
+                    {/* Value */}
+                    <Text
+                        fontSize="md"
+                        fontWeight="bold"
+                        color="green.600"
+                        minWidth="50px"
+                        textAlign="right"
+                    >
+                        {progressValue}%
+                    </Text>
+                </Flex>
+            </Box>
             <Box bg="white" shadow="md" rounded="lg" overflow="hidden" mb={4}>
-                {trainingProgram.weeks.map((week, weekIndex) => (
-                    <Box key={weekIndex} p={4} borderBottom="1px solid #e2e8f0">
-                        <Text fontSize="xl" fontWeight="bold" mb={2}>
-                            Week {week.weekNumber}
-                        </Text>
-                        <UnorderedList spacing={3} ml={6}>
-                            {week.workouts.map((workout, workoutIndex) => (
-                                <ListItem key={workoutIndex}>
-                                    <Flex align="center" gap={4}>
-                                        <Text fontSize="md" fontWeight="semibold" color="gray.700">
-                                            Workout {workout.workoutNumber}: {workout.name.split(":")[1]?.trim()}
-                                        </Text>
-                                        <Button
-                                            onClick={() => handleViewWorkout(week.weekNumber, workout.workoutNumber)}
-                                            colorScheme="gray"
-                                            variant="solid"
-                                        >
-                                            <ViewIcon className="w-4 h-4 mr-3" />
-                                            View Description
-                                        </Button>
-                                    </Flex>
+                {trainingProgram.weeks.map((week, weekIndex) => {
+                    // Check if previous weeks are complete
+                    const isPreviousWeekComplete = weekIndex === 0 ||
+                        trainingProgram.weeks[weekIndex - 1].workouts.every(prevWorkout =>
+                            prevWorkout.workoutExercises.every(exercise => exercise.completedAt !== null)
+                        );
 
-                                    <Table variant="simple" width="100%" mt={2}>
-                                        <Tbody>
-                                            {workout.workoutExercises.map((exerciseob) => {
+                    return (
+                        <Box
+                            key={weekIndex}
+                            p={4}
+                            borderBottom="1px solid #e2e8f0"
+                            opacity={isPreviousWeekComplete ? 1 : 0.6}
+                        >
+                            <Text
+                                fontSize="xl"
+                                fontWeight="bold"
+                                mb={2}
+                                color={isPreviousWeekComplete ? "black" : "gray.500"}
+                            >
+                                Week {week.weekNumber}
+                                {!isPreviousWeekComplete && " (Locked)"}
+                            </Text>
 
-                                                console.log("Given Exercise Object: ", exerciseob);
+                            {isPreviousWeekComplete ? (
+                                <UnorderedList spacing={3} ml={6}>
+                                    {week.workouts.map((workout, workoutIndex) => {
+                                        // Check if previous workouts in the same week are complete
+                                        const isPreviousWorkoutComplete = workoutIndex === 0 ||
+                                            week.workouts[workoutIndex - 1].workoutExercises.every(
+                                                exercise => exercise.completedAt !== null
+                                            );
 
-                                                return (<Tr key={exerciseob.id} bgColor="#f7f9fc">
-                                                    <Td>
-                                                        <Text>
-                                                            {exerciseob.exercise.name}
-                                                        </Text>
-                                                    </Td>
-                                                    <Td textAlign="right">
-                                                        {(isUserJoined && user && exerciseob.completedAt === null) ? (
-                                                            <Button
-                                                                onClick={() => handleStartSession(exerciseob.id)}
-                                                                colorScheme="green"
-                                                                size="sm"
-                                                            >
-                                                                Start Session!
-                                                            </Button>
-                                                        ) : (
-                                                            <Text color="gray.500">
-                                                                {exerciseob.completedAt ? 'Completed' : 'Not Started'}
-                                                            </Text>
-                                                        )}
-                                                    </Td>
-                                                </Tr>)
-                                            }
-                                            )
-                                        }
-                                        </Tbody>
-                                    </Table>
-                                </ListItem>
-                            ))}
-                        </UnorderedList>
-                    </Box>
-                ))}
+                                        return (
+                                            <ListItem key={workoutIndex}>
+                                                <Flex align="center" gap={4}>
+                                                    <Text
+                                                        fontSize="md"
+                                                        fontWeight="semibold"
+                                                        color={isPreviousWorkoutComplete ? "gray.700" : "gray.500"}
+                                                    >
+                                                        Workout {workout.workoutNumber}:
+                                                        {workout.name.split(":")[1]?.trim()}
+                                                        {!isPreviousWorkoutComplete && " (Locked)"}
+                                                    </Text>
+                                                    <Button
+                                                        onClick={() => handleViewWorkout(week.weekNumber, workout.workoutNumber)}
+                                                        colorScheme="gray"
+                                                        variant="solid"
+                                                        isDisabled={!isPreviousWorkoutComplete}
+                                                    >
+                                                        <ViewIcon className="w-4 h-4 mr-3" />
+                                                        View Description
+                                                    </Button>
+                                                </Flex>
+
+                                                <Table variant="simple" width="100%" mt={2}>
+                                                    <Tbody>
+                                                        {workout.workoutExercises.map((exerciseob) => {
+                                                            // Determine if the exercise can be started
+                                                            const canStartExercise =
+                                                                isPreviousWeekComplete &&
+                                                                isPreviousWorkoutComplete;
+
+                                                            return (
+                                                                <Tr key={exerciseob.id} bgColor="#f7f9fc">
+                                                                    <Td>
+                                                                        <Text>
+                                                                            {exerciseob.exercise.name}
+                                                                        </Text>
+                                                                    </Td>
+                                                                    <Td textAlign="right">
+                                                                        {(isUserJoined && user) ? (
+                                                                            exerciseob.completedAt && exerciseob.completedSets ? (
+                                                                                <Text color="green.500" fontWeight="bold">
+                                                                                    ({exerciseob.completedSets.reduce((acc, set) => acc + set, 0)}/{exerciseob.repetitions * exerciseob.sets}) Completed ✓
+                                                                                </Text>
+                                                                            ) : canStartExercise ? (
+                                                                                <Button
+                                                                                    onClick={() => handleStartSession(exerciseob.id)}
+                                                                                    colorScheme="green"
+                                                                                    size="sm"
+                                                                                >
+                                                                                    Start Session!
+                                                                                </Button>
+                                                                            ) : (
+                                                                                <Tooltip
+                                                                                    label="Complete previous week/workout first"
+                                                                                    hasArrow
+                                                                                    placement="top"
+                                                                                >
+                                                                                    <Text color="gray.500">
+                                                                                        Locked
+                                                                                    </Text>
+                                                                                </Tooltip>
+                                                                            )
+                                                                        ) : (
+                                                                            <Text color="gray.500">
+                                                                                Not Joined
+                                                                            </Text>
+                                                                        )}
+                                                                    </Td>
+                                                                </Tr>
+                                                            );
+                                                        })}
+                                                    </Tbody>
+                                                </Table>
+                                            </ListItem>
+                                        );
+                                    })}
+                                </UnorderedList>
+                            ) : (
+                                <Text color="gray.500" textAlign="center">
+                                    Complete previous week to unlock
+                                </Text>
+                            )}
+                        </Box>
+                    );
+                })}
             </Box>
 
             <Detailed_Ex_Modal
