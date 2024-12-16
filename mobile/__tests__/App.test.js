@@ -30,7 +30,9 @@ import PostDetail from '../components/PostDetail';
 import FeedbackDetail from '../components/FeedbackDetail';
 import ProfilePage from '../components/ProfilePage';
 import ProgramCard from '../components/ProgramCard';
+import DietCard from '../components/DietCard';
 import ProgramDetail from '../components/ProgramDetail';
+import DietDetail from '../components/DietDetail';
 import UserProfile from '../components/UserProfile';
 
 /*it('Renders Whole Application Correctly', () => {
@@ -253,6 +255,16 @@ test('Renders Program Card Page Correctly', () => {
   expect(tree).toMatchSnapshot();
 });
 
+test('Renders Diet Card Page Correctly', () => {
+  const tree = renderer.create(<DietCard />).toJSON();
+  expect(tree).toMatchSnapshot();
+});
+
+test('Renders Diet Detail Page Correctly', () => {
+  const tree = renderer.create(<DietDetail />).toJSON();
+  expect(tree).toMatchSnapshot();
+});
+
 test('Joined Training Programs Correctly', async () => {
   const username = jest.fn();
   // TODO: This creates mock data, maybe we should change to a real username
@@ -285,9 +297,22 @@ test('Leave Program Correctly', async () => {
   expect(response).toBe(200);
 });
 
+test('Rate Program Correctly', async () => {
+  const programId = 1;
+  const rating = 3;
+  const mockToken = jest.fn();
+  // TODO: This creates mock data, maybe we should change to a real progam_ID
+
+   const response = await apiInstance(mockToken).post(`api/training-programs/${programId}/rate?rating=${rating}`, {
+
+         });
+    expect(response).toBe(200);
+});
+
 
 // User Profile
 test('Renders User Profile Page Correctly', () => {
   const tree = renderer.create(<UserProfile />).toJSON();
   expect(tree).toMatchSnapshot();
 });
+
