@@ -7,7 +7,7 @@ const FeedbackCard = ({ trainingProgram, bodyPart, weekNumber, workoutNumber, ex
             style={styles.card}
             onPress={() => navigation.navigate('FeedbackDetail', { trainingProgram, bodyPart, weekNumber, workoutNumber, exerciseNumber, feedbackText, navigation })}
         >
-      
+
       {/* Feedback Program, Body Part, and Week Number */}
       <View style={styles.content}>
         <Text style={styles.description}>{trainingProgram}</Text>
@@ -102,3 +102,4 @@ const styles = StyleSheet.create({
 });
 
 export default FeedbackCard;
+

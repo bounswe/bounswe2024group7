@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const PostCard = ({ tags, program_id,post_id, description, owner, date, likeCount, commentList, liked, navigation }) => {
+const PostCard = ({ tags, program_id,post_id, description, owner, date, likeCount, liked, navigation }) => {
+var commentList = [];
   return (
     <TouchableOpacity
               style={styles.card}

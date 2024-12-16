@@ -12,6 +12,7 @@ import { programRoute } from './routes/program'
 import { progressRoute } from './routes/progress'
 import { progressTodayRoute } from './routes/progressToday'
 import { searchRoute } from './routes/search'
+import { trainingRoute } from './routes/training'
 import React from 'react'
 import { registerRoute } from './routes/register'
 import {
@@ -30,7 +31,8 @@ const routeTree = rootRoute.addChildren([
   programRoute,
   progressRoute,
   progressTodayRoute,
-  searchRoute
+  searchRoute,
+  trainingRoute,
 ])
 
 const router = createRouter({ routeTree })

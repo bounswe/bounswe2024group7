@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import apiInstance from "../instance/apiInstance";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { userProfile, userPassword, userSessionToken } from "../context/user";
 
@@ -18,6 +18,16 @@ export const PostContext = createContext(
         bookmarkedPosts: [],
         isLoadingBookmarks: false,
         isFetchingBookmarks: false,
+        recommendedPrograms: [],
+        explorePrograms: [],
+        forYouPosts: [],
+        fetchNextForYouPage: () => {},
+        hasMoreForYou: false,
+        isLoadingForYou: false,
+        explorePosts: [],
+        fetchNextExplorePage: () => {},
+        hasMoreExplore: false,
+        isLoadingExplore: false,
     }
 )
 
@@ -26,6 +36,10 @@ export const PhaseContextProvider = ({ children }) => {
     const [programs, setPrograms] = useState([])
     const [bookmarkedPosts, setBookmarkedPosts] = useState([])
     const [tags, setTags] = useState([])
+    const [recommendedPrograms, setRecommendedPrograms] = useState([])
+    const [explorePrograms, setExplorePrograms] = useState([])
+    const [forYouPosts, setForYouPosts] = useState([])
+    const [explorePosts, setExplorePosts] = useState([])
 
     const sessionToken = useSelector(userSessionToken)
 
@@ -89,6 +103,66 @@ export const PhaseContextProvider = ({ children }) => {
         refetchOnWindowFocus: false
     })
 
+    const {
+        data: recommendedProgramsData,
+        isFetching: recommendedProgramsIsFetching,
+        isLoading: recommendedProgramsIsLoading,
+    } = useQuery({
+        queryKey: ['recommended-programs'],
+        queryFn: async () => {
+            const response = await apiInstance(sessionToken).get('/api/training-programs/recommended')
+            return response.data
+        },
+        refetchOnWindowFocus: false,
+        enabled: !!sessionToken
+    })
+
+    const {
+        data: exploreProgramsData,
+        isFetching: exploreProgramsIsFetching,
+        isLoading: exploreProgramsIsLoading,
+    } = useQuery({
+        queryKey: ['explore-programs'],
+        queryFn: async () => {
+            const response = await apiInstance().get('/api/training-programs/explore')
+            return response.data
+        },
+        refetchOnWindowFocus: false
+    })
+
+    const {
+        data: forYouPostsData,
+        fetchNextPage: fetchNextForYouPage,
+        hasNextPage: hasMoreForYou,
+        isFetchingNextPage: isLoadingForYou,
+    } = useInfiniteQuery({
+        queryKey: ['forYouPosts'],
+        queryFn: async ({ pageParam = 0 }) => {
+            const response = await apiInstance(sessionToken).get(`/api/posts/for-you?page=${pageParam}&size=10`);
+            return response.data;
+        },
+        getNextPageParam: (lastPage) =>
+            lastPage.currentPage + 1 < lastPage.totalPages ? lastPage.currentPage + 1 : undefined,
+    }
+    );
+
+    // Infinite Query for "Explore" posts
+    const {
+        data: explorePostsData,
+        fetchNextPage: fetchNextExplorePage,
+        hasNextPage: hasMoreExplore,
+        isFetchingNextPage: isLoadingExplore,
+    } = useInfiniteQuery({
+        queryKey: ['explorePosts'],
+        queryFn: async ({ pageParam = 0 }) => {
+            const response = await apiInstance().get(`/api/posts/explore?page=${pageParam}&size=10`);
+            return response.data;
+        },
+        getNextPageParam: (lastPage) =>
+            lastPage.currentPage + 1 < lastPage.totalPages ? lastPage.currentPage + 1 : undefined,
+    }
+    );
+
     useEffect(() => {
         if (postsData && !postsIsFetching) {
             // Order posts by createdAt date
@@ -114,6 +188,38 @@ export const PhaseContextProvider = ({ children }) => {
         }
     }, [tagsData, tagsIsFetching])
 
+    useEffect(() => {
+        if (recommendedProgramsData && !recommendedProgramsIsLoading) {
+            setRecommendedPrograms(
+                recommendedProgramsData?.programs || []
+            )
+        }
+    }, [recommendedProgramsData, recommendedProgramsIsLoading])
+
+    useEffect(() => {
+        if (exploreProgramsData && !exploreProgramsIsLoading) {
+            setExplorePrograms(
+                exploreProgramsData?.programs || []
+            )
+        }
+    }, [exploreProgramsData, exploreProgramsIsLoading])
+
+    useEffect(() => {
+        if (forYouPostsData && !isLoadingForYou) {
+            setForYouPosts(
+                forYouPostsData?.pages?.flatMap((page) => page.posts) || []
+            )
+        }
+    }, [forYouPostsData, isLoadingForYou])
+
+    useEffect(() => {
+        if (explorePostsData && !isLoadingExplore) {
+            setExplorePosts(
+                explorePostsData?.pages?.flatMap((page) => page.posts) || []
+            )
+        }
+    }, [explorePostsData, forYouPostsData, isLoadingExplore])
+
     return (
         <PostContext.Provider value={{
             posts,
@@ -127,7 +233,17 @@ export const PhaseContextProvider = ({ children }) => {
             isFetchingBookmarks: bookmarksIsFetching,
             tags: tags,
             isLoadingTags: tagsIsLoading,
-            isFetchingTags: tagsIsFetching
+            isFetchingTags: tagsIsFetching,
+            recommendedPrograms,
+            explorePrograms,
+            forYouPosts,
+            fetchNextForYouPage,
+            hasMoreForYou,
+            isLoadingForYou,
+            explorePosts,
+            fetchNextExplorePage,
+            hasMoreExplore,
+            isLoadingExplore,
         }}>
             {children}
         </PostContext.Provider>

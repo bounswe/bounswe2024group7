@@ -168,7 +168,6 @@ const SearchPage = () => {
             {!selectedMuscle && <Text style={styles.hint}>Click on any muscle to see related exercises</Text>}
             </View>
         </ScrollView>
-
     );
 };
 
@@ -263,4 +262,6 @@ flexDirection: 'column'       ,
     marginTop: 16,
   },
 });
+
 export default SearchPage;
+

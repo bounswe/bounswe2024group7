@@ -15,6 +15,7 @@ import UserProfile from './components/UserProfile';
 import Label from './components/Label';
 import SearchBar from './components/SearchBar';
 import SearchResult from './components/SearchResult';
+import SearchResults from './components/SearchResults';
 import ProgressTracker from './components/ProgressTracker';
 import WorkoutDetails from './components/WorkoutDetails';
 import JoinedWorkout from './components/JoinedWorkout';
@@ -80,6 +81,8 @@ const App = () => {
                 <Stack.Screen name="Label" component={Label} />
                 <Stack.Screen name="SearchBar" component={SearchBar} />
                 <Stack.Screen name="SearchResult" component={SearchResult} />
+                <Stack.Screen name="SearchResults" component={SearchResults} />
+
                 <Stack.Screen name="ProgressTracker" component={ProgressTracker} />
                 <Stack.Screen name="WorkoutDetails" component={WorkoutDetails} />
                 <Stack.Screen name="JoinedWeek" component={JoinedWeek} />
@@ -91,6 +94,8 @@ const App = () => {
                 <Stack.Screen name="CreateFeedback" component={CreateFeedback} />
                 <Stack.Screen name="FeedbackCard" component={FeedbackCard} />
                 <Stack.Screen name="FeedbackDetail" component={FeedbackDetail} />
+                <Stack.Screen name="SearchPage" component={SearchPage} />
+
                 <Stack.Screen name="SearchPage" component={SearchPage} />
               </Stack.Navigator>
             </NavigationContainer>

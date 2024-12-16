@@ -14,6 +14,9 @@ import {
     useToast,
     Tooltip
 } from '@chakra-ui/react'
+import { ChatIcon } from '@chakra-ui/icons';
+import FeedbackModal from './FeedbackModal.component';
+import { ViewIcon } from '@chakra-ui/icons';
 // import { useNavigate } from 'react-router-dom';
 import { useNavigate } from '@tanstack/react-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -24,12 +27,20 @@ import apiInstance from '../instance/apiInstance'
 import PlusIcon from '../icons/PlusIcon'
 import { UserContext } from '../context/UserContext'
 // import { router } from '../main.jsx';
+import Detailed_Training_Modal from './Detailed_Training_Modal.component';
+import { useDisclosure } from '@chakra-ui/react';
 
 
 function ProgramFeedCard({
     program
 }) {
 
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isFeedbackOpen,
+        onOpen: onFeedbackOpen,
+        onClose: onFeedbackClose
+    } = useDisclosure();
     const password = useSelector(userPassword)
     const sessionToken = useSelector(userSessionToken)
     const toast = useToast()
@@ -175,6 +186,17 @@ function ProgramFeedCard({
             },
             onError: (error) => {
                 console.log(error)
+                // If error status is 400, it means the user is already joined to a program with same interest area
+                if (error.response.status === 400) {
+                    toast({
+                        title: error.response.data.message,
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                    return
+                }
+
                 toast({
                     title: 'An error occurred.',
                     status: 'error',
@@ -224,7 +246,7 @@ function ProgramFeedCard({
     const handleStartPracticing = (program_id) => {
         navigate(
             {
-                to: `/program?programId=${program_id}`,
+                to: `/training?trainingId=${program_id}`,
             }
         )
     }
@@ -295,6 +317,21 @@ function ProgramFeedCard({
                     flexDirection='column'
                     gap='4'
                 >
+                    <span className="
+                    px-2 py-1 
+                    bg-blue-50 
+                    text-blue-600 
+                    rounded-full 
+                    text-xs 
+                    font-semibold 
+                    inline-flex 
+                    items-center
+                ">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                    Type: {program.type}
+                </span>
                     <Text
                         fontSize={"xl"}
                         fontWeight={"bold"}
@@ -313,6 +350,14 @@ function ProgramFeedCard({
                             </li>
                         ))}
                     </Text> */}
+                    <Button
+                        onClick={onOpen}
+                        colorScheme="gray"
+                        variant="solid"
+                    >
+                        <ViewIcon className="w-4 h-4 mr-3" />
+                        View Description
+                    </Button>
                 </CardBody>
 
 
@@ -325,7 +370,9 @@ function ProgramFeedCard({
                         },
                     }}
                 >
-                    <Flex gap={2} width="full">
+                    <Flex gap={2} width="full"
+                        marginBottom={2}
+                    >
                         <Tooltip
                             label={
                                 user && program.trainer === user.username ? null : (
@@ -369,18 +416,44 @@ function ProgramFeedCard({
                         </Tooltip>
 
                         {isUserJoined && user && program.trainer !== user.username && (
-                            <Button
-                                flex='1'
-                                variant='solid'
-                                colorScheme='green'
-                                onClick={() => handleStartPracticing(program.id)}
-                            >
-                                Start Practicing
-                            </Button>
+                            <Flex gap={2} flex="1">
+                                <Button
+                                    flex='1'
+                                    variant='solid'
+                                    colorScheme='green'
+                                    onClick={() => handleStartPracticing(program.id)}
+                                >
+                                    Start Practicing
+                                </Button>
+                            </Flex>
                         )}
                     </Flex>
+                    {
+                        isUserJoined && user && program.trainer !== user.username && (
+                    <Button
+                        variant='outline'
+                        colorScheme='purple'
+                        leftIcon={<ChatIcon />}
+                        onClick={() => onFeedbackOpen()}
+                        width={"full"}
+                    >
+                         Give Feedback
+                    </Button>
+                    )
+                    }
                 </CardFooter>
             </Card>
+            <FeedbackModal
+                isOpen={isFeedbackOpen}
+                onClose={onFeedbackClose}
+                programId={program.id}
+                programTitle={program.title}
+            />
+            <Detailed_Training_Modal
+                isOpen={isOpen}
+                onClose={onClose}
+                data={program}
+            />
         </>
 
     )

@@ -4,12 +4,16 @@ import com.group7.demo.dtos.*;
 import com.group7.demo.dtos.mapper.Mapper;
 import com.group7.demo.exceptions.UnauthorizedException;
 import com.group7.demo.models.*;
+import com.group7.demo.models.enums.ProgramLevel;
 import com.group7.demo.models.enums.TrainingProgramWithTrackingStatus;
 import com.group7.demo.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,6 +34,7 @@ public class TrainingProgramService {
     private final WorkoutWithTrackingRepository workoutWithTrackingRepository;
     private final WorkoutExerciseWithTrackingRepository workoutExerciseWithTrackingRepository;
 
+    private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
     private final UserService userService;
 
@@ -237,6 +242,13 @@ public class TrainingProgramService {
     }
 
     @Transactional
+    public TrainingProgramWithTrackingResponse getTrainingProgramWithTracking(Long trackingId){
+        TrainingProgramWithTracking trainingProgramWithTracking = trainingProgramWithTrackingRepository.findById(trackingId)
+                .orElseThrow(() -> new EntityNotFoundException("Training program with tracking not found with tracking id: " + trackingId));
+        return mapper.mapToTrainingProgramWithTrackingResponse(trainingProgramWithTracking);
+    }
+
+    @Transactional
     public Set<String> getRegisteredUsernames(Long trainingProgramId) {
         // Fetch the training program by its ID
         TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
@@ -270,6 +282,19 @@ public class TrainingProgramService {
         // This list can contain at most one element because of the joinTrainingProgram method
         return ongoingPrograms.get(0);
 
+    }
+
+    public TrainingProgramWithTrackingResponse getOngoingUserTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+        List<TrainingProgramWithTracking> ongoingPrograms = trainingProgramWithTrackingRepository.findByUserAndTrainingProgramIdAndStatus(user, trainingProgramId, TrainingProgramWithTrackingStatus.ONGOING);
+
+        if (ongoingPrograms.isEmpty()) {
+            throw new IllegalStateException("No ongoing training program found.");
+        }
+
+        // This list can contain at most one element because of the joinTrainingProgram method
+        TrainingProgramWithTracking trainingProgramWithTracking = ongoingPrograms.get(0);
+        return mapper.mapToTrainingProgramWithTrackingResponse(trainingProgramWithTracking);
     }
 
     @Transactional
@@ -392,17 +417,16 @@ public class TrainingProgramService {
         return weeklyCompletionRates;
     }
 
-    public void rateTrainingProgram(Long trainingProgramId, Long userId, int rating) {
+    public void rateTrainingProgram(Long trainingProgramId, int rating, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
         // Validate the rating value
         if (rating < 0 || rating > 5) {
             throw new IllegalArgumentException("Rating must be between 0 and 5");
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-
         // Ensure the user is a participant
-        boolean isParticipant = trainingProgramWithTrackingRepository.existsByTrainingProgramIdAndUserId(trainingProgramId, userId);
+        boolean isParticipant = trainingProgramWithTrackingRepository.existsByTrainingProgramIdAndUserId(trainingProgramId, user.getId());
         if (!isParticipant) {
             throw new IllegalArgumentException("Only participants can rate the training program");
         }
@@ -412,7 +436,7 @@ public class TrainingProgramService {
                 .orElseThrow(() -> new IllegalArgumentException("Training program not found"));
 
         // Check if the user has already rated the program
-        Optional<TrainingProgramRating> existingRatingOpt = trainingProgramRatingRepository.findByTrainingProgramIdAndUserId(trainingProgramId, userId);
+        Optional<TrainingProgramRating> existingRatingOpt = trainingProgramRatingRepository.findByTrainingProgramIdAndUserId(trainingProgramId, user.getId());
 
         if (existingRatingOpt.isPresent()) {
             // Update the existing rating
@@ -437,6 +461,22 @@ public class TrainingProgramService {
         }
     }
 
+
+    public int getUserRatingForTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
+        // Fetch the authenticated user
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        boolean isParticipant = trainingProgramWithTrackingRepository.existsByTrainingProgramIdAndUserId(trainingProgramId, user.getId());
+        if (!isParticipant) {
+            throw new IllegalArgumentException("Only participants can rate the training program");
+        }
+
+        // Check if the user has rated the training program
+        TrainingProgramRating rating = trainingProgramRatingRepository.findByTrainingProgramIdAndUserId(trainingProgramId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User has not rated this training program."));
+
+        return rating.getRating();
+    }
     private void updateAverageRating(TrainingProgram trainingProgram, int oldRating, int newRating, boolean isNew) {
         double totalRatingSum = trainingProgram.getRating() * trainingProgram.getRatingCount();
 
@@ -449,6 +489,56 @@ public class TrainingProgramService {
 
         trainingProgram.setRating(totalRatingSum / trainingProgram.getRatingCount());
         trainingProgramRepository.save(trainingProgram);
+    }
+
+    public Map<String, Object> getRecommendedPrograms(int page, int size, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+        
+        // Get user's survey data
+        Survey survey = surveyRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Survey not found for user"));
+
+        // Convert string fitness level to enum
+        ProgramLevel fitnessLevel = survey.getFitnessLevel();
+
+        // Create pageable object
+        Pageable paging = PageRequest.of(page, size);
+        
+        // Get programs matching user's fitness level
+        Page<TrainingProgram> pagePrograms = trainingProgramRepository.findRecommendedPrograms(
+                fitnessLevel,
+                paging
+        );
+
+        List<TrainingProgramResponse> programs = pagePrograms.getContent().stream()
+                .map(mapper::mapToTrainingProgramResponse)
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("programs", programs);
+        response.put("currentPage", pagePrograms.getNumber());
+        response.put("totalItems", pagePrograms.getTotalElements());
+        response.put("totalPages", pagePrograms.getTotalPages());
+
+        return response;
+    }
+
+    public Map<String, Object> explorePrograms(int page, int size) {
+        Pageable paging = PageRequest.of(page, size);
+        
+        Page<TrainingProgram> pagePrograms = trainingProgramRepository.findAllByOrderByParticipantsDesc(paging);
+
+        List<TrainingProgramResponse> programs = pagePrograms.getContent().stream()
+                .map(mapper::mapToTrainingProgramResponse)
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("programs", programs);
+        response.put("currentPage", pagePrograms.getNumber());
+        response.put("totalItems", pagePrograms.getTotalElements());
+        response.put("totalPages", pagePrograms.getTotalPages());
+
+        return response;
     }
 
 }

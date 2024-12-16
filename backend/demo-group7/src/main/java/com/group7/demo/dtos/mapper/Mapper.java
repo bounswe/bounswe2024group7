@@ -94,6 +94,20 @@ public class Mapper {
 
     public TrainingProgramWithTrackingResponse mapToTrainingProgramWithTrackingResponse(TrainingProgramWithTracking trainingProgramWithTracking) {
         TrainingProgram program = trainingProgramWithTracking.getTrainingProgram();
+
+        long totalExercises = trainingProgramWithTracking.getWeeksWithTracking().stream()
+                .flatMap(week -> week.getWorkoutsWithTracking().stream())
+                .flatMap(workout -> workout.getWorkoutExercisesWithTracking().stream())
+                .count();
+
+        long completedExercises = trainingProgramWithTracking.getWeeksWithTracking().stream()
+                .flatMap(week -> week.getWorkoutsWithTracking().stream())
+                .flatMap(workout -> workout.getWorkoutExercisesWithTracking().stream())
+                .filter(exercise -> exercise.getCompletedAt() != null)
+                .count();
+
+        double completionPercentage = (totalExercises == 0) ? 0 : (double) completedExercises / totalExercises * 100;
+
         return TrainingProgramWithTrackingResponse.builder()
                 .id(program.getId())
                 .trackingId(trainingProgramWithTracking.getId())
@@ -110,6 +124,7 @@ public class Mapper {
                 .status(trainingProgramWithTracking.getStatus())
                 .completedAt(trainingProgramWithTracking.getCompletedAt())
                 .lastCompletedWorkoutDate(getLastCompletedWorkoutDate(trainingProgramWithTracking))
+                .completionPercentage(completionPercentage)
                 .weeks(trainingProgramWithTracking.getWeeksWithTracking().stream()
                         .map(this::mapToWeekWithTrackingResponse)
                         .sorted(Comparator.comparing(WeekWithTrackingResponse::getWeekNumber))
@@ -123,11 +138,24 @@ public class Mapper {
                 .build();
     }
 
+
     private WeekWithTrackingResponse mapToWeekWithTrackingResponse(WeekWithTracking weekWithTracking) {
+        long totalExercises = weekWithTracking.getWorkoutsWithTracking().stream()
+                .flatMap(workout -> workout.getWorkoutExercisesWithTracking().stream())
+                .count();
+
+        long completedExercises = weekWithTracking.getWorkoutsWithTracking().stream()
+                .flatMap(workout -> workout.getWorkoutExercisesWithTracking().stream())
+                .filter(exercise -> exercise.getCompletedAt() != null)
+                .count();
+
+        double completionPercentage = (totalExercises == 0) ? 0 : (double) completedExercises / totalExercises * 100;
+
         return WeekWithTrackingResponse.builder()
                 .id(weekWithTracking.getWeek().getId())
                 .weekNumber(weekWithTracking.getWeek().getWeekNumber())
                 .completedAt(weekWithTracking.getCompletedAt())
+                .completionPercentage(completionPercentage)
                 .workouts(weekWithTracking.getWorkoutsWithTracking().stream()
                         .map(this::mapToWorkoutWithTrackingResponse)
                         .sorted(Comparator.comparing(WorkoutWithTrackingResponse::getWorkoutNumber))
@@ -135,18 +163,28 @@ public class Mapper {
                 .build();
     }
 
+
     private WorkoutWithTrackingResponse mapToWorkoutWithTrackingResponse(WorkoutWithTracking workoutWithTracking) {
+        long totalExercises = workoutWithTracking.getWorkoutExercisesWithTracking().size();
+        long completedExercises = workoutWithTracking.getWorkoutExercisesWithTracking().stream()
+                .filter(exercise -> exercise.getCompletedAt() != null)
+                .count();
+
+        double completionPercentage = (totalExercises == 0) ? 0 : (double) completedExercises / totalExercises * 100;
+
         return WorkoutWithTrackingResponse.builder()
                 .id(workoutWithTracking.getWorkout().getId())
                 .name(workoutWithTracking.getWorkout().getName())
                 .workoutNumber(workoutWithTracking.getWorkout().getWorkoutNumber())
                 .completedAt(workoutWithTracking.getCompletedAt())
+                .completionPercentage(completionPercentage)
                 .workoutExercises(workoutWithTracking.getWorkoutExercisesWithTracking().stream()
                         .map(this::mapToWorkoutExerciseWithTracking)
                         .sorted(Comparator.comparing(WorkoutExerciseWithTrackingResponse::getExerciseNumber))
                         .collect(Collectors.toList()))
                 .build();
     }
+
 
     private WorkoutExerciseWithTrackingResponse mapToWorkoutExerciseWithTracking(WorkoutExerciseWithTracking workoutExerciseWithTracking) {
         return WorkoutExerciseWithTrackingResponse.builder()
@@ -175,7 +213,7 @@ public class Mapper {
                 .id(feedback.getId())
                 .trainingProgramTitle(feedback.getTrainingProgram().getTitle()) // Map training program title
                 .username(feedback.getUser().getUsername()) // Map user's username
-                .bodyPart(feedback.getBodyPart()) // Map body part
+                .feedbackMuscle(feedback.getFeedbackMuscle()) // Map body part
                 .weekNumber(feedback.getWeekNumber()) // Map week number
                 .workoutNumber(feedback.getWorkoutNumber()) // Map workout number
                 .exerciseNumber(feedback.getExerciseNumber()) // Map exercise number
