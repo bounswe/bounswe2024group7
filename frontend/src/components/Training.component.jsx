@@ -392,9 +392,9 @@ const TrainingCard = () => {
             </p>
 
             {/* Rating */}
-            <div className="flex justify-center mb-6">
+            {/* <div className="flex justify-center mb-6">
                 {renderRatingStars(trainingProgram.rating, trainingProgram.ratingCount)}
-            </div>
+            </div> */}
 
             {/* Join/Unjoin Button Section */}
             <div className="flex justify-center mb-4">
