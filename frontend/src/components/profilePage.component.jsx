@@ -26,7 +26,7 @@ export default function ProfilePage() {
     const { user, followers, following, posts, programs, progressDataForAllPrograms, joinedPrograms } = useContext(UserContext);
     const { bookmarkedPosts, isLoadingBookmarks } = useContext(PostContext);
     const [view, setView] = useState('posts');
-
+    console.log(joinedPrograms);
     return (
         <Box p={6} maxW="1200px" mx="auto" borderRadius="md">
             <Flex direction="column" align="center">
@@ -132,10 +132,10 @@ export default function ProfilePage() {
                             )}
                         </Stack>
                     )}
-                    {view === 'MyProgress' && user.role === 'TRAINEE' && (
+                    {view === 'MyProgress' && (
                         <Box width="100%" maxW="800px">
                             {user.joinedPrograms && user.joinedPrograms.length > 0 ? (
-                                <ProgressGraphs />
+                                <ProgressGraphs programsList={joinedPrograms} />
                             ) : (
                                 <Text color="gray.500" textAlign="center">No joined programs</Text>
                             )}
