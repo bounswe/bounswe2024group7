@@ -33,6 +33,7 @@ import {
 } from '@chakra-ui/react';
 import { useContext } from 'react';
 import { UserContext } from '../context/UserContext';
+import RestModal from './RestModal.component';
 
 const renderRatingStars = (rating, ratingCount) => {
     return (
@@ -97,10 +98,17 @@ const TrainingCard = () => {
     const toast = useToast();
 
     const { isOpen, onOpen, onClose } = useDisclosure();
+
     const {
         isOpen: isWorkoutOpen,
         onOpen: onWorkoutOpen,
         onClose: onWorkoutClose
+    } = useDisclosure();
+
+    const {
+        isOpen: isRestOpen,
+        onOpen: onRestOpen,
+        onClose: onRestClose
     } = useDisclosure();
     const [weekNumber, setWeekNumber] = useState(null);
     const [workoutNumber, setWorkoutNumber] = useState(null);
@@ -264,6 +272,30 @@ const TrainingCard = () => {
 
     const isWeekComplete = (week) => {
         return week.workouts.every(workout => isWorkoutComplete(workout));
+    };
+
+    const shouldUserRest = (restIntervalOnDays, lastWorkoutDate) => {
+        if (!lastWorkoutDate) {
+            return false;
+        }
+
+        const lastWorkoutDateTime = new Date(lastWorkoutDate).getTime();
+        const timeSinceLastWorkout = Date.now() - lastWorkoutDateTime;
+        const timeSinceLastWorkoutInDays = timeSinceLastWorkout / (1000 * 60 * 60 * 24);
+
+        return timeSinceLastWorkoutInDays < restIntervalOnDays;
+    };
+
+    const remainingRestDays = (restIntervalOnDays, lastWorkoutDate) => {
+        if (!lastWorkoutDate) {
+            return 0;
+        }
+
+        const lastWorkoutDateTime = new Date(lastWorkoutDate).getTime();
+        const timeSinceLastWorkout = Date.now() - lastWorkoutDateTime;
+        const remainingDays = restIntervalOnDays - (timeSinceLastWorkout / (1000 * 60 * 60 * 24));
+
+        return Math.ceil(remainingDays);
     };
 
     return (
@@ -503,7 +535,14 @@ const TrainingCard = () => {
                                                                                 </Text>
                                                                             ) : canStartExercise ? (
                                                                                 <Button
-                                                                                    onClick={() => handleStartSession(exerciseob.id)}
+                                                                                    onClick={() => {
+                                                                                        if (shouldUserRest(trainingProgram.interval, trainingProgram.lastCompletedWorkoutDate)) {
+                                                                                            setSelectedExerciseId(exerciseob.id);
+                                                                                            onRestOpen();
+                                                                                        } else {
+                                                                                            handleStartSession(exerciseob.id)
+                                                                                        }
+                                                                                    }}
                                                                                     colorScheme="green"
                                                                                     size="sm"
                                                                                 >
@@ -558,7 +597,14 @@ const TrainingCard = () => {
                 data={trainingProgram}
                 weekNumber={weekNumber}
                 workoutNumber={workoutNumber}
-
+            />
+            <RestModal
+                isOpen={isRestOpen}
+                onClose={onRestClose}
+                interval={remainingRestDays(trainingProgram.interval, trainingProgram.lastCompletedWorkoutDate)}
+                onContinueWorkout={() => {
+                    handleStartSession(selectedExerciseId);
+                }}
             />
         </div>
     );
