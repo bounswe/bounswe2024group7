@@ -256,17 +256,13 @@ const TrainingCard = () => {
         onWorkoutOpen();
     };
 
-    console.log(isUserJoined);
-    // Add a new utility function to check workout completion
     const isWorkoutComplete = (workout) => {
         return workout.workoutExercises.every(exercise => exercise.completedAt !== null);
     };
 
-    // Add a new utility function to check week completion
     const isWeekComplete = (week) => {
         return week.workouts.every(workout => isWorkoutComplete(workout));
     };
-
 
     return (
         <div className="w-full max-w-[60%] mx-auto p-4 bg-white shadow-lg rounded-lg text-sm">
