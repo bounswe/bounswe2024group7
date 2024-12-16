@@ -34,6 +34,7 @@ import { useDisclosure } from '@chakra-ui/react';
 function ProgramFeedCard({
     program
 }) {
+    console.log('program', program)
     const { isOpen, onOpen, onClose } = useDisclosure();
     const {
         isOpen: isFeedbackOpen,
@@ -45,7 +46,6 @@ function ProgramFeedCard({
     const toast = useToast()
     const queryClient = useQueryClient()
     const [isProgramCompleted, setIsProgramCompleted] = useState(false)
-    const [programWithTracking, setProgramWithTracking] = useState(program)
 
     const {
         followers,
@@ -67,10 +67,14 @@ function ProgramFeedCard({
 
     useEffect(() => {
         if (user && joinedPrograms) {
-            // Check the ongoing programs
-            const isProgramCompleted = programWithTracking.status === 'COMPLETED'
-
-            setIsProgramCompleted(isProgramCompleted)
+            setIsProgramCompleted(
+                joinedPrograms
+                    .filter(
+                        (joinedProgram) => joinedProgram.status === 'COMPLETED'
+                    )
+                    .map((joinedProgram) => joinedProgram.id)
+                    .includes(program.id)
+            )
         }
     }, [user, joinedPrograms])
 
@@ -82,7 +86,14 @@ function ProgramFeedCard({
 
     useEffect(() => {
         if (user && user.joinedPrograms) {
-            setIsUserJoined(programWithTracking.status !== 'LEFT')
+            setIsUserJoined(
+                user.joinedPrograms
+                    .filter(
+                        (joinedProgram) => joinedProgram.status !== 'LEFT'
+                    )
+                    .map((joinedProgram) => joinedProgram.id)
+                    .includes(program.id)
+            )
         }
     }, [user])
 
@@ -254,26 +265,6 @@ function ProgramFeedCard({
             },
         }
     )
-
-    const {
-        data: programData,
-        isLoading: programIsLoading,
-    } = useQuery({
-        queryKey: ['training-programs', program.id],
-        queryFn: async () => {
-            const response = await apiInstance(sessionToken).get(`api/training-programs/tracking/${program.id}`)
-
-            return response.data
-        },
-        refetchOnWindowFocus: false,
-    })
-
-    useEffect(() => {
-        if (programData && !programIsLoading) {
-            console.log(programData)
-            setProgramWithTracking(programData)
-        }
-    }, [programData])
 
     const navigate = useNavigate()
     const handleStartPracticing = (program_id) => {

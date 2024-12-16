@@ -146,8 +146,6 @@ function CreatePostModal({
                     return
                 }
 
-                console.log(post)
-
                 // First create image model and get the image id
                 if (post.image) {
                     const imageResponse = await apiInstance(
@@ -158,8 +156,6 @@ function CreatePostModal({
                     })
 
                     post.image = imageResponse.data.id
-
-                    console.log(post)
                 } else {
                     delete post.image
                 }

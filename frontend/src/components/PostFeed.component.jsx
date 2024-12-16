@@ -99,7 +99,7 @@ function PostFeed() {
                     })
                 }
             >
-                {ongoingJoinedPrograms.length > 0 && user && (
+                {user  && (
                     <Box>
                         <Heading size="lg" mb={4}>Your Active Programs:</Heading>
                         <UserJoinedProgramsCard />
