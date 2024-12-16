@@ -28,7 +28,6 @@ import FeedbackDetail from './components/FeedbackDetail';
 import CreateFeedback from './components/CreateFeedback';
 
 
-
 import { Provider as ReduxProvider } from 'react-redux';
 import {
   QueryClient,
@@ -92,6 +91,7 @@ const App = () => {
                 <Stack.Screen name="CreateFeedback" component={CreateFeedback} />
                 <Stack.Screen name="FeedbackCard" component={FeedbackCard} />
                 <Stack.Screen name="FeedbackDetail" component={FeedbackDetail} />
+
 
 
               </Stack.Navigator>

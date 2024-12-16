@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,16 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
+import { useSelector } from 'react-redux';
+import { userSessionToken } from '../user.js';
+import { useQuery } from "@tanstack/react-query"
+import apiInstance from '../Api';
 
 const JoinedProgramDetail = ({ route }) => {
   const {
     trainerUsername,
+    completion,
+    trackingId,
     title,
     description,
     programId,
@@ -21,17 +27,24 @@ const JoinedProgramDetail = ({ route }) => {
     participants,
     navigation
   } = route.params;
+  console.log(trackingId);
   const {expandedState,setExpandedState} = useState(0);
-  const renderWeek = ({ item, index }) => {
+  const sessionToken = useSelector(userSessionToken);
+  console.log("Completion response for detail is: "+completion)
+  for (const [key, value] of Object.entries(completion)) {
+    console.log(`${key}: ${value}`);
+  }
+  const renderWeek = ({ item, index}) => {
     const workoutCount = item.workouts.length;
+    console.log("Completion is: "+completion["10"])
     return (
       <View style={styles.weekContainer}>
         <Text style={styles.weekTitle}>Week {index + 1}</Text>
         <Text style={styles.workoutCount}>{workoutCount} Workouts</Text>
-        <TouchableOpacity style={styles.startButton} onPress = {()=>{navigation.navigate("JoinedWeek",{programId,programTitle:title,weekId:item.id,weekNumber:item.weekNumber,workouts:item.workouts, navigation:navigation})}}>
+        <TouchableOpacity style={styles.startButton} onPress = {()=>{navigation.navigate("JoinedWeek",{programId, trackingId, programTitle:title,weekId:item.id,weekNumber:item.weekNumber,workouts:item.workouts, navigation:navigation})}}>
           <Text style={styles.startButtonText}>Start Workout</Text>
         </TouchableOpacity>
-        <Text style={styles.completionText}>0%</Text>
+        <Text style={styles.completionText}>%{Object.keys(completion).length>0?completion[`${item.id}`]:0}</Text>
       </View>
     );
   };
