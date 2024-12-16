@@ -9,37 +9,28 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // Import Picker
 
-const Survey = ({ route }) => {
-    const {navigation} = route.params;
+const CreateFeedback = ({ route }) => {
+    const {trainingProgram, bodyPart, weekNumber, exerciseNumber, navigation} = route.params;
 
     const goHome = () => navigation.navigate('Home');
 
-    const [level, setLevel] = useState('Beginner'); // Default Level
-    const [goals, setGoals] = useState([]); // Default No Goals
-    const goalOptions = [
-        { label: 'Pilates', value: 'pilates' },
-        { label: 'Cycling', value: 'cycling' },
-        { label: 'Yoga', value: 'yoga' },
-        { label: 'Cardio', value: 'cardio' },
-        { label: 'Strength Training', value: 'strength_training' },
-      ];
+    /* const [trainingProgram, setTrainingProgram] = useState('');
+    const [bodyPart, setbodyPart] = useState('');
+    const [weekNumber, setWeekNumber] = useState(0);
+    const [exerciseNumber, setExerciseNumber] = useState(0); */
+    const [feedbackText, setFeedbackText] = useState('');
+    
 
-    const handleGoalSelection = (goal) => {
-        if (goals.includes(goal)) {
-          // Goal is already selected, remove it
-          setGoals(goals.filter((selectedGoal) => selectedGoal !== goal));
-        } else {
-          // Goal is not selected, add it
-          setGoals([...goals, goal]);
-        }
-      };
-    /*const deliverDatabase = async (fitnessGoals, fitnessLevel) => {
+    /*const deliverDatabase = async (trainingProgram, bodyPart, weekNumber, exerciseNumber, feedbackText) => {
         try{
             const response = await apiInstance().post(
-                "api/surveys",
+                "api/feedback",
                 {
-                    fitnessGoals,
-                    fitnessLevel
+                    trainingProgram,
+                    bodyPart,
+                    weekNumber,
+                    exerciseNumber,
+                    feedbackText
                 }
             )
 
@@ -56,8 +47,8 @@ const Survey = ({ route }) => {
               Toast.show({
                 type: 'error',
                 position: 'bottom',
-                text1: 'Survey Completion Error',
-                text2: 'There is an error in your survey. Please try again.',
+                text1: 'Feedback Not Send Error',
+                text2: 'There is an error while sending your feedback. Please try again.',
                 visibilityTime: 2000,
                 autoHide: true,
                 topOffset: 30,
@@ -66,60 +57,35 @@ const Survey = ({ route }) => {
         }
     }*/
 
-    const deliverDatabase = (goals, level) => {
-            console.log(goals);
-            console.log(level);
+    const deliverDatabase = (trainingProgram, bodyPart, weekNumber, exerciseNumber, feedbackText) => {
+            console.log(trainingProgram);
+            console.log(bodyPart);
+            console.log(weekNumber);
+            console.log(exerciseNumber);
+            console.log(feedbackText);
             goHome();
         }
 
 
     return (
         <ScrollView style={styles.container}>
-          <Text style={styles.title}> Before Facting Fitness... </Text>    
+          <Text style={styles.title}> Your Feedback Is Valued For Us </Text>    
             <View style={styles.exerciseContainer}>
-
-                        <Text style={styles.fitnessGoal}> Select Your Fitness Goals</Text>
-                        <View style={styles.optionsContainer}>
-
-                        {goalOptions.map((option) => (
-                                  <TouchableOpacity
-                                    key={option.value}
-                                    style={[
-                                      styles.goalOption,
-                                      goals.includes(option.value) && styles.selectedGoalOption,
-                                    ]}
-                                    onPress={() => handleGoalSelection(option.value)}
-                                  >
-                                    <Text
-                                      style={[
-                                        styles.goalOptionText,
-                                        goals.includes(option.value) && styles.selectedGoalOptionText,
-                                      ]}
-                                    >
-                                      {option.label}
-                                    </Text>
-                                  </TouchableOpacity>
-                                ))}
-                        </View>
-                        <Text style={styles.fitnessLevel}> Select Your Fitness Level</Text>
-                        <View style={styles.pickerContainer}>
-                        <Picker
-                            selectedValue={level}
-                            onValueChange={(itemValue) => setLevel(itemValue)}
-                            style={styles.picker} >
-                            <Picker.Item label="Intermediate" value="Intermediate" />
-                            <Picker.Item label="Beginner" value="Beginner" />
-                            <Picker.Item label="Professional" value="Professional" />
-                        </Picker>
-                        </View>
-
-                    </View>
-            <TouchableOpacity
+                <Text style={styles.fitnessGoal}> Type Your Feedback...</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Feedback Text"
+                  placeholderTextColor={styles.placeholderColor}
+                  value={feedbackText}
+                  onChangeText={setFeedbackText}
+                />
+              <TouchableOpacity
                   style={styles.button}
-                  onPress={() => deliverDatabase(username, goals, level)}
+                  onPress={() => deliverDatabase(trainingProgram, bodyPart, weekNumber, exerciseNumber, feedbackText)}
                 >
-                  <Text style={styles.buttonText}>Start The Journey</Text>
-            </TouchableOpacity>
+                  <Text style={styles.buttonText}>Send Your Feedback</Text>
+              </TouchableOpacity>
+            </View>
         </ScrollView>
       );
 
@@ -290,4 +256,4 @@ goalOption: {
     },
   });
 
-export default Survey;
+export default CreateFeedback;
