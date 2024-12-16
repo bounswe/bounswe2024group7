@@ -231,7 +231,7 @@ function ProgramFeedCard({
     }
     return (
         <>
-            <Card maxW='lg' onClick={onOpen} cursor="pointer" _hover={{ shadow: 'lg' }}>  // Remove extra Card and combine props here
+            <Card maxW='lg' onClick={onOpen} cursor="pointer" _hover={{ shadow: 'lg' }}> 
                     <CardHeader>
                     <Flex spacing='4'>
                         <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
