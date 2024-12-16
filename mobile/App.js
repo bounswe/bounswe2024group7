@@ -30,7 +30,6 @@ import CreateFeedback from './components/CreateFeedback';
 import SearchPage from './components/SearchPage';
 
 
-
 import { Provider as ReduxProvider } from 'react-redux';
 import {
   QueryClient,
@@ -96,7 +95,9 @@ const App = () => {
                 <Stack.Screen name="CreateFeedback" component={CreateFeedback} />
                 <Stack.Screen name="FeedbackCard" component={FeedbackCard} />
                 <Stack.Screen name="FeedbackDetail" component={FeedbackDetail} />
+
                 <Stack.Screen name="SearchPage" component={SearchPage} />
+
 
               </Stack.Navigator>
             </NavigationContainer>

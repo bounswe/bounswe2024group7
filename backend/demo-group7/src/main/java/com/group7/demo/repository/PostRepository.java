@@ -35,4 +35,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT DISTINCT p FROM Post p JOIN p.tags t WHERE t.name IN :tagNames")
     Page<Post> findPostsByTagsWithPagination(@Param("tagNames") Set<String> tagNames, Pageable pageable);
+
+    @Query("SELECT p FROM Post p LEFT JOIN p.tags t WHERE t IN :tags ORDER BY SIZE(p.likedByUsers) DESC")
+    Page<Post> findAllByTagsInOrderByLikesDesc(@Param("tags") Set<Tag> tags, Pageable pageable);
+
+    @Query("SELECT DISTINCT p FROM Post p LEFT JOIN p.tags t WHERE t.name IN :tagNames ORDER BY SIZE(p.likedByUsers) DESC")
+    Page<Post> findPostsByTagsWithPaginationOrderByLikesDesc(@Param("tagNames") Set<String> tagNames, Pageable pageable);
+
+    @Query("SELECT p FROM Post p ORDER BY SIZE(p.likedByUsers) DESC")
+    Page<Post> findAllOrderByLikesDesc(Pageable pageable);
 }

@@ -33,6 +33,7 @@ import { useSelector } from 'react-redux'
 import { userSessionToken } from '../context/user'
 import apiInstance from '../instance/apiInstance'
 import { useColorModeValue } from '@chakra-ui/react'
+import Detailed_Training_Modal from './Detailed_Training_Modal.component';
 
 function PostFeedCard({ post }) {
     const sessionToken = useSelector(userSessionToken)
@@ -327,7 +328,12 @@ function PostFeedCard({ post }) {
                     </Button>
                 </CardFooter>
             </Card>
-
+            <Detailed_Training_Modal
+                isOpen={isOpen}
+                onClose={onClose}
+                data={post.trainingProgram}
+            />
+            {/* 
             <Modal isOpen={isOpen} onClose={onClose} size="xl">
                 <ModalOverlay />
                 <ModalContent>
@@ -357,7 +363,7 @@ function PostFeedCard({ post }) {
                         </Accordion>
                     </ModalBody>
                 </ModalContent>
-            </Modal>
+            </Modal> */}
         </>
     )
 }

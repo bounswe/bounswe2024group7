@@ -14,6 +14,7 @@ import {
     useToast,
     Tooltip
 } from '@chakra-ui/react'
+import { ViewIcon } from '@chakra-ui/icons';
 // import { useNavigate } from 'react-router-dom';
 import { useNavigate } from '@tanstack/react-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -24,12 +25,15 @@ import apiInstance from '../instance/apiInstance'
 import PlusIcon from '../icons/PlusIcon'
 import { UserContext } from '../context/UserContext'
 // import { router } from '../main.jsx';
+import Detailed_Training_Modal from './Detailed_Training_Modal.component';
+import { useDisclosure } from '@chakra-ui/react';
 
 
 function ProgramFeedCard({
     program
 }) {
 
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const password = useSelector(userPassword)
     const sessionToken = useSelector(userSessionToken)
     const toast = useToast()
@@ -175,6 +179,17 @@ function ProgramFeedCard({
             },
             onError: (error) => {
                 console.log(error)
+                // If error status is 400, it means the user is already joined to a program with same interest area
+                if (error.response.status === 400) {
+                    toast({
+                        title: error.response.data.message,
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                    return
+                }
+
                 toast({
                     title: 'An error occurred.',
                     status: 'error',
@@ -224,7 +239,7 @@ function ProgramFeedCard({
     const handleStartPracticing = (program_id) => {
         navigate(
             {
-                to: `/program?programId=${program_id}`,
+                to: `/training?trainingId=${program_id}`,
             }
         )
     }
@@ -313,6 +328,14 @@ function ProgramFeedCard({
                             </li>
                         ))}
                     </Text> */}
+                    <Button
+                        onClick={onOpen}
+                        colorScheme="gray"
+                        variant="solid"
+                    >
+                        <ViewIcon className="w-4 h-4 mr-3" />
+                        View Description
+                    </Button>
                 </CardBody>
 
 
@@ -381,6 +404,11 @@ function ProgramFeedCard({
                     </Flex>
                 </CardFooter>
             </Card>
+            <Detailed_Training_Modal
+                isOpen={isOpen}
+                onClose={onClose}
+                data={program}
+            />
         </>
 
     )

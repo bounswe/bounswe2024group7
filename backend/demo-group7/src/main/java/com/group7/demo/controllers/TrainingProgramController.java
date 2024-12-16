@@ -55,6 +55,18 @@ public class TrainingProgramController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/tracking/{trackingId}")
+    public ResponseEntity<TrainingProgramWithTrackingResponse> getTrainingProgramWithTracking(@PathVariable Long trackingId){
+        TrainingProgramWithTrackingResponse response = trainingProgramService.getTrainingProgramWithTracking(trackingId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/ongoing/{trainingProgramId}")
+    public ResponseEntity<TrainingProgramWithTrackingResponse> getOngoingTrainingProgram(@PathVariable Long trainingProgramId, HttpServletRequest request) {
+        TrainingProgramWithTrackingResponse response = trainingProgramService.getOngoingUserTrainingProgram(trainingProgramId, request);
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{programId}/leave")
     public ResponseEntity<TrainingProgramWithTrackingResponse> leaveProgram(@PathVariable Long programId, HttpServletRequest request) {
         TrainingProgramWithTrackingResponse response = trainingProgramService.leaveTrainingProgram(programId, request);
@@ -90,20 +102,42 @@ public class TrainingProgramController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{programId}/completion-rates")
-    public ResponseEntity<Map<Long, Double>> getCompletionRates(@PathVariable Long programId) {
-        Map<Long, Double> completionRates = trainingProgramService.getCompletionRatesForProgram(programId);
+    @GetMapping("/{trackingId}/completion-rates")
+    public ResponseEntity<Map<Long, Double>> getCompletionRates(@PathVariable Long trackingId) {
+        Map<Long, Double> completionRates = trainingProgramService.getCompletionRatesForProgram(trackingId);
         return ResponseEntity.ok(completionRates);
     }
 
     @PostMapping("/{trainingProgramId}/rate")
     public ResponseEntity<Void> rateTrainingProgram(@PathVariable Long trainingProgramId,
-                                                    @RequestParam Long userId,
-                                                    @RequestParam int rating) {
-        trainingProgramService.rateTrainingProgram(trainingProgramId, userId, rating);
+                                                    @RequestParam int rating,
+                                                    HttpServletRequest request) {
+        trainingProgramService.rateTrainingProgram(trainingProgramId, rating, request);
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{trainingProgramId}/rate")
+    public ResponseEntity<Integer> getUserRatingForTrainingProgram(@PathVariable Long trainingProgramId,
+                                                                   HttpServletRequest request) {
+        int rating = trainingProgramService.getUserRatingForTrainingProgram(trainingProgramId, request);
+        return ResponseEntity.ok(rating);
+    }
 
+    @GetMapping("/recommended")
+    public ResponseEntity<Map<String, Object>> getRecommendedPrograms(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        Map<String, Object> response = trainingProgramService.getRecommendedPrograms(page, size, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/explore")
+    public ResponseEntity<Map<String, Object>> explorePrograms(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Map<String, Object> response = trainingProgramService.explorePrograms(page, size);
+        return ResponseEntity.ok(response);
+    }
 
 }

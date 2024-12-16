@@ -334,6 +334,7 @@ useEffect(() => {
                             rating = {item.rating}
                             navigation = {navigation}
                             programId = {item.id}
+                            trackingId = {item.trackingId}
             />
           )}
           style={styles.postList}

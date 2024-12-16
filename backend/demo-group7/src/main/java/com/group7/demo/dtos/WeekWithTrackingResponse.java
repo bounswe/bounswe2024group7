@@ -14,5 +14,6 @@ public class WeekWithTrackingResponse {
     private Long id;
     private int weekNumber;
     private LocalDateTime completedAt;
+    private double completionPercentage;
     private List<WorkoutWithTrackingResponse> workouts;
 }

@@ -87,8 +87,8 @@ const FeedbackDetail = ({route}) => {
       }, [ownFollowingData, ownFollowingIsFetching]);*/
 
   return (
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* Post Header */}
+      {/*<ScrollView contentContainerStyle={styles.container}>
+
         <View style={styles.postContainer}>
           <View style={styles.postHeader}>
           <Text style={styles.date}>Program {trainingProgram}</Text>
@@ -115,33 +115,7 @@ const FeedbackDetail = ({route}) => {
             feedbackText = {feedback.feedbackText}
             navigation = {navigation}/>
 
-        {/*<View style={styles.commentsSection}>
-          <Text style={styles.commentsTitle}>Comments</Text>
-          <FlatList
-            data={comments}
-            nestedScrollEnable
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.commentItem}>
-                <Text style={styles.commentUser}>{item.user}</Text>
-                <Text style={styles.commentText}>{item.text}</Text>
-              </View>
-            )}
-          />
-        </View>
-
-        <View style={styles.commentInputContainer}>
-          <TextInput
-            style={styles.commentInput}
-            placeholder="Write a comment..."
-            value={newComment}
-            onChangeText={setNewComment}
-          />
-          <TouchableOpacity style={styles.submitButton} onPress={handleCommentSubmit}>
-            <Icon name="send" size={20} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>*/}
-      </ScrollView>
+      </ScrollView>*/}
     );
 };
 

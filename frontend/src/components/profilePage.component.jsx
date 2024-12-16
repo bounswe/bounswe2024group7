@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from 'react-redux';
-import { userName, userProfile } from '../context/user.js';
+import { userName, userProfile, userSessionToken } from '../context/user.js';
 import {
     Box,
     Flex,
@@ -17,13 +17,13 @@ import { UserContext } from "../context/UserContext";
 import { PostContext } from "../context/PostContext";
 import PostFeedCard from "./PostFeedCard.component.jsx";
 import ProgramFeedCard from "./ProgramFeedCard.component.jsx";
-import ProgressBoard from "./ProgressBoard.component.jsx";
+// import ProgressBoard from "./ProgressBoard.component.jsx";
+import ProgressGraphs from "./ProgressGraphs.component.jsx";
 
 export default function ProfilePage() {
     const username = useSelector(userName);
     const profile = useSelector(userProfile);
-    const { colorMode, toggleColorMode } = useColorMode();
-    const { user, followers, following, posts, programs } = useContext(UserContext);
+    const { user, followers, following, posts, programs, progressDataForAllPrograms, joinedPrograms } = useContext(UserContext);
     const { bookmarkedPosts, isLoadingBookmarks } = useContext(PostContext);
     const [view, setView] = useState('posts');
 
@@ -135,7 +135,7 @@ export default function ProfilePage() {
                     {view === 'MyProgress' && user.role === 'TRAINEE' && (
                         <Box width="100%" maxW="800px">
                             {user.joinedPrograms && user.joinedPrograms.length > 0 ? (
-                                <ProgressBoard />
+                                <ProgressGraphs />
                             ) : (
                                 <Text color="gray.500" textAlign="center">No joined programs</Text>
                             )}

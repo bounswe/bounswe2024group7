@@ -5,16 +5,43 @@ import { useSelector } from 'react-redux';
 import { userName, userSessionToken } from '../user.js';
 import { useQuery } from "@tanstack/react-query"
 import apiInstance from '../Api';
-const JoinedProgramCard = ({ trainerUsername, title, description, programId, weeks, rating, level, joined, date, participants, navigation }) => {
+const JoinedProgramCard = ({ trainerUsername, trackingId, title, description, programId, weeks, rating, level, joined, date, participants, navigation }) => {
 
     const sessionToken = useSelector(userSessionToken)
+    const [completion,setCompletion] = useState({});
     const username = useSelector(userName)
     console.log(username);
+    const {
+          data: completionData,
+          isFetching: programsIsFetching,
+          isLoading: programsIsLoading,
+        } = useQuery({
+          queryKey: [`completion-rate-${trackingId}`],
+          queryFn: async () => {
+              try {
+                  const response = await apiInstance(sessionToken).get(`api/training-programs/${trackingId}/completion-rates`);
+                  console.log("Completion rate response:")
+                  console.log(response.data);
+                  //response.data.weeks.forEach((workout)=>console.log(workout.workoutExercises));
+                  return response.data
+              } catch (error) {
+                  console.log(e);
+                  return {}
+              }
+          },
+          refetchOnWindowFocus: true,
+        })
+        useEffect(() => {
+          if (completionData && !programsIsFetching) {
+              setCompletion(completionData)
+              console.log(completion)
+          }
+        }, [completionData, programsIsFetching])
 
   return (
     <TouchableOpacity
           style={styles.card}
-          onPress={() => navigation.navigate('JoinedProgramDetail', { trainerUsername, title, description, programId, weeks, rating, level, date, participants, navigation })}
+          onPress={() => navigation.navigate('JoinedProgramDetail', { trainerUsername, trackingId, completion, title, description, programId, weeks, rating, level, date, participants, navigation })}
         >
       <TouchableOpacity onPress={() => navigation.navigate('UserProfile', { username: trainerUsername })}>
         <Text style={styles.owner}>{trainerUsername}</Text>

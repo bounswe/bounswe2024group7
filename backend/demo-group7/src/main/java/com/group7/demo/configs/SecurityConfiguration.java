@@ -40,7 +40,12 @@ public class SecurityConfiguration {
                             "/api/user/{username}/following",
                             "/api/posts/**",
                             "/api/tags",
-                            "/api/training-programs/**",
+                            "/api/training-programs",
+                            "/api/training-programs/{id}",
+                            "/api/training-programs/{id}/participants",
+                            "/api/training-programs/trainer/{username}",
+                            "/api/training-programs/joined/{username}",
+                            "/api/training-programs/{trackingId}/completion-rates",
                             "/api/exercises/*",
                             "api/exercises"
                     ).permitAll()
