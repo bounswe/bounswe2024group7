@@ -134,6 +134,12 @@ const DetailedExModal = ({ isOpen, onClose, data, setData, excersizeID }) => {
                     position: "top-right",
                     autoClose: 3000,
                 });
+
+                const numberOfTotalExercises = data.weeks.reduce((acc, week) => {
+                    return acc + week.workouts.reduce((acc, workout) => {
+                        return acc + workout.workoutExercises.length;
+                    }, 0);
+                }, 0);
     
                 // Update local state for the completed exercise
                 const updatedWeeks = data.weeks.map(week => {
@@ -162,9 +168,18 @@ const DetailedExModal = ({ isOpen, onClose, data, setData, excersizeID }) => {
                     }
                     return week;
                 });
+
+                const completedExercises = updatedWeeks.reduce((acc, week) => {
+                    return acc + week.workouts.reduce((acc, workout) => {
+                        return acc + workout.workoutExercises.filter(exercise => exercise.completedAt).length;
+                    }, 0);
+                }, 0);
+
+                const progressPercentage = Math.round((completedExercises / numberOfTotalExercises) * 100);
     
                 setData(prev => ({
                     ...prev,
+                    completionPercentage: progressPercentage,
                     weeks: updatedWeeks,
                 }));
     

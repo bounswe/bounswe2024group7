@@ -113,7 +113,7 @@ const TrainingCard = () => {
     const [weekNumber, setWeekNumber] = useState(null);
     const [workoutNumber, setWorkoutNumber] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState(null);
-    const [progressValue, setprogressValue] = useState(66);
+    const [progressValue, setprogressValue] = useState(trainingProgram ? parseInt(trainingProgram.completionPercentage) : 0);
 
     // Join to a program Mutation
     const { mutate: joinProgram } = useMutation({
@@ -176,6 +176,12 @@ const TrainingCard = () => {
     })
 
     useEffect(() => {
+        if (trainingProgram) {
+            setprogressValue(parseInt(trainingProgram.completionPercentage));
+        }
+    }, [trainingProgram]);
+
+    useEffect(() => {
         const fetchTrainingProgram = async () => {
             if (!programID) {
                 setError(new Error('No program ID provided'));
@@ -212,6 +218,7 @@ const TrainingCard = () => {
                     setIsUserJoined(joinedProgram ? true : false);
                     setError(null);
                     setTrainingProgram(joinedProgram);
+                    setprogressValue(parseInt(joinedProgram.completionPercentage));
                     return;
                 }
 
