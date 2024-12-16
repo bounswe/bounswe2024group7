@@ -10,10 +10,12 @@ import { useSelector } from 'react-redux';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import Detailed_Ex_Modal from './Detailed_Ex_Modal.component';
+import Detailed_Workout_Modal from './Detailed_Workout_Modal.component';
 import { userProfile, userSessionToken } from '../context/user';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton } from '@chakra-ui/react';
 import { Table, TableCaption, Thead, Tbody, Tfoot, Tr, Th, Td, UnorderedList, ListItem } from '@chakra-ui/react';
 import PlusIcon from '../icons/PlusIcon';
+import { ViewIcon } from '@chakra-ui/icons';
 import {
     Box,
     Card,
@@ -90,9 +92,14 @@ const TrainingCard = () => {
     const queryClient = useQueryClient();
     const toast = useToast();
 
-    const weekColors = ['#f7f9fc', '#e3f2fd', '#e8f5e9', '#fff3e0', '#ede7f6'];
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const navigate = useNavigate();
+    const {
+        isOpen: isWorkoutOpen,
+        onOpen: onWorkoutOpen,
+        onClose: onWorkoutClose
+    } = useDisclosure();
+    const [weekNumber, setWeekNumber] = useState(null);
+    const [workoutNumber, setWorkoutNumber] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState(null);
 
     // Join to a program Mutation
@@ -233,7 +240,11 @@ const TrainingCard = () => {
         setSelectedExerciseId(exerciseId);
         onOpen();
     };
-
+    const handleViewWorkout = (week, workout) => {
+        setWeekNumber(week); // Set the week number dynamically
+        setWorkoutNumber(workout); // Set the workout number dynamically
+        onWorkoutOpen();
+    };
 
     console.log(isUserJoined);
 
@@ -371,60 +382,73 @@ const TrainingCard = () => {
                     </Button>
                 </Tooltip>
             </div>
+            <Box bg="white" shadow="md" rounded="lg" overflow="hidden" mb={4}>
+                {trainingProgram.weeks.map((week, weekIndex) => (
+                    <Box key={weekIndex} p={4} borderBottom="1px solid #e2e8f0">
+                        <Text fontSize="xl" fontWeight="bold" mb={2}>
+                            Week {week.weekNumber}
+                        </Text>
+                        <UnorderedList spacing={3} ml={6}>
+                            {week.workouts.map((workout, workoutIndex) => (
+                                <ListItem key={workoutIndex}>
+                                    <Flex align="center" gap={4}>
+                                        <Text fontSize="md" fontWeight="semibold" color="gray.700">
+                                            Workout {workout.workoutNumber}: {workout.name.split(":")[1]?.trim()}
+                                        </Text>
+                                        <Button
+                                            onClick={() => handleViewWorkout(week.weekNumber, workout.workoutNumber)}
+                                            colorScheme="gray"
+                                            variant="solid"
+                                        >
+                                            <ViewIcon className="w-4 h-4 mr-3" />
+                                            View Description
+                                        </Button>
+                                    </Flex>
 
-            {/* Weeks Table */}
-            <div className="bg-white shadow-md rounded-lg overflow-hidden mb-4">
-                <Table variant="simple" width="100%">
-                    <Thead>
-                        <Tr>
-                            <Th>Week</Th>
-                            <Th>Workout</Th>
-                            <Th>Exercise</Th>
-                            <Th></Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {trainingProgram.weeks.map((week, weekIndex) => {
-                            let displayedWeek = false; // Track if the week label has been displayed
-                            return week.workouts.map((workout) => {
-                                let displayedWorkout = false; // Track if the workout label has been displayed
-                                return workout.workoutExercises.map((exerciseob, index) => (
-                                    <Tr key={exerciseob.id} bgColor={weekColors[weekIndex % weekColors.length]}>
-                                        <Td>
-                                            {!displayedWeek && `Week ${week.weekNumber}`}
-                                            {displayedWeek = true}
-                                        </Td>
-                                        <Td>
-                                            {!displayedWorkout && workout.name}
-                                            {displayedWorkout = true}
-                                        </Td>
-                                        <Td>{exerciseob.exercise.name} : {exerciseob.completedSets}</Td>
-                                        <Td>
-
-                                            {isUserJoined && user && (
-                                                <Button
-                                                    onClick={() => handleStartSession(exerciseob.id)}
-                                                    colorScheme="green"
-                                                    variant="solid"
-                                                >
-                                                    Start Session!
-                                                </Button>
-                                            )}
-                                        </Td>
-                                    </Tr>
-                                ));
-                            });
-                        })}
-                    </Tbody>
-                    <Tfoot></Tfoot>
-                </Table>
-            </div>
+                                    <Table variant="simple" width="100%" mt={2}>
+                                        <Tbody>
+                                            {workout.workoutExercises.map((exerciseob) => (
+                                                <Tr key={exerciseob.id} bgColor="#f7f9fc">
+                                                    <Td>
+                                                        <Text>
+                                                            {exerciseob.exercise.name}
+                                                        </Text>
+                                                    </Td>
+                                                    <Td textAlign="right">
+                                                        {isUserJoined && user && (
+                                                            <Button
+                                                                onClick={() => handleStartSession(exerciseob.id)}
+                                                                colorScheme="green"
+                                                                size="sm"
+                                                            >
+                                                                Start Session!
+                                                            </Button>
+                                                        )}
+                                                    </Td>
+                                                </Tr>
+                                            ))}
+                                        </Tbody>
+                                    </Table>
+                                </ListItem>
+                            ))}
+                        </UnorderedList>
+                    </Box>
+                ))}
+            </Box>
 
             <Detailed_Ex_Modal
                 isOpen={isOpen}
                 onClose={onClose}
                 data={trainingProgram}
                 excersizeID={selectedExerciseId}
+            />
+            <Detailed_Workout_Modal
+                isOpen={isWorkoutOpen}
+                onClose={onWorkoutClose}
+                data={trainingProgram}
+                weekNumber={weekNumber}
+                workoutNumber={workoutNumber}
+
             />
         </div>
     );
