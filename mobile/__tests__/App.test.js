@@ -105,7 +105,7 @@ test('Searches for a Query Correctly', async () => {
                      }
                  });
 
-    expect(response).toBe(200);
+    expect(response.status).toBe(200);
 });
 
 test('Renders Create Post Page Correctly', () => {
@@ -216,7 +216,7 @@ test('Progress Submission in Joined Exercise Correctly', async () => {
   // TODO: This creates mock data, maybe we should change to real values
 
   const response  = await apiInstance(mockToken).post(`/api/training-programs/${programId}/workout-exercises/${exerciseId}/complete`, newInputs);
-  expect(response).toBe(200);
+  expect(response.status).toBe(200);
 });
 
 // Post Detail
@@ -240,6 +240,24 @@ test('User Following Data Works Correctly', async () => {
 
   const response  = await apiInstance(mockToken).get(`api/user/${ownUsername}/following`);
   expect(response.data).not.toBeNull();
+});
+
+test('Follow User Works Correctly', async () => {
+  const username = "mockusername1111";
+  const mockToken = jest.fn();
+  // TODO: This creates mock data, maybe we should change to a real ownUsername
+
+const response = await apiInstance(mockToken).post(`api/user/${username}/follow`, {})
+ expect(response.status).toBe(200);
+});
+
+test('Unfollow User Works Correctly', async () => {
+  const username = "mockusername1111";
+  const mockToken = jest.fn();
+  // TODO: This creates mock data, maybe we should change to a real ownUsername
+
+const response = await apiInstance(mockToken).delete(`api/user/${username}/follow`, {})
+ expect(response.status).toBe(200);
 });
 
 // Profile Page
@@ -285,7 +303,7 @@ test('Join Program Correctly', async () => {
   // TODO: This creates mock data, maybe we should change to a real progam_ID
 
   const response  = await apiInstance(mockToken).post(`api/training-programs/${programId}/join`);
-  expect(response).toBe(200);
+  expect(response.status).toBe(200);
 });
 
 test('Leave Program Correctly', async () => {
@@ -294,7 +312,7 @@ test('Leave Program Correctly', async () => {
   // TODO: This creates mock data, maybe we should change to a real progam_ID
 
   const response  = await apiInstance(mockToken).delete(`api/training-programs/${programId}/leave`);
-  expect(response).toBe(200);
+  expect(response.status).toBe(200);
 });
 
 test('Rate Program Correctly', async () => {
@@ -306,7 +324,7 @@ test('Rate Program Correctly', async () => {
    const response = await apiInstance(mockToken).post(`api/training-programs/${programId}/rate?rating=${rating}`, {
 
          });
-    expect(response).toBe(200);
+    expect(response.status).toBe(200);
 });
 
 
