@@ -6,7 +6,8 @@ import {
     Stack,
     Text,
     Spinner,
-    useBreakpointValue, VStack
+    useBreakpointValue, VStack,
+    Tabs, TabList, TabPanels, Tab, TabPanel
 } from '@chakra-ui/react';
 import { PostContext } from '../context/PostContext';
 import PostFeedCard from './PostFeedCard.component';
@@ -14,7 +15,7 @@ import ProgramFeedCard from './ProgramFeedCard.component';
 import UserJoinedProgramsCard from './UserJoinedProgramsCard.component'
 
 function PostFeed() {
-    const { posts, isLoadingPosts, programs, isFetchingPrograms } = useContext(PostContext);
+    const { posts, isLoadingPosts, programs, isFetchingPrograms, recommendedPrograms, explorePrograms, forYouPosts, explorePosts } = useContext(PostContext);
 
     const isLoading = isLoadingPosts || isFetchingPrograms;
 
@@ -40,19 +41,6 @@ function PostFeed() {
                     })
                 }
             >
-                {/* Today's Programs */}
-                {/* {programs.length > 0 && (
-                    <Box
-                    // borderRadius="md"
-                    // p={4}
-                    // bg="gray.50"
-                    // boxShadow="sm"
-                    >
-                        <Heading size="lg" mb={4}>Your Progress Today</Heading>
-                        <ProgressToday />
-                    </Box>
-                )} */}
-
                 {programs.length > 0 && (
                     <Box>
                         <Heading size="lg" mb={4}>Your Active Programs:</Heading>
@@ -67,7 +55,7 @@ function PostFeed() {
                     width={'full'} // Full width on small screens, larger on desktop
                 >
                     <Heading size="lg" mb={4}>Recommended Programs</Heading>
-                    {programs.length > 0 ? (
+                    {recommendedPrograms.length > 0 ? (
                         programs.map((program) => (
                             <ProgramFeedCard program={program} key={program.id} />
                         ))
@@ -75,29 +63,68 @@ function PostFeed() {
                         <Text>No programs to recommend right now.</Text>
                     )}
                 </Box>
-            </VStack>
 
-            {/* Main Feed */}
-            <Box
-                flex={{ base: 'none', lg: '2' }} // Full width on small screens, larger on desktop
-                maxW={{ base: '100%', lg: '2xl' }} // Responsive max width
-            >
-                <Stack spacing={6}>
-                    <Heading size="lg">Your Feed</Heading>
-                    {isLoading ? (
-                        <Flex justify="center" align="center">
-                            <Spinner />
-                            <Text>Loading Content...</Text>
-                        </Flex>
-                    ) : posts.length > 0 ? (
-                        posts.map((post) => (
-                            <PostFeedCard post={post} key={post.id} />
+                {/* Explore Programs */}
+                <Box
+                    borderRadius="md"
+                    p={4}
+                    boxShadow="sm"
+                    width={'full'} // Full width on small screens, larger on desktop
+                >
+                    <Heading size="lg" mb={4}>Explore Programs</Heading>
+                    {explorePrograms.length > 0 ? (
+                        programs.map((program) => (
+                            <ProgramFeedCard program={program} key={program.id} />
                         ))
                     ) : (
-                        <Text>Nothing to show here...</Text>
+                        <Text>No programs to explore right now.</Text>
                     )}
-                </Stack>
-            </Box>
+                </Box>
+            </VStack>
+
+            {/* 
+                Tabs for different types of posts. Explore and For You
+            */}
+            {
+                isLoading ? (
+                    <Spinner size="xl" />
+                ) : (
+                    <Box
+                        flex={{ base: 'none', lg: '1' }} // Full width on small screens, larger on desktop
+                        maxW={{ base: '100%', lg: '2xl' }} // Responsive max width
+                    >
+                        <Tabs isFitted
+                            colorScheme='purple'
+                        >
+                            <TabList mb={4}
+                            >
+                                <Tab>For You</Tab>
+                                <Tab>Explore</Tab>
+                            </TabList>
+                            <TabPanels>
+                                <TabPanel>
+                                    {forYouPosts.length > 0 ? (
+                                        forYouPosts.map((post) => (
+                                            <PostFeedCard post={post} key={post.id} />
+                                        ))
+                                    ) : (
+                                        <Text>No posts for you right now.</Text>
+                                    )}
+                                </TabPanel>
+                                <TabPanel>
+                                    {explorePosts.length > 0 ? (
+                                        explorePosts.map((post) => (
+                                            <PostFeedCard post={post} key={post.id} />
+                                        ))
+                                    ) : (
+                                        <Text>No posts to explore right now.</Text>
+                                    )}
+                                </TabPanel>
+                            </TabPanels>
+                        </Tabs>
+                    </Box>
+                )
+            }
         </Flex>
     );
 }
