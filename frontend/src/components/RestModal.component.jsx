@@ -1,43 +1,53 @@
-import React from 'react'
+import React from 'react';
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    ModalCloseButton,
-    useToast,
-    Button,
-    Text,
-} from '@chakra-ui/react'
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
+  Text,
+} from '@chakra-ui/react';
 
 function RestModal({
-    onClose,
-    isOpen,
+  onClose,
+  isOpen,
+  interval, // Number of days for the recommended rest period
+  onContinueWorkout, // Callback to handle when the user wants to continue the workout
 }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>
-            You need to rest!
+          Recommended Rest Period
         </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
+          <Text mb={4}>
+            It is recommended to rest for <strong>{interval} day{interval > 1 ? 's' : ''}</strong> before continuing your workouts. This will help you recover and maximize your performance.
+          </Text>
           <Text>
-            You have completed all the exercises for today. Take a break and rest up!
+            If you'd like, you can choose to continue the workout without waiting.
           </Text>
         </ModalBody>
 
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={() => {}}>
+          <Button colorScheme="gray" mr={3} onClick={onClose}>
             Close
+          </Button>
+          <Button colorScheme="purple" onClick={() => {
+            onContinueWorkout();
+            onClose();
+          }}>
+            Continue Anyway
           </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
-  )
+  );
 }
 
-export default RestModal
+export default RestModal;

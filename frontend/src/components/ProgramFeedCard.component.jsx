@@ -179,6 +179,17 @@ function ProgramFeedCard({
             },
             onError: (error) => {
                 console.log(error)
+                // If error status is 400, it means the user is already joined to a program with same interest area
+                if (error.response.status === 400) {
+                    toast({
+                        title: error.response.data.message,
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                    return
+                }
+
                 toast({
                     title: 'An error occurred.',
                     status: 'error',
