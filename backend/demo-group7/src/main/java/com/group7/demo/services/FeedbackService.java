@@ -52,7 +52,7 @@ public class FeedbackService {
         Feedback feedback = Feedback.builder()
                 .trainingProgram(trainingProgram)
                 .user(user)
-                .bodyPart(feedbackRequest.getBodyPart())
+                .feedbackMuscle(feedbackRequest.getFeedbackMuscle())
                 .weekNumber(feedbackRequest.getWeekNumber())
                 .workoutNumber(feedbackRequest.getWorkoutNumber())
                 .exerciseNumber(feedbackRequest.getExerciseNumber())

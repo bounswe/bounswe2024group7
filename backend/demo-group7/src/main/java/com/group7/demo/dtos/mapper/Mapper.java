@@ -213,7 +213,7 @@ public class Mapper {
                 .id(feedback.getId())
                 .trainingProgramTitle(feedback.getTrainingProgram().getTitle()) // Map training program title
                 .username(feedback.getUser().getUsername()) // Map user's username
-                .bodyPart(feedback.getBodyPart()) // Map body part
+                .feedbackMuscle(feedback.getFeedbackMuscle()) // Map body part
                 .weekNumber(feedback.getWeekNumber()) // Map week number
                 .workoutNumber(feedback.getWorkoutNumber()) // Map workout number
                 .exerciseNumber(feedback.getExerciseNumber()) // Map exercise number

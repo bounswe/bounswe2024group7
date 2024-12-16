@@ -1,6 +1,6 @@
 package com.group7.demo.dtos;
 
-import com.group7.demo.models.enums.BodyPart;
+import com.group7.demo.models.enums.FeedbackMuscle;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,7 +16,7 @@ public class FeedbackResponse {
 
     private String username; // User's username
 
-    private BodyPart bodyPart;
+    private FeedbackMuscle feedbackMuscle;
 
     private int weekNumber;
 
