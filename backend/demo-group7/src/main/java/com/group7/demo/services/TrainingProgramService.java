@@ -461,6 +461,22 @@ public class TrainingProgramService {
         }
     }
 
+
+    public int getUserRatingForTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
+        // Fetch the authenticated user
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
+        boolean isParticipant = trainingProgramWithTrackingRepository.existsByTrainingProgramIdAndUserId(trainingProgramId, user.getId());
+        if (!isParticipant) {
+            throw new IllegalArgumentException("Only participants can rate the training program");
+        }
+
+        // Check if the user has rated the training program
+        TrainingProgramRating rating = trainingProgramRatingRepository.findByTrainingProgramIdAndUserId(trainingProgramId, user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User has not rated this training program."));
+
+        return rating.getRating();
+    }
     private void updateAverageRating(TrainingProgram trainingProgram, int oldRating, int newRating, boolean isNew) {
         double totalRatingSum = trainingProgram.getRating() * trainingProgram.getRatingCount();
 

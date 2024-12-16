@@ -116,6 +116,13 @@ public class TrainingProgramController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{trainingProgramId}/rate")
+    public ResponseEntity<Integer> getUserRatingForTrainingProgram(@PathVariable Long trainingProgramId,
+                                                                   HttpServletRequest request) {
+        int rating = trainingProgramService.getUserRatingForTrainingProgram(trainingProgramId, request);
+        return ResponseEntity.ok(rating);
+    }
+
     @GetMapping("/recommended")
     public ResponseEntity<Map<String, Object>> getRecommendedPrograms(
             @RequestParam(defaultValue = "0") int page,
