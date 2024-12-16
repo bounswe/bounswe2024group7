@@ -212,9 +212,9 @@ public class PostService {
 
         // Create Pageable object
         Pageable paging = PageRequest.of(page, size);
-
-        // Fetch posts with pagination
-        Page<Post> pagePost = postRepository.findAllByTagsIn(fitnessGoals, paging);
+        
+        // Use the new method that sorts by likes
+        Page<Post> pagePost = postRepository.findAllByTagsInOrderByLikesDesc(fitnessGoals, paging);
 
         // Get content for current page
         List<PostResponse> posts = pagePost.getContent().stream()
@@ -233,7 +233,9 @@ public class PostService {
     @Transactional
     public Map<String, Object> getAllPostsWithPagination(int page, int size, HttpServletRequest request) {
         Pageable paging = PageRequest.of(page, size);
-        Page<Post> pagePost = postRepository.findAll(paging);
+        
+        // Use the new method that sorts by likes
+        Page<Post> pagePost = postRepository.findAllOrderByLikesDesc(paging);
 
         List<PostResponse> posts = pagePost.getContent().stream()
                 .map(post -> mapper.mapToPostResponse(post, request))
@@ -251,7 +253,9 @@ public class PostService {
     @Transactional
     public Map<String, Object> getPostsByTagsWithPagination(Set<String> tagNames, int page, int size, HttpServletRequest request) {
         Pageable paging = PageRequest.of(page, size);
-        Page<Post> pagePost = postRepository.findPostsByTagsWithPagination(tagNames, paging);
+        
+        // Use the new method that sorts by likes
+        Page<Post> pagePost = postRepository.findPostsByTagsWithPaginationOrderByLikesDesc(tagNames, paging);
 
         List<PostResponse> posts = pagePost.getContent().stream()
                 .map(post -> mapper.mapToPostResponse(post, request))
