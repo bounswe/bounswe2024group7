@@ -238,7 +238,7 @@ public class Mapper {
         // Bookmark statistics
         interactionStats[1] = Map.of(
             "@type", "InteractionCounter",
-            "interactionType", "SaveAction",
+            "interactionType", "https://schema.org/BookmarkAction",
             "userInteractionCount", post.getBookmarkedByUsers() != null ? post.getBookmarkedByUsers().size() : 0
         );
 
