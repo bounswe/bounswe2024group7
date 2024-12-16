@@ -14,6 +14,8 @@ import {
     useToast,
     Tooltip
 } from '@chakra-ui/react'
+import { ChatIcon } from '@chakra-ui/icons';
+import FeedbackModal from './FeedbackModal.component';
 import { ViewIcon } from '@chakra-ui/icons';
 // import { useNavigate } from 'react-router-dom';
 import { useNavigate } from '@tanstack/react-router'
@@ -34,6 +36,11 @@ function ProgramFeedCard({
 }) {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isFeedbackOpen,
+        onOpen: onFeedbackOpen,
+        onClose: onFeedbackClose
+    } = useDisclosure();
     const password = useSelector(userPassword)
     const sessionToken = useSelector(userSessionToken)
     const toast = useToast()
@@ -392,18 +399,34 @@ function ProgramFeedCard({
                         </Tooltip>
 
                         {isUserJoined && user && program.trainer !== user.username && (
-                            <Button
-                                flex='1'
-                                variant='solid'
-                                colorScheme='green'
-                                onClick={() => handleStartPracticing(program.id)}
-                            >
-                                Start Practicing
-                            </Button>
+                            <Flex gap={2} flex="1">
+                                <Button
+                                    flex='1'
+                                    variant='solid'
+                                    colorScheme='green'
+                                    onClick={() => handleStartPracticing(program.id)}
+                                >
+                                    Start Practicing
+                                </Button>
+                                <Button
+                                    variant='outline'
+                                    colorScheme='purple'
+                                    leftIcon={<ChatIcon />}
+                                    onClick={() => onFeedbackOpen()}
+                                >
+                                    Give Feedback
+                                </Button>
+                            </Flex>
                         )}
                     </Flex>
                 </CardFooter>
             </Card>
+            <FeedbackModal
+                isOpen={isFeedbackOpen}
+                onClose={onFeedbackClose}
+                programId={program.id}
+                programTitle={program.title}
+            />
             <Detailed_Training_Modal
                 isOpen={isOpen}
                 onClose={onClose}
