@@ -417,17 +417,16 @@ public class TrainingProgramService {
         return weeklyCompletionRates;
     }
 
-    public void rateTrainingProgram(Long trainingProgramId, Long userId, int rating) {
+    public void rateTrainingProgram(Long trainingProgramId, int rating, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+
         // Validate the rating value
         if (rating < 0 || rating > 5) {
             throw new IllegalArgumentException("Rating must be between 0 and 5");
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-
         // Ensure the user is a participant
-        boolean isParticipant = trainingProgramWithTrackingRepository.existsByTrainingProgramIdAndUserId(trainingProgramId, userId);
+        boolean isParticipant = trainingProgramWithTrackingRepository.existsByTrainingProgramIdAndUserId(trainingProgramId, user.getId());
         if (!isParticipant) {
             throw new IllegalArgumentException("Only participants can rate the training program");
         }
@@ -437,7 +436,7 @@ public class TrainingProgramService {
                 .orElseThrow(() -> new IllegalArgumentException("Training program not found"));
 
         // Check if the user has already rated the program
-        Optional<TrainingProgramRating> existingRatingOpt = trainingProgramRatingRepository.findByTrainingProgramIdAndUserId(trainingProgramId, userId);
+        Optional<TrainingProgramRating> existingRatingOpt = trainingProgramRatingRepository.findByTrainingProgramIdAndUserId(trainingProgramId, user.getId());
 
         if (existingRatingOpt.isPresent()) {
             // Update the existing rating
