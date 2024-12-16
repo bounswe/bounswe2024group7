@@ -16,6 +16,7 @@ import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody,
 import { Table, TableCaption, Thead, Tbody, Tfoot, Tr, Th, Td, UnorderedList, ListItem } from '@chakra-ui/react';
 import PlusIcon from '../icons/PlusIcon';
 import { ViewIcon } from '@chakra-ui/icons';
+import { Progress } from '@chakra-ui/react'
 import {
     Box,
     Card,
@@ -30,7 +31,8 @@ import {
     Spinner,
     Button
 } from '@chakra-ui/react';
-import RestModal from './RestModal.component';
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext';
 
 const renderRatingStars = (rating, ratingCount) => {
     return (
@@ -88,8 +90,9 @@ const TrainingCard = () => {
     const [isUserJoined, setIsUserJoined] = useState(false);
 
     const sessionToken = useSelector(userSessionToken);
-    const user = useSelector(userProfile);
-    console.log(user);
+    const {
+        user,
+    } = useContext(UserContext)
     const queryClient = useQueryClient();
     const toast = useToast();
 
@@ -99,14 +102,10 @@ const TrainingCard = () => {
         onOpen: onWorkoutOpen,
         onClose: onWorkoutClose
     } = useDisclosure();
-    const {
-        isOpen: isRestOpen,
-        onOpen: onRestOpen,
-        onClose: onRestClose
-    } = useDisclosure();
     const [weekNumber, setWeekNumber] = useState(null);
     const [workoutNumber, setWorkoutNumber] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState(null);
+    const [progressValue, setprogressValue] = useState(66);
 
     // Join to a program Mutation
     const { mutate: joinProgram } = useMutation({
@@ -185,25 +184,30 @@ const TrainingCard = () => {
                         headers: { 'Content-Type': 'application/json' },
                     }
                 );
-                // console.log(user.profile.username);
-                // Check if user has joined programs
-                if (user) {
-                    const joinedProgramsResponse = await apiInstance(sessionToken).get(
-                        `/api/training-programs/joined/${user.profile.username}`
-                    );
-                    // console.log(joinedProgramsResponse);
-                    // Check if the current program is in the user's joined programs
-                    const isJoined = joinedProgramsResponse.data.some(
-                        program => program.id === parseInt(programID)
-                    );
-                    setIsUserJoined(isJoined);
-                }
 
-                if (!response.data) {
+                const data = response.data;
+
+                if (!data) {
                     throw new Error('No training program data received');
                 }
 
-                setTrainingProgram(response.data);
+                if (user) {
+                    const joinedProgramsResponse = await apiInstance(sessionToken).get(
+                        `/api/training-programs/joined/${user.username}`
+                    );
+                    // console.log(joinedProgramsResponse);
+                    // Get the current program if the user has joined
+                    const joinedProgram = joinedProgramsResponse.data.find(
+                        (program) => program.id === parseInt(programID)
+                    );
+
+                    setIsUserJoined(joinedProgram ? true : false);
+                    setError(null);
+                    setTrainingProgram(joinedProgram);
+                    return;
+                }
+
+                setTrainingProgram(data);
                 setError(null);
             } catch (error) {
                 console.error('Error fetching training program:', error);
@@ -219,7 +223,9 @@ const TrainingCard = () => {
             }
         };
 
-        fetchTrainingProgram();
+        if (user && user.username) {
+            fetchTrainingProgram();
+        }
     }, [programID, sessionToken, user]);
 
     // Loading state
@@ -243,12 +249,6 @@ const TrainingCard = () => {
     }
 
     const handleStartSession = (exerciseId) => {
-        // Check if the user needs a rest day
-        if (checkUserNeedsRestDay(trainingProgram.lastWorkoutDate, trainingProgram.interval)) {
-            onRestOpen();
-            return;
-        }
-
         setSelectedExerciseId(exerciseId);
         onOpen();
     };
@@ -258,14 +258,12 @@ const TrainingCard = () => {
         onWorkoutOpen();
     };
 
-    const checkUserNeedsRestDay = (lastWorkoutDate, restIntervalAsDay) => {
-        const lastWorkout = new Date(lastWorkoutDate);
-        const today = new Date();
-        const diffTime = Math.abs(today - lastWorkout);
+    const isWorkoutComplete = (workout) => {
+        return workout.workoutExercises.every(exercise => exercise.completedAt !== null);
+    };
 
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        return diffDays < restIntervalAsDay;
+    const isWeekComplete = (week) => {
+        return week.workouts.every(workout => isWorkoutComplete(workout));
     };
 
     return (
@@ -401,65 +399,157 @@ const TrainingCard = () => {
                         }
                     </Button>
                 </Tooltip>
-            </div>
-            <Box bg="white" shadow="md" rounded="lg" overflow="hidden" mb={4}>
-                {trainingProgram.weeks.map((week, weekIndex) => (
-                    <Box key={weekIndex} p={4} borderBottom="1px solid #e2e8f0">
-                        <Text fontSize="xl" fontWeight="bold" mb={2}>
-                            Week {week.weekNumber}
-                        </Text>
-                        <UnorderedList spacing={3} ml={6}>
-                            {week.workouts.map((workout, workoutIndex) => (
-                                <ListItem key={workoutIndex}>
-                                    <Flex align="center" gap={4}>
-                                        <Text fontSize="md" fontWeight="semibold" color="gray.700">
-                                            Workout {workout.workoutNumber}: {workout.name.split(":")[1]?.trim()}
-                                        </Text>
-                                        <Button
-                                            onClick={() => handleViewWorkout(week.weekNumber, workout.workoutNumber)}
-                                            colorScheme="gray"
-                                            variant="solid"
-                                        >
-                                            <ViewIcon className="w-4 h-4 mr-3" />
-                                            View Description
-                                        </Button>
-                                    </Flex>
 
-                                    <Table variant="simple" width="100%" mt={2}>
-                                        <Tbody>
-                                            {workout.workoutExercises.map((exerciseob) => (
-                                                <Tr key={exerciseob.id} bgColor="#f7f9fc">
-                                                    <Td>
-                                                        <Text>
-                                                            {exerciseob.exercise.name}
-                                                        </Text>
-                                                    </Td>
-                                                    <Td textAlign="right">
-                                                        {isUserJoined && user && (
-                                                            <Button
-                                                                onClick={() => handleStartSession(exerciseob.id)}
-                                                                colorScheme="green"
-                                                                size="sm"
-                                                            >
-                                                                Start Session!
-                                                            </Button>
-                                                        )}
-                                                    </Td>
-                                                </Tr>
-                                            ))}
-                                        </Tbody>
-                                    </Table>
-                                </ListItem>
-                            ))}
-                        </UnorderedList>
-                    </Box>
-                ))}
+            </div>
+            <Box width="100%">
+                <Flex align="center" gap={4}>
+                    {/* Progress Bar */}
+                    <Progress
+                        hasStripe
+                        colorScheme="green"
+                        size="md"
+                        value={progressValue}
+                        flex="1"
+                    />
+                    {/* Value */}
+                    <Text
+                        fontSize="md"
+                        fontWeight="bold"
+                        color="green.600"
+                        minWidth="50px"
+                        textAlign="right"
+                    >
+                        {progressValue}%
+                    </Text>
+                </Flex>
+            </Box>
+            <Box bg="white" shadow="md" rounded="lg" overflow="hidden" mb={4}>
+                {trainingProgram.weeks.map((week, weekIndex) => {
+                    // Check if previous weeks are complete
+                    const isPreviousWeekComplete = weekIndex === 0 ||
+                        trainingProgram.weeks[weekIndex - 1].workouts.every(prevWorkout =>
+                            prevWorkout.workoutExercises.every(exercise => exercise.completedAt !== null)
+                        );
+
+                    return (
+                        <Box
+                            key={weekIndex}
+                            p={4}
+                            borderBottom="1px solid #e2e8f0"
+                            opacity={isPreviousWeekComplete ? 1 : 0.6}
+                        >
+                            <Text
+                                fontSize="xl"
+                                fontWeight="bold"
+                                mb={2}
+                                color={isPreviousWeekComplete ? "black" : "gray.500"}
+                            >
+                                Week {week.weekNumber}
+                                {!isPreviousWeekComplete && " (Locked)"}
+                            </Text>
+
+                            {isPreviousWeekComplete ? (
+                                <UnorderedList spacing={3} ml={6}>
+                                    {week.workouts.map((workout, workoutIndex) => {
+                                        // Check if previous workouts in the same week are complete
+                                        const isPreviousWorkoutComplete = workoutIndex === 0 ||
+                                            week.workouts[workoutIndex - 1].workoutExercises.every(
+                                                exercise => exercise.completedAt !== null
+                                            );
+
+                                        return (
+                                            <ListItem key={workoutIndex}>
+                                                <Flex align="center" gap={4}>
+                                                    <Text
+                                                        fontSize="md"
+                                                        fontWeight="semibold"
+                                                        color={isPreviousWorkoutComplete ? "gray.700" : "gray.500"}
+                                                    >
+                                                        Workout {workout.workoutNumber}:
+                                                        {workout.name.split(":")[1]?.trim()}
+                                                        {!isPreviousWorkoutComplete && " (Locked)"}
+                                                    </Text>
+                                                    <Button
+                                                        onClick={() => handleViewWorkout(week.weekNumber, workout.workoutNumber)}
+                                                        colorScheme="gray"
+                                                        variant="solid"
+                                                        isDisabled={!isPreviousWorkoutComplete}
+                                                    >
+                                                        <ViewIcon className="w-4 h-4 mr-3" />
+                                                        View Description
+                                                    </Button>
+                                                </Flex>
+
+                                                <Table variant="simple" width="100%" mt={2}>
+                                                    <Tbody>
+                                                        {workout.workoutExercises.map((exerciseob) => {
+                                                            // Determine if the exercise can be started
+                                                            const canStartExercise =
+                                                                isPreviousWeekComplete &&
+                                                                isPreviousWorkoutComplete;
+
+                                                            return (
+                                                                <Tr key={exerciseob.id} bgColor="#f7f9fc">
+                                                                    <Td>
+                                                                        <Text>
+                                                                            {exerciseob.exercise.name}
+                                                                        </Text>
+                                                                    </Td>
+                                                                    <Td textAlign="right">
+                                                                        {(isUserJoined && user) ? (
+                                                                            exerciseob.completedAt && exerciseob.completedSets ? (
+                                                                                <Text color="green.500" fontWeight="bold">
+                                                                                    ({exerciseob.completedSets.reduce((acc, set) => acc + set, 0)}/{exerciseob.repetitions * exerciseob.sets}) Completed ✓
+                                                                                </Text>
+                                                                            ) : canStartExercise ? (
+                                                                                <Button
+                                                                                    onClick={() => handleStartSession(exerciseob.id)}
+                                                                                    colorScheme="green"
+                                                                                    size="sm"
+                                                                                >
+                                                                                    Start Session!
+                                                                                </Button>
+                                                                            ) : (
+                                                                                <Tooltip
+                                                                                    label="Complete previous week/workout first"
+                                                                                    hasArrow
+                                                                                    placement="top"
+                                                                                >
+                                                                                    <Text color="gray.500">
+                                                                                        Locked
+                                                                                    </Text>
+                                                                                </Tooltip>
+                                                                            )
+                                                                        ) : (
+                                                                            <Text color="gray.500">
+                                                                                Not Joined
+                                                                            </Text>
+                                                                        )}
+                                                                    </Td>
+                                                                </Tr>
+                                                            );
+                                                        })}
+                                                    </Tbody>
+                                                </Table>
+                                            </ListItem>
+                                        );
+                                    })}
+                                </UnorderedList>
+                            ) : (
+                                <Text color="gray.500" textAlign="center">
+                                    Complete previous week to unlock
+                                </Text>
+                            )}
+                        </Box>
+                    );
+                })}
             </Box>
 
             <Detailed_Ex_Modal
                 isOpen={isOpen}
                 onClose={onClose}
                 data={trainingProgram}
+                setData={setTrainingProgram}
                 excersizeID={selectedExerciseId}
             />
             <Detailed_Workout_Modal
@@ -468,10 +558,7 @@ const TrainingCard = () => {
                 data={trainingProgram}
                 weekNumber={weekNumber}
                 workoutNumber={workoutNumber}
-            />
-            <RestModal
-                isOpen={isRestOpen}
-                onClose={onRestClose}
+
             />
         </div>
     );

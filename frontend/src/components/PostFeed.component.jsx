@@ -11,8 +11,7 @@ import {
 import { PostContext } from '../context/PostContext';
 import PostFeedCard from './PostFeedCard.component';
 import ProgramFeedCard from './ProgramFeedCard.component';
-import ProfessToday from './ProgressToday.component';
-import ProgressToday from './ProgressToday.component';
+import UserJoinedProgramsCard from './UserJoinedProgramsCard.component'
 
 function PostFeed() {
     const { posts, isLoadingPosts, programs, isFetchingPrograms } = useContext(PostContext);
@@ -34,7 +33,12 @@ function PostFeed() {
             <VStack // Use VStack to stack components vertically
                 spacing={6} // Add space between the boxes
                 align="stretch" // Make children stretch to full width
-                w="40%" // Full width of the parent container
+                w={
+                    useBreakpointValue({
+                        base: 'full', // Full width on small screens
+                        lg: 'md', // Larger width on desktop
+                    })
+                }
             >
                 {/* Today's Programs */}
                 {/* {programs.length > 0 && (
@@ -49,11 +53,18 @@ function PostFeed() {
                     </Box>
                 )} */}
 
+                {programs.length > 0 && (
+                    <Box>
+                        <Heading size="lg" mb={4}>Your Active Programs:</Heading>
+                        <UserJoinedProgramsCard />
+                    </Box>
+                )}
                 {/* Recommended Programs */}
                 <Box
                     borderRadius="md"
                     p={4}
                     boxShadow="sm"
+                    width={'full'} // Full width on small screens, larger on desktop
                 >
                     <Heading size="lg" mb={4}>Recommended Programs</Heading>
                     {programs.length > 0 ? (
