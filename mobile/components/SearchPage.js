@@ -1,8 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, ScrollView, StyleSheet } from 'react-native';
 import { Badge, Card } from 'react-native-paper';
 import Svg, { G, Path } from 'react-native-svg'; // Replace muscle model rendering
 import { AppContext } from '../context/AppContext';
+import { useSelector } from "react-redux";
+import { isLoggedIn, userSessionToken } from '../user';
+import { useDispatch } from 'react-redux'
+import apiInstance from '../Api';
+import Toast from 'react-native-toast-message';
+import { useQuery } from "@tanstack/react-query"
+
 // import Body from "react-native-body-highlighter";
 const SearchPage = () => {
     const [selectedMuscle, setSelectedMuscle] = useState("");
@@ -58,9 +65,9 @@ const SearchPage = () => {
         }, [exercisesData, exercisesIsFetching])
 
     // Highlight Data (Dummy Functionality)
-    setHighlightedData( selectedName
+    /*setHighlightedData( selectedName
         ? [{ bodyPartName: selectedName, intensity:2 }]
-        : []);
+        : []);*/
 
     // Function to format muscle names
     const formatMuscleNameForComparison = (muscleName) =>
@@ -68,22 +75,13 @@ const SearchPage = () => {
 
     // Handle muscle click
     const handleMuscleClick = (data) => {
-        if (data && data.bodyPartName) {
-            // Format muscle name
-            const muscleName = data.bodyPartName
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^./, str => str.toUpperCase())
-                .trim();
-            
-            // Toggle selection if clicking the same muscle
-            if(prevMuscle===muscleName){
+        if (data) {
+            prevMuscle = selectedMuscle
+            if(prevMuscle===data){
             setSelectedMuscle("");
-            setSelectedName("");
             }
             else{
-                setSelectedMuscle(muscleName);
-                setSelectedName(data.bodyPartName);
-
+                setSelectedMuscle(data);
             }
         }
     };
@@ -93,8 +91,8 @@ const SearchPage = () => {
     const filteredExercises = selectedMuscle
         ? exerciseOptions.filter(
               (exercise) =>
-                  exercise.targetMuscle === formatMuscleNameForComparison(selectedMuscle) ||
-                  exercise.secondaryMuscles.includes(formatMuscleNameForComparison(selectedMuscle))
+                  exercise.targetMuscle === selectedMuscle ||
+                  exercise.secondaryMuscles.includes(selectedMuscle)
           )
         : [];
 
@@ -111,14 +109,14 @@ const SearchPage = () => {
                                key={option.value}
                                style={[
                                  styles.muscleOption,
-                                 selectedMuscle.includes(option.value) && styles.selectedMuscleOption,
+                                 (selectedMuscle===option.value) && styles.selectedMuscleOption,
                                ]}
                                onPress={() => handleMuscleClick(option.value)}
                                >
                                <Text
                                  style={[
                                    styles.muscleOptionText,
-                                     selectedMuscle.includes(option.value) && styles.selectedMuscleOptionText,
+                                     (selectedMuscle===option.value) && styles.selectedMuscleOptionText,
                                    ]}
                                    >
                                    {option.label}
@@ -127,14 +125,14 @@ const SearchPage = () => {
                               ))}
                        </View>
 
-                
+
 
             {/* Selected Muscle Info */}
             {selectedMuscle && (
                 <View style={styles.exerciseContainer}>
                     <Text style={styles.muscleTitle}>Exercises for {selectedMuscle}</Text>
 
-                    {isLoadingExercises ? (
+                    {exercisesIsLoading ? (
                         <Text style={styles.loadingText}>Loading exercises...</Text>
                     ) : filteredExercises.length > 0 ? (
                         <FlatList
@@ -168,81 +166,101 @@ const SearchPage = () => {
             )}
 
             {!selectedMuscle && <Text style={styles.hint}>Click on any muscle to see related exercises</Text>}
+            </View>
         </ScrollView>
+
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        padding: 16,
-        backgroundColor: '#f5f5f5',
-        flexGrow: 1,
-    },
-    heading: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 16,
-        color: '#6B46C1',
-    },
-    modelsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    modelSection: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    modelTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginBottom: 8,
-    },
-    exerciseContainer: {
-        marginTop: 16,
-        padding: 12,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        elevation: 3,
-    },
-    muscleTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#6B46C1',
-        marginBottom: 8,
-    },
-    loadingText: {
-        textAlign: 'center',
-    },
-    card: {
-        marginVertical: 8,
-        padding: 8,
-    },
-    badges: {
-        flexDirection: 'row',
-        marginBottom: 8,
-    },
-    badge: {
-        marginRight: 8,
-        backgroundColor: '#6B46C1',
-        color: '#fff',
-    },
-    outlineBadge: {
-        borderColor: '#6B46C1',
-        borderWidth: 1,
-        backgroundColor: '#fff',
-        color: '#6B46C1',
-    },
-    instruction: {
-        fontSize: 14,
-        color: '#333',
-    },
-    hint: {
-        textAlign: 'center',
-        color: '#888',
-        fontSize: 14,
-        marginTop: 16,
-    },
-});
+  container: {
+    padding: 16,
+    backgroundColor: '#f5f5f5',
+    flexGrow: 1,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 16,
+    color: '#6B46C1',
+  },
+  modelsContainer: {
+flexDirection: 'column'       ,
+ alignItems: 'center', // Center items horizontally
 
+  },
+  optionsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap', // Allow wrapping to the next line
+      justifyContent: 'center',
+      width: '100%', // Occupy full width of parent
+      width: '100%', // Occupy full width of parent
+    },
+  muscleOption: {
+    backgroundColor: '#f9f9f9',
+    width: '%45',
+    padding: 10,
+    margin: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  selectedMuscleOption: {
+    backgroundColor: '#6B46C1',
+    borderColor: '#6B46C1',
+  },
+  muscleOptionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  selectedMuscleOptionText: {
+    color: '#fff',
+  },
+  exerciseContainer: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 3,
+  },
+  muscleTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#6B46C1',
+    marginBottom: 8,
+  },
+  loadingText: {
+    textAlign: 'center',
+  },
+  card: {
+    marginVertical: 8,
+    padding: 8,
+  },
+  badges: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  badge: {
+    marginRight: 8,
+    backgroundColor: '#6B46C1',
+    color: '#fff',
+  },
+  outlineBadge: {
+    borderColor: '#6B46C1',
+    borderWidth: 1,
+    backgroundColor: '#fff',
+    color: '#6B46C1',
+  },
+  instruction: {
+    fontSize: 14,
+    color: '#333',
+  },
+  hint: {
+    textAlign: 'center',
+    color: '#888',
+    fontSize: 14,
+    marginTop: 16,
+  },
+});
 export default SearchPage;
