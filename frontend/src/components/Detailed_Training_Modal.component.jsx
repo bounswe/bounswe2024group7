@@ -70,7 +70,6 @@ const Detailed_Training_Modal = ({ isOpen, onClose, data }) => {
                         Close
                     </Button>
                     <Button
-                        // variant="gohst"
                         colorScheme="green"
                         onClick={() => VisitTraining(data.id)} // Pass a function reference
                     >
