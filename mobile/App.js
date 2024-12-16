@@ -26,6 +26,7 @@ import Survey from './components/Survey'
 import FeedbackCard from './components/FeedbackCard';
 import FeedbackDetail from './components/FeedbackDetail';
 import CreateFeedback from './components/CreateFeedback';
+import SearchPage from './components/SearchPage';
 
 
 
@@ -92,7 +93,7 @@ const App = () => {
                 <Stack.Screen name="CreateFeedback" component={CreateFeedback} />
                 <Stack.Screen name="FeedbackCard" component={FeedbackCard} />
                 <Stack.Screen name="FeedbackCard" component={FeedbackDetail} />
-
+                <Stack.Screen name="SearchPage" component={SearchPage} />
 
               </Stack.Navigator>
             </NavigationContainer>
