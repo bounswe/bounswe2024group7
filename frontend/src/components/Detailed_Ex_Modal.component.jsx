@@ -149,6 +149,7 @@ const DetailedExModal = ({ isOpen, onClose, data, setData, excersizeID }) => {
                                                 return {
                                                     ...exercise,
                                                     completedAt: new Date().toISOString(), // Mark as completed
+                                                    completedSets: parsedSetInputs,
                                                 };
                                             }
                                             return exercise;
