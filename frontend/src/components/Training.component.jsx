@@ -88,7 +88,6 @@ const TrainingCard = () => {
 
     const sessionToken = useSelector(userSessionToken);
     const user = useSelector(userProfile);
-    console.log(user);
     const queryClient = useQueryClient();
     const toast = useToast();
 
@@ -179,25 +178,30 @@ const TrainingCard = () => {
                         headers: { 'Content-Type': 'application/json' },
                     }
                 );
-                // console.log(user.profile.username);
-                // Check if user has joined programs
+
+                const data = response.data;
+
+                if (!data) {
+                    throw new Error('No training program data received');
+                }
+
                 if (user) {
                     const joinedProgramsResponse = await apiInstance(sessionToken).get(
                         `/api/training-programs/joined/${user.profile.username}`
                     );
                     // console.log(joinedProgramsResponse);
-                    // Check if the current program is in the user's joined programs
-                    const isJoined = joinedProgramsResponse.data.some(
-                        program => program.id === parseInt(programID)
+                    // Get the current program if the user has joined
+                    const joinedProgram = joinedProgramsResponse.data.find(
+                        (program) => program.id === parseInt(programID)
                     );
-                    setIsUserJoined(isJoined);
+
+                    setIsUserJoined(joinedProgram ? true : false);
+                    setError(null);
+                    setTrainingProgram(joinedProgram);
+                    return;
                 }
 
-                if (!response.data) {
-                    throw new Error('No training program data received');
-                }
-
-                setTrainingProgram(response.data);
+                setTrainingProgram(data);
                 setError(null);
             } catch (error) {
                 console.error('Error fetching training program:', error);
@@ -407,15 +411,18 @@ const TrainingCard = () => {
 
                                     <Table variant="simple" width="100%" mt={2}>
                                         <Tbody>
-                                            {workout.workoutExercises.map((exerciseob) => (
-                                                <Tr key={exerciseob.id} bgColor="#f7f9fc">
+                                            {workout.workoutExercises.map((exerciseob) => {
+
+                                                console.log("Given Exercise Object: ", exerciseob);
+
+                                                return (<Tr key={exerciseob.id} bgColor="#f7f9fc">
                                                     <Td>
                                                         <Text>
                                                             {exerciseob.exercise.name}
                                                         </Text>
                                                     </Td>
                                                     <Td textAlign="right">
-                                                        {isUserJoined && user && (
+                                                        {(isUserJoined && user && exerciseob.completedAt === null) ? (
                                                             <Button
                                                                 onClick={() => handleStartSession(exerciseob.id)}
                                                                 colorScheme="green"
@@ -423,10 +430,16 @@ const TrainingCard = () => {
                                                             >
                                                                 Start Session!
                                                             </Button>
+                                                        ) : (
+                                                            <Text color="gray.500">
+                                                                {exerciseob.completedAt ? 'Completed' : 'Not Started'}
+                                                            </Text>
                                                         )}
                                                     </Td>
-                                                </Tr>
-                                            ))}
+                                                </Tr>)
+                                            }
+                                            )
+                                        }
                                         </Tbody>
                                     </Table>
                                 </ListItem>
@@ -440,6 +453,7 @@ const TrainingCard = () => {
                 isOpen={isOpen}
                 onClose={onClose}
                 data={trainingProgram}
+                setData={setTrainingProgram}
                 excersizeID={selectedExerciseId}
             />
             <Detailed_Workout_Modal

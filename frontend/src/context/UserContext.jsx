@@ -50,26 +50,7 @@ export const UserContextProvider = ({ children }) => {
             try {
                 const response = await apiInstance(sessionToken).get(`api/training-programs/joined/${username}`);
 
-                // Process the response to include exercise progress
-                const programsWithProgress = response.data.map(program => ({
-                    ...program,
-                    exercises: program.exercises.map(exercise => ({
-                        ...exercise,
-                        completed: exercise.completed || false
-                    }))
-                }));
-
-                // Build exercise progress map
-                const progressMap = {};
-                programsWithProgress.forEach(program => {
-                    progressMap[program.id] = program.exercises.reduce((acc, exercise) => {
-                        acc[exercise.id] = exercise.completed;
-                        return acc;
-                    }, {});
-                });
-
-                setExerciseProgress(progressMap);
-                return programsWithProgress;
+                return response.data;
             } catch (error) {
                 console.error('Error fetching joined programs:', error);
                 return [];
