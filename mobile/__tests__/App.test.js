@@ -160,6 +160,14 @@ test('Training Programs in Feed Working Correctly', async () => {
   expect(response.data).not.toBeNull();
 });
 
+test('Training Program Card in Profile Working Correctly', async () => {
+  const programId = jest.fn();
+  const response = await apiInstance().get(`api/training-programs/${programId}`);
+  expect(response.data).not.toBeNull();
+});
+
+
+
 test('Random Posts in Feed Working Correctly', async () => {
   const response  = await apiInstance().get('api/posts/random');
   expect(response.data).not.toBeNull();
