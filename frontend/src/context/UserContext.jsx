@@ -11,6 +11,7 @@ export const UserContext = createContext({
     posts: [],
     programs: [],
     joinedPrograms: [],
+    progressDataForAllPrograms: [],
     exerciseProgress: {},
 })
 
@@ -21,6 +22,7 @@ export const UserContextProvider = ({ children }) => {
     const [posts, setPosts] = useState([])
     const [programs, setPrograms] = useState([])
     const [joinedPrograms, setJoinedPrograms] = useState([])
+    const [progressDataForAllPrograms, setProgressDataForAllPrograms] = useState([])
     const [exerciseProgress, setExerciseProgress] = useState({})
 
     const sessionToken = useSelector(userSessionToken)
@@ -133,6 +135,25 @@ export const UserContextProvider = ({ children }) => {
         refetchOnWindowFocus: false,
     })
 
+    const {
+        data: progressData,
+        isFetching: progressIsFetching,
+        isLoading: progressIsLoading,
+    } = useQuery({
+        queryKey: ['progressDataForAllPrograms', joinedPrograms],
+        queryFn: async () => {
+            const responses = await Promise.all(
+                joinedPrograms.map((program) =>
+                    apiInstance(sessionToken).get(`/api/training-programs/${program.trackingId}/completion-rates`)
+                )
+            );
+
+            return responses.map((res) => res.data);
+        },
+        refetchOnWindowFocus: false,
+        enabled: !!joinedPrograms,
+    });
+
     useEffect(() => {
         if (followersData && !followersIsFetching) {
             setFollowers(followersData)
@@ -170,6 +191,12 @@ export const UserContextProvider = ({ children }) => {
         }
     }, [joinedProgramsData, joinedProgramsIsFetching]);
 
+    useEffect(() => {
+        if (progressData && !progressIsFetching) {
+            setProgressDataForAllPrograms(progressData);
+        }
+    }, [progressData, progressIsFetching]);
+
     // Function to update exercise completion status
     const updateExerciseCompletion = async (programId, exerciseId, completed) => {
         try {
@@ -200,6 +227,7 @@ export const UserContextProvider = ({ children }) => {
             programs,
             joinedPrograms,
             exerciseProgress,
+            progressDataForAllPrograms,
             updateExerciseCompletion,
         }}>
             {children}
