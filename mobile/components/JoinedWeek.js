@@ -13,6 +13,13 @@ const JoinedWeek = ({ route }) => {
   console.log("Response for JoinedWeek:");
   console.log(workouts);
   const {expandedState,setExpandedState} = useState(0);
+  const calculateProgress = ({workoutExercises}) => {
+    var completedReps = 0;
+    var totalReps=0;
+    workoutExercises.forEach((exercise)=>{completedReps+= (exercise.completedSets?exercise.completedSets.reduce((accumulator, currentValue) => accumulator + currentValue, 0):0) })
+    workoutExercises.forEach((exercise)=>{totalReps+= exercise.sets*exercise.repetitions })
+    return Math.round(100*completedReps/totalReps,2);
+  }
   const renderWorkout = ({ item, index, navigation }) => {
     return (
       <View style={styles.exerciseContainer}>
@@ -25,7 +32,7 @@ const JoinedWeek = ({ route }) => {
         <TouchableOpacity style={styles.startButton} onPress = {()=>{navigation.navigate("JoinedWorkout",{programId,weekId,weekNumber,workoutId:item.id,name:item.name,workoutNumber:item.workoutNumber,workoutExercises:item.workoutExercises, navigation})}}>
           <Text style={styles.startButtonText}>Start</Text>
         </TouchableOpacity>
-        <Text style={styles.completionText}>0%</Text>
+        <Text style={styles.completionText}>%{calculateProgress({workoutExercises:item.workoutExercises})}</Text>
 
       </View>
     );

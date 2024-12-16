@@ -55,6 +55,18 @@ public class TrainingProgramController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/tracking/{trackingId}")
+    public ResponseEntity<TrainingProgramWithTrackingResponse> getTrainingProgramWithTracking(@PathVariable Long trackingId){
+        TrainingProgramWithTrackingResponse response = trainingProgramService.getTrainingProgramWithTracking(trackingId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/ongoing/{trainingProgramId}")
+    public ResponseEntity<TrainingProgramWithTrackingResponse> getOngoingTrainingProgram(@PathVariable Long trainingProgramId, HttpServletRequest request) {
+        TrainingProgramWithTrackingResponse response = trainingProgramService.getOngoingUserTrainingProgram(trainingProgramId, request);
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{programId}/leave")
     public ResponseEntity<TrainingProgramWithTrackingResponse> leaveProgram(@PathVariable Long programId, HttpServletRequest request) {
         TrainingProgramWithTrackingResponse response = trainingProgramService.leaveTrainingProgram(programId, request);
@@ -90,9 +102,9 @@ public class TrainingProgramController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{programId}/completion-rates")
-    public ResponseEntity<Map<Long, Double>> getCompletionRates(@PathVariable Long programId) {
-        Map<Long, Double> completionRates = trainingProgramService.getCompletionRatesForProgram(programId);
+    @GetMapping("/{trackingId}/completion-rates")
+    public ResponseEntity<Map<Long, Double>> getCompletionRates(@PathVariable Long trackingId) {
+        Map<Long, Double> completionRates = trainingProgramService.getCompletionRatesForProgram(trackingId);
         return ResponseEntity.ok(completionRates);
     }
 

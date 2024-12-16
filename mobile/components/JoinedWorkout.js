@@ -26,8 +26,8 @@ const JoinedWorkout = ({ route }) => {
 
         <Text style={styles.repCount}>{item.repetitions} Reps</Text>
 
-        <TouchableOpacity style={styles.startButton} onPress={()=>navigation.navigate('JoinedExercise',{programId,weekId,weekNumber,workoutId,workoutNumber,exerciseNumber:item.exerciseNumber,exerciseId:item.id,exercise:item.exercise,sets:item.sets,repetitions:item.repetitions})}>
-          <Text style={styles.startButtonText}>Start</Text>
+        <TouchableOpacity style={[styles.startButton, item.completedAt !== null && styles.disabledButton]} disabled={item.completedAt !== null} onPress={()=>navigation.navigate('JoinedExercise',{programId,weekId,weekNumber,workoutId,workoutNumber,exerciseNumber:item.exerciseNumber,exerciseId:item.id,exercise:item.exercise,sets:item.sets,repetitions:item.repetitions})}>
+          <Text style={styles.startButtonText}>{item.completedAt ==null ? "Start" : "Completed"} </Text>
         </TouchableOpacity>
         <Text style={styles.completionText}>%{ (100 *( item.completedSets?(item.completedSets.reduce((accumulator, currentValue) => accumulator + currentValue, 0))/((item.sets) * (item.repetitions)):0))}</Text>
       </View>
@@ -57,6 +57,9 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
+  disabledButton: {
+      backgroundColor: 'gray', // Or any other style to indicate disabled state
+    },
   exerciseNameContainer: {
     flex: 1,
   },

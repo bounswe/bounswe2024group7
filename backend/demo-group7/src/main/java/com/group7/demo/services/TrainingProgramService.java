@@ -237,6 +237,13 @@ public class TrainingProgramService {
     }
 
     @Transactional
+    public TrainingProgramWithTrackingResponse getTrainingProgramWithTracking(Long trackingId){
+        TrainingProgramWithTracking trainingProgramWithTracking = trainingProgramWithTrackingRepository.findById(trackingId)
+                .orElseThrow(() -> new EntityNotFoundException("Training program with tracking not found with tracking id: " + trackingId));
+        return mapper.mapToTrainingProgramWithTrackingResponse(trainingProgramWithTracking);
+    }
+
+    @Transactional
     public Set<String> getRegisteredUsernames(Long trainingProgramId) {
         // Fetch the training program by its ID
         TrainingProgram trainingProgram = trainingProgramRepository.findById(trainingProgramId)
@@ -270,6 +277,19 @@ public class TrainingProgramService {
         // This list can contain at most one element because of the joinTrainingProgram method
         return ongoingPrograms.get(0);
 
+    }
+
+    public TrainingProgramWithTrackingResponse getOngoingUserTrainingProgram(Long trainingProgramId, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+        List<TrainingProgramWithTracking> ongoingPrograms = trainingProgramWithTrackingRepository.findByUserAndTrainingProgramIdAndStatus(user, trainingProgramId, TrainingProgramWithTrackingStatus.ONGOING);
+
+        if (ongoingPrograms.isEmpty()) {
+            throw new IllegalStateException("No ongoing training program found.");
+        }
+
+        // This list can contain at most one element because of the joinTrainingProgram method
+        TrainingProgramWithTracking trainingProgramWithTracking = ongoingPrograms.get(0);
+        return mapper.mapToTrainingProgramWithTrackingResponse(trainingProgramWithTracking);
     }
 
     @Transactional

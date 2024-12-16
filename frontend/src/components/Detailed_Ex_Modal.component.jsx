@@ -28,7 +28,7 @@ import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
+const DetailedExModal = ({ isOpen, onClose, data, setData, excersizeID }) => {
     const [setInputs, setSetInputs] = useState([]);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isAlertOpen, setIsAlertOpen] = useState(false);
@@ -122,43 +122,61 @@ const DetailedExModal = ({ isOpen, onClose, data, excersizeID }) => {
             try {
                 // Convert set inputs to numbers
                 const parsedSetInputs = setInputs.map(input => parseInt(input, 10));
-
-                // Log request details for debugging
-                console.log('Submitting Progress:', {
-                    programId: data.id,
-                    workoutExerciseId: excersizeID,
-                    setInputs: parsedSetInputs
-                });
-
-                // Submit exercise sets to backend
+    
+                // Submit exercise sets to the backend
                 const response = await submitMutation.mutateAsync({
                     id: data.id,
                     setInputs: parsedSetInputs
                 });
-
+    
                 // Show success toast
                 toast.success('Exercise sets completed successfully!', {
                     position: "top-right",
                     autoClose: 3000,
                 });
-
+    
+                // Update local state for the completed exercise
+                const updatedWeeks = data.weeks.map(week => {
+                    if (week.weekNumber === weekNumber) {
+                        return {
+                            ...week,
+                            workouts: week.workouts.map(workout => {
+                                if (workout.workoutNumber === workoutNumber) {
+                                    return {
+                                        ...workout,
+                                        workoutExercises: workout.workoutExercises.map(exercise => {
+                                            if (exercise.id === excersizeID) {
+                                                return {
+                                                    ...exercise,
+                                                    completedAt: new Date().toISOString(), // Mark as completed
+                                                };
+                                            }
+                                            return exercise;
+                                        }),
+                                    };
+                                }
+                                return workout;
+                            }),
+                        };
+                    }
+                    return week;
+                });
+    
+                setData(prev => ({
+                    ...prev,
+                    weeks: updatedWeeks,
+                }));
+    
                 setIsSubmitted(true);
                 onClose();
-                console.log(response.data);
-                return response.data;
             } catch (error) {
-                // Enhanced error logging
-                console.error('Full Error Object:', error);
-                console.error('Error Response:', error.response);
-                console.error('Error Request:', error.request);
-                console.error('Error Config:', error.config);
-
-                // More detailed error message
-                const errorMessage = error.response?.data?.message ||
+                console.error('Error submitting exercise progress:', error);
+                const errorMessage =
+                    error.response?.data?.message ||
                     error.response?.data?.error ||
                     'Failed to submit exercise sets';
-
-                // Show error toast with more details
+    
+                // Show error toast with details
                 toast.error(errorMessage, {
                     position: "top-right",
                     autoClose: 5000,
