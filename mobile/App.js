@@ -22,7 +22,8 @@ import JoinedWeek from './components/JoinedWeek';
 import JoinedExercise from './components/JoinedExercise';
 import JoinedProgramDetail from './components/JoinedProgramDetail';
 import JoinedProgramCard from './components/JoinedProgramCard';
-import Survey from './components/Survey'
+import Survey from './components/Survey';
+// import SearchPage from './components/SearchPage'
 
 
 import { Provider as ReduxProvider } from 'react-redux';
@@ -86,6 +87,7 @@ const App = () => {
                 <Stack.Screen name="JoinedExercise" component={JoinedExercise} />
                 <Stack.Screen name="JoinedProgramDetail" component={JoinedProgramDetail} />
                 <Stack.Screen name="JoinedProgramCard" component={JoinedProgramCard} />
+                
 
 
               </Stack.Navigator>
