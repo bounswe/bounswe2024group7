@@ -95,8 +95,6 @@ const App = () => {
                 <Stack.Screen name="FeedbackCard" component={FeedbackCard} />
                 <Stack.Screen name="FeedbackDetail" component={FeedbackDetail} />
                 <Stack.Screen name="SearchPage" component={SearchPage} />
-
-                <Stack.Screen name="SearchPage" component={SearchPage} />
               </Stack.Navigator>
             </NavigationContainer>
           </AuthProvider>

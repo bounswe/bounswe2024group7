@@ -140,7 +140,7 @@ const JoinedProgramDetail = ({ route }) => {
       <View style={styles.ratingContainer}>
         <Text style={styles.ratingLabel}>{isRated ? "Your Rating" : "Average Rating"}</Text>
         <View style={styles.starsContainer}>{renderStars()}</View>
-        <Slider
+        {/*<Slider
           style={styles.slider}
           minimumValue={0}
           maximumValue={5}
@@ -150,7 +150,7 @@ const JoinedProgramDetail = ({ route }) => {
             handleRating(value);
             setIsRated(true);
           }}
-        />
+        />*/}
         <Text style={styles.sliderValue}>{userRating} / 5</Text>
       </View>
 
