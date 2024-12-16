@@ -198,33 +198,27 @@ const UserJoinedProgramsCard = () => {
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {program.weeks.map((week) =>
-                                    week.workouts.map((workout) =>
-                                        workout.workoutExercises
-                                            .filter(exercise => !exercise.completedAt)
-                                            .map((exercise) => (
-                                                <Tr key={exercise.id}>
-                                                    <Td>{exercise.exercise.name}</Td>
-                                                    <Td>
-                                                        <Button
-                                                            onClick={() => {
-                                                                if (shouldUserRest(program.interval, program.lastCompletedWorkoutDate)) {
-                                                                    setSelectedProgram(program);
-                                                                    setSelectedExerciseId(exercise.id);
-                                                                    onRestOpen();
-                                                                } else {
-                                                                    handleStartSession(program, exercise.id);
-                                                                }
-                                                            }}
-                                                            colorScheme="green"
-                                                            size="sm"
-                                                        >
-                                                            Start Session
-                                                        </Button>
-                                                    </Td>
-                                                </Tr>
-                                            ))
-                                    )
+                                {firstUncompletedExercise && (
+                                    <Tr key={firstUncompletedExercise.exercise.id}>
+                                        <Td>{firstUncompletedExercise.exercise.exercise.name}</Td>
+                                        <Td>
+                                            <Button
+                                                onClick={() => {
+                                                    if (shouldUserRest(program.interval, program.lastCompletedWorkoutDate)) {
+                                                        setSelectedProgram(program);
+                                                        setSelectedExerciseId(firstUncompletedExercise.exercise.id);
+                                                        onRestOpen();
+                                                    } else {
+                                                        handleStartSession(program, firstUncompletedExercise.exercise.id);
+                                                    }
+                                                }}
+                                                colorScheme="green"
+                                                size="sm"
+                                            >
+                                                Start Session
+                                            </Button>
+                                        </Td>
+                                    </Tr>
                                 )}
                             </Tbody>
                         </Table>
