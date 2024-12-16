@@ -470,9 +470,9 @@ const TrainingCard = () => {
                                                                     </Td>
                                                                     <Td textAlign="right">
                                                                         {(isUserJoined && user) ? (
-                                                                            exerciseob.completedAt ? (
+                                                                            exerciseob.completedAt && exerciseob.completedSets ? (
                                                                                 <Text color="green.500" fontWeight="bold">
-                                                                                    Completed ✓
+                                                                                    ({exerciseob.completedSets.reduce((acc, set) => acc + set, 0)}/{exerciseob.repetitions * exerciseob.sets}) Completed ✓
                                                                                 </Text>
                                                                             ) : canStartExercise ? (
                                                                                 <Button
