@@ -10,14 +10,62 @@ import {
     Tabs, TabList, TabPanels, Tab, TabPanel
 } from '@chakra-ui/react';
 import { PostContext } from '../context/PostContext';
+import { UserContext } from '../context/UserContext';
 import PostFeedCard from './PostFeedCard.component';
 import ProgramFeedCard from './ProgramFeedCard.component';
 import UserJoinedProgramsCard from './UserJoinedProgramsCard.component'
+import { useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { userSessionToken } from '../context/user';
 
 function PostFeed() {
-    const { posts, isLoadingPosts, programs, isFetchingPrograms, recommendedPrograms, explorePrograms, forYouPosts, explorePosts } = useContext(PostContext);
+    const { 
+        isLoadingPosts, 
+        programs, 
+        isFetchingPrograms, 
+        recommendedPrograms, 
+        explorePrograms,
+        forYouPosts,
+        fetchNextForYouPage,
+        hasMoreForYou,
+        isLoadingForYou,
+        explorePosts,
+        fetchNextExplorePage,
+        hasMoreExplore,
+        isLoadingExplore,
+    } = useContext(PostContext);
+
+    const { user } = useContext(UserContext);
+    const sessionToken = useSelector(userSessionToken);
 
     const isLoading = isLoadingPosts || isFetchingPrograms;
+
+    const observerForYou = useRef();
+    const observerExplore = useRef();
+
+    // Observer for "For You" posts
+    const lastForYouPostRef = (node) => {
+        if (isLoadingForYou) return;
+        if (observerForYou.current) observerForYou.current.disconnect();
+        observerForYou.current = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasMoreForYou) {
+                fetchNextForYouPage();
+            }
+        });
+        if (node) observerForYou.current.observe(node);
+    };
+
+    // Observer for "Explore" posts
+    const lastExplorePostRef = (node) => {
+        if (isLoadingExplore) return;
+        if (observerExplore.current) observerExplore.current.disconnect();
+        observerExplore.current = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasMoreExplore) {
+                fetchNextExplorePage();
+            }
+        });
+        if (node) observerExplore.current.observe(node);
+    };
 
     return (
         <Flex
@@ -55,8 +103,11 @@ function PostFeed() {
                     width={'full'} // Full width on small screens, larger on desktop
                 >
                     <Heading size="lg" mb={4}>Recommended Programs</Heading>
-                    {recommendedPrograms.length > 0 ? (
-                        programs.map((program) => (
+                    {
+                        !user || !sessionToken ?
+                            <Text>Please log in to see personalized programs.</Text>
+                            : recommendedPrograms.length > 0 ? (
+                        recommendedPrograms.map((program) => (
                             <ProgramFeedCard program={program} key={program.id} />
                         ))
                     ) : (
@@ -73,7 +124,7 @@ function PostFeed() {
                 >
                     <Heading size="lg" mb={4}>Explore Programs</Heading>
                     {explorePrograms.length > 0 ? (
-                        programs.map((program) => (
+                        explorePrograms.map((program) => (
                             <ProgramFeedCard program={program} key={program.id} />
                         ))
                     ) : (
@@ -102,25 +153,42 @@ function PostFeed() {
                                 <Tab>Explore</Tab>
                             </TabList>
                             <TabPanels>
-                                <TabPanel>
-                                    {forYouPosts.length > 0 ? (
-                                        forYouPosts.map((post) => (
-                                            <PostFeedCard post={post} key={post.id} />
-                                        ))
-                                    ) : (
-                                        <Text>No posts for you right now.</Text>
-                                    )}
-                                </TabPanel>
-                                <TabPanel>
-                                    {explorePosts.length > 0 ? (
-                                        explorePosts.map((post) => (
-                                            <PostFeedCard post={post} key={post.id} />
-                                        ))
-                                    ) : (
-                                        <Text>No posts to explore right now.</Text>
-                                    )}
-                                </TabPanel>
-                            </TabPanels>
+                            {/* For You Tab */}
+                            <TabPanel>
+                                { !user || !sessionToken ? 
+                                    <Text>Please log in to see personalized posts.</Text>
+                                    : forYouPosts.map((post, index) => {
+                                    if (forYouPosts.length === index + 1) {
+                                        return (
+                                            <PostFeedCard
+                                                ref={lastForYouPostRef}
+                                                post={post}
+                                                key={post.id}
+                                            />
+                                        );
+                                    }
+                                    return <PostFeedCard post={post} key={post.id} />;
+                                })}
+                                {isLoadingForYou && <Spinner size="lg" />}
+                            </TabPanel>
+
+                            {/* Explore Tab */}
+                            <TabPanel>
+                                {explorePosts.map((post, index) => {
+                                    if (explorePosts.length === index + 1) {
+                                        return (
+                                            <PostFeedCard
+                                                ref={lastExplorePostRef}
+                                                post={post}
+                                                key={post.id}
+                                            />
+                                        );
+                                    }
+                                    return <PostFeedCard post={post} key={post.id} />;
+                                })}
+                                {isLoadingExplore && <Spinner size="lg" />}
+                            </TabPanel>
+                        </TabPanels>
                         </Tabs>
                     </Box>
                 )

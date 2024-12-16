@@ -236,7 +236,12 @@ function CreatePostModal({
                                 :
                                 <Select
                                     styles={selectComponentStyles}
-                                    options={programs.map((program) => ({
+                                    options={
+                                        Array.isArray(programs) ?
+                                        programs?.map((program) => ({
+                                        value: program.id,
+                                        label: program.title
+                                    })) : programs.programs.map((program) => ({
                                         value: program.id,
                                         label: program.title
                                     }))
