@@ -9,6 +9,7 @@ import CreatePost from './CreatePost';
 import CreateProgram from './CreateProgram';
 import Create from './Create';
 import SearchResults from './SearchResults';
+import SearchPage from './SearchPage';
 import { isLoggedIn, userSessionToken } from '../user';
 import { useDispatch } from 'react-redux'
 import apiInstance from '../Api';
@@ -46,7 +47,7 @@ const Home = ({ navigation }) => {
 
   const SearchPageContainer = () => (
       <View style={currentStyles.page}>
-        <SearchResults/>
+        <SearchPage/>
       </View>
     );
     const handleLogOut = async () => {
