@@ -30,6 +30,8 @@ import {
     Spinner,
     Button
 } from '@chakra-ui/react';
+import { useContext } from 'react';
+import { UserContext } from '../context/UserContext';
 
 const renderRatingStars = (rating, ratingCount) => {
     return (
@@ -87,7 +89,9 @@ const TrainingCard = () => {
     const [isUserJoined, setIsUserJoined] = useState(false);
 
     const sessionToken = useSelector(userSessionToken);
-    const user = useSelector(userProfile);
+    const {
+        user,
+    } = useContext(UserContext)
     const queryClient = useQueryClient();
     const toast = useToast();
 
@@ -187,7 +191,7 @@ const TrainingCard = () => {
 
                 if (user) {
                     const joinedProgramsResponse = await apiInstance(sessionToken).get(
-                        `/api/training-programs/joined/${user.profile.username}`
+                        `/api/training-programs/joined/${user.username}`
                     );
                     // console.log(joinedProgramsResponse);
                     // Get the current program if the user has joined
