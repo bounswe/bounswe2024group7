@@ -11,8 +11,7 @@ import {
 import { PostContext } from '../context/PostContext';
 import PostFeedCard from './PostFeedCard.component';
 import ProgramFeedCard from './ProgramFeedCard.component';
-import ProfessToday from './ProgressToday.component';
-import ProgressToday from './ProgressToday.component';
+import UserJoinedProgramsCard from './UserJoinedProgramsCard.component'
 
 function PostFeed() {
     const { posts, isLoadingPosts, programs, isFetchingPrograms } = useContext(PostContext);
@@ -49,6 +48,12 @@ function PostFeed() {
                     </Box>
                 )} */}
 
+                {programs.length > 0 && (
+                    <Box>
+                        <Heading size="lg" mb={4}>Your Active Programs:</Heading>
+                        <UserJoinedProgramsCard />
+                    </Box>
+                )}
                 {/* Recommended Programs */}
                 <Box
                     borderRadius="md"
