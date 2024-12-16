@@ -14,6 +14,7 @@ import {
     useToast,
     Tooltip
 } from '@chakra-ui/react'
+import { ViewIcon } from '@chakra-ui/icons';
 // import { useNavigate } from 'react-router-dom';
 import { useNavigate } from '@tanstack/react-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -24,12 +25,15 @@ import apiInstance from '../instance/apiInstance'
 import PlusIcon from '../icons/PlusIcon'
 import { UserContext } from '../context/UserContext'
 // import { router } from '../main.jsx';
+import Detailed_Training_Modal from './Detailed_Training_Modal.component';
+import { useDisclosure } from '@chakra-ui/react';
 
 
 function ProgramFeedCard({
     program
 }) {
 
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const password = useSelector(userPassword)
     const sessionToken = useSelector(userSessionToken)
     const toast = useToast()
@@ -313,6 +317,14 @@ function ProgramFeedCard({
                             </li>
                         ))}
                     </Text> */}
+                    <Button
+                        onClick={onOpen}
+                        colorScheme="gray"
+                        variant="solid"
+                    >
+                        <ViewIcon className="w-4 h-4 mr-3" />
+                        View Description
+                    </Button>
                 </CardBody>
 
 
@@ -381,6 +393,11 @@ function ProgramFeedCard({
                     </Flex>
                 </CardFooter>
             </Card>
+            <Detailed_Training_Modal
+                isOpen={isOpen}
+                onClose={onClose}
+                data={program}
+            />
         </>
 
     )
