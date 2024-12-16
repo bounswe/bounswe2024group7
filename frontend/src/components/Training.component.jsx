@@ -16,6 +16,7 @@ import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody,
 import { Table, TableCaption, Thead, Tbody, Tfoot, Tr, Th, Td, UnorderedList, ListItem } from '@chakra-ui/react';
 import PlusIcon from '../icons/PlusIcon';
 import { ViewIcon } from '@chakra-ui/icons';
+import { Progress } from '@chakra-ui/react'
 import {
     Box,
     Card,
@@ -100,6 +101,7 @@ const TrainingCard = () => {
     const [weekNumber, setWeekNumber] = useState(null);
     const [workoutNumber, setWorkoutNumber] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState(null);
+    const [progressValue, setprogressValue] = useState(66);
 
     // Join to a program Mutation
     const { mutate: joinProgram } = useMutation({
@@ -395,7 +397,30 @@ const TrainingCard = () => {
                         }
                     </Button>
                 </Tooltip>
+
             </div>
+            <Box width="100%">
+                <Flex align="center" gap={4}>
+                    {/* Progress Bar */}
+                    <Progress
+                        hasStripe
+                        colorScheme="green"
+                        size="md"
+                        value={progressValue}
+                        flex="1"
+                    />
+                    {/* Value */}
+                    <Text
+                        fontSize="md"
+                        fontWeight="bold"
+                        color="green.600"
+                        minWidth="50px"
+                        textAlign="right"
+                    >
+                        {progressValue}%
+                    </Text>
+                </Flex>
+            </Box>
             <Box bg="white" shadow="md" rounded="lg" overflow="hidden" mb={4}>
                 {trainingProgram.weeks.map((week, weekIndex) => {
                     // Check if previous weeks are complete
