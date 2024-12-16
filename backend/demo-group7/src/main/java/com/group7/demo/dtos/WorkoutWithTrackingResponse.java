@@ -15,5 +15,6 @@ public class WorkoutWithTrackingResponse {
     private String name;
     private int workoutNumber;
     private LocalDateTime completedAt;
+    private double completionPercentage;
     private List<WorkoutExerciseWithTrackingResponse> workoutExercises;
 }
