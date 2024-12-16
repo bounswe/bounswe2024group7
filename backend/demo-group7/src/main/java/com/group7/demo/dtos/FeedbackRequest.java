@@ -8,8 +8,6 @@ public class FeedbackRequest {
 
     private Long trainingProgramId;
 
-    private Long userId;
-
     private FeedbackMuscle feedbackMuscle;
 
     private int weekNumber;
