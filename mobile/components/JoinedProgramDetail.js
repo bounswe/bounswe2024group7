@@ -64,7 +64,6 @@ const JoinedProgramDetail = ({ route }) => {
           topOffset: 30,
           bottomOffset: 40
         });
-        goHome();
       }
     } catch (e) {
       //console.log(e)
