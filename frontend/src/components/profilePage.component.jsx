@@ -133,10 +133,10 @@ export default function ProfilePage() {
                             )}
                         </Stack>
                     )}
-                    {view === 'MyProgress' && user.role === 'TRAINEE' && (
+                    {view === 'MyProgress' && (
                         <Box width="100%" maxW="800px">
                             {user.joinedPrograms && user.joinedPrograms.length > 0 ? (
-                                <ProgressGraphs />
+                                <ProgressGraphs programsList={joinedPrograms} />
                             ) : (
                                 <Text color="gray.500" textAlign="center">No joined programs</Text>
                             )}
