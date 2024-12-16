@@ -19,6 +19,7 @@ import PostFeedCard from "./PostFeedCard.component.jsx";
 import ProgramFeedCard from "./ProgramFeedCard.component.jsx";
 // import ProgressBoard from "./ProgressBoard.component.jsx";
 import ProgressGraphs from "./ProgressGraphs.component.jsx";
+import TrainerProgramCard from './TrainerProgramCard.component.jsx';
 
 export default function ProfilePage() {
     const username = useSelector(userName);
@@ -145,7 +146,7 @@ export default function ProfilePage() {
                         <Stack spacing={4} width="100%" maxW="800px">
                             {programs?.length > 0 ? (
                                 programs.map((program) => (
-                                    <ProgramFeedCard key={program.id} program={program} />
+                                    <TrainerProgramCard key={program.id} program={program} />
                                 ))
                             ) : (
                                 <Text color="gray.500" textAlign="center">No created programs yet</Text>
