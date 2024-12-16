@@ -91,7 +91,7 @@ const App = () => {
                 <Stack.Screen name="JoinedProgramCard" component={JoinedProgramCard} />
                 <Stack.Screen name="CreateFeedback" component={CreateFeedback} />
                 <Stack.Screen name="FeedbackCard" component={FeedbackCard} />
-                <Stack.Screen name="FeedbackCard" component={FeedbackDetail} />
+                <Stack.Screen name="FeedbackDetail" component={FeedbackDetail} />
 
 
               </Stack.Navigator>
