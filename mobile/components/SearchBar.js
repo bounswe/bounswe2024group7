@@ -1,56 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/FontAwesome5'; // Import search icon from react-native-vector-icons
 import apiInstance from '../Api';
+import { useSelector } from "react-redux";
+import { userSessionToken } from "../user";
 
-function SearchBar({ screen, setResults, setLoading, loading }) {
+function SearchBar({ searchResults, screen, setResults, setLoading, loading }) {
   const [searchQuery, setSearchQuery] = useState('');
+const titleString = (str) => {
+    return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ');
+}
+  const sessionToken = useSelector(userSessionToken);
 
-  const handleSearch = async (val) => {
-    if (!val.trim()) {
-      Toast.show({
-        type: 'info',
-        position: 'bottom',
-        text1: 'Empty Search Query',
-        text2: 'Please enter a search term.',
-        visibilityTime: 2000,
-        autoHide: true,
-        topOffset: 30,
-        bottomOffset: 40,
-      });
-      return;
-    }
+  const handleSearch = async () => {
+           setLoading(true);
+           console.log(searchQuery);
+           try {
+               if (!searchQuery) {
+                   setLoading(false);
+                   return;
+               }
 
-    /*try {
-      setLoading(true);
-      const response = await apiInstance().post('search', {
-        query: val,
-      });
+               const response = await apiInstance(sessionToken).get(`/api/search`, {
+                   params: {
+                       q: titleString(searchQuery)
+                   }
+               });
 
-      if (response.status === 200) {
-        const data = response.data;
-        console.log(data);
-        setResults(data);
-        setSearchQuery('');
+               if (response.status === 200) {
+                   const data = response.data;
+                   setResults(data);
+                   setSearchQuery("");
+                   Toast.show({
+                                   type: 'success',
+                                   position: 'bottom',
+                                   text1: 'Search successfully done',
+                                   visibilityTime: 2000,
+                                   autoHide: true,
+                                   topOffset: 30,
+                                   bottomOffset: 40
+                               });
+               }
+
+               setLoading(false);
+           } catch (e) {
+               console.log(e);
+               Toast.show({
+                               type: 'error',
+                               position: 'bottom',
+                               text1: 'Search Error',
+                               text2: 'There is an error searching. Please try again.',
+                               visibilityTime: 2000,
+                               autoHide: true,
+                               topOffset: 30,
+                               bottomOffset: 40
+                           });
+               setLoading(false);
+           }
+       };
+    useEffect(() => {
+      if (!searchResults) {
+        console.log('Search results are null');
+        return;
       }
-    } catch (e) {
-      console.error(e);
-      Toast.show({
-        type: 'error',
-        position: 'bottom',
-        text1: 'Search Error',
-        text2: 'There was an error while searching. Please try again.',
-        visibilityTime: 2000,
-        autoHide: true,
-        topOffset: 30,
-        bottomOffset: 40,
-      });
-    } finally {
-      setLoading(false);
+      console.log('Search results have changed:', searchResults);
+    }, [searchResults]);
 
-  };*/
-  };
+
 
   return (
     <View style={styles.container}>

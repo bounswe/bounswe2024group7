@@ -110,10 +110,17 @@ public class TrainingProgramController {
 
     @PostMapping("/{trainingProgramId}/rate")
     public ResponseEntity<Void> rateTrainingProgram(@PathVariable Long trainingProgramId,
-                                                    @RequestParam Long userId,
-                                                    @RequestParam int rating) {
-        trainingProgramService.rateTrainingProgram(trainingProgramId, userId, rating);
+                                                    @RequestParam int rating,
+                                                    HttpServletRequest request) {
+        trainingProgramService.rateTrainingProgram(trainingProgramId, rating, request);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{trainingProgramId}/rate")
+    public ResponseEntity<Integer> getUserRatingForTrainingProgram(@PathVariable Long trainingProgramId,
+                                                                   HttpServletRequest request) {
+        int rating = trainingProgramService.getUserRatingForTrainingProgram(trainingProgramId, request);
+        return ResponseEntity.ok(rating);
     }
 
     @GetMapping("/recommended")

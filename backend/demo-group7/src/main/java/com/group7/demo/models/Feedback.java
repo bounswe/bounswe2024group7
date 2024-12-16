@@ -1,7 +1,7 @@
 package com.group7.demo.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.group7.demo.models.enums.BodyPart;
+import com.group7.demo.models.enums.FeedbackMuscle;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ public class Feedback {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    private BodyPart bodyPart;
+    private FeedbackMuscle feedbackMuscle;
 
     private int weekNumber;
 
