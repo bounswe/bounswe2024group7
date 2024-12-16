@@ -4,12 +4,16 @@ import com.group7.demo.dtos.*;
 import com.group7.demo.dtos.mapper.Mapper;
 import com.group7.demo.exceptions.UnauthorizedException;
 import com.group7.demo.models.*;
+import com.group7.demo.models.enums.ProgramLevel;
 import com.group7.demo.models.enums.TrainingProgramWithTrackingStatus;
 import com.group7.demo.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,6 +34,7 @@ public class TrainingProgramService {
     private final WorkoutWithTrackingRepository workoutWithTrackingRepository;
     private final WorkoutExerciseWithTrackingRepository workoutExerciseWithTrackingRepository;
 
+    private final SurveyRepository surveyRepository;
     private final UserRepository userRepository;
     private final UserService userService;
 
@@ -469,6 +474,56 @@ public class TrainingProgramService {
 
         trainingProgram.setRating(totalRatingSum / trainingProgram.getRatingCount());
         trainingProgramRepository.save(trainingProgram);
+    }
+
+    public Map<String, Object> getRecommendedPrograms(int page, int size, HttpServletRequest request) {
+        User user = authenticationService.getAuthenticatedUserInternal(request);
+        
+        // Get user's survey data
+        Survey survey = surveyRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Survey not found for user"));
+
+        // Convert string fitness level to enum
+        ProgramLevel fitnessLevel = survey.getFitnessLevel();
+
+        // Create pageable object
+        Pageable paging = PageRequest.of(page, size);
+        
+        // Get programs matching user's fitness level
+        Page<TrainingProgram> pagePrograms = trainingProgramRepository.findRecommendedPrograms(
+                fitnessLevel,
+                paging
+        );
+
+        List<TrainingProgramResponse> programs = pagePrograms.getContent().stream()
+                .map(mapper::mapToTrainingProgramResponse)
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("programs", programs);
+        response.put("currentPage", pagePrograms.getNumber());
+        response.put("totalItems", pagePrograms.getTotalElements());
+        response.put("totalPages", pagePrograms.getTotalPages());
+
+        return response;
+    }
+
+    public Map<String, Object> explorePrograms(int page, int size) {
+        Pageable paging = PageRequest.of(page, size);
+        
+        Page<TrainingProgram> pagePrograms = trainingProgramRepository.findAllByOrderByParticipantsDesc(paging);
+
+        List<TrainingProgramResponse> programs = pagePrograms.getContent().stream()
+                .map(mapper::mapToTrainingProgramResponse)
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("programs", programs);
+        response.put("currentPage", pagePrograms.getNumber());
+        response.put("totalItems", pagePrograms.getTotalElements());
+        response.put("totalPages", pagePrograms.getTotalPages());
+
+        return response;
     }
 
 }

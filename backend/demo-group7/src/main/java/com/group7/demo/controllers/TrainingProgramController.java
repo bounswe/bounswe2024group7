@@ -116,6 +116,21 @@ public class TrainingProgramController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/recommended")
+    public ResponseEntity<Map<String, Object>> getRecommendedPrograms(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
+        Map<String, Object> response = trainingProgramService.getRecommendedPrograms(page, size, request);
+        return ResponseEntity.ok(response);
+    }
 
+    @GetMapping("/explore")
+    public ResponseEntity<Map<String, Object>> explorePrograms(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Map<String, Object> response = trainingProgramService.explorePrograms(page, size);
+        return ResponseEntity.ok(response);
+    }
 
 }
