@@ -12,6 +12,7 @@ import jestConfig from '../jest.config';
 
 // Note: test renderer must be required after react-native.
 import renderer from 'react-test-renderer';
+import apiInstance from '../Api';
 
 import Home from '../components/Home'
 import Login from '../components/Login'
@@ -34,15 +35,10 @@ it('Renders Whole Application Correctly', () => {
   renderer.create(<App />);
 });
 
-const Home = require('../components/Home');
-
 test('Renders Home Page Correctly', () => {
   const tree = renderer.create(<Home />).toJSON();
   expect(tree).toMatchSnapshot();
 });
-
-const Login = require('../components/Login');
-const Register = require('../components/Register');
 
 test('Renders Login Page Correctly', () => {
     const tree = renderer.create(<Login />).toJSON();
@@ -54,7 +50,7 @@ test('Logs In Correctly', async () => {
   const mockPassword = jest.fn();
 
   const response  = await apiInstance().post("auth/login", { mockUsername, mockPassword });
-  expect(response.status).not.toBe(200);
+  expect(response.status).toBe(200);
 });
 
 test('Renders Register Page Correctly', () => {
@@ -96,16 +92,17 @@ test('Create Post Correctly', async () => {
   const mockContent = jest.fn();
   const mockTrainingProgramId = jest.fn();
   const mockLabels = jest.fn();
-  const mockProfile = jest.fn();
+  const mockToken = jest.fn();
+  //const mockProfile = jest.fn();
 
-  const response  = await apiInstance().post("api/posts", {mockContent, mockTrainingProgramId, mockLabels, mockProfile });
+  const response  = await apiInstance(mockToken).post("api/posts", {mockContent, mockTrainingProgramId, mockLabels });
   expect(response.status).toBe(200);
 });
 
 const CreateProgram = require('../components/CreateProgram');
 
 test('Renders Create Program Page Correctly', () => {
-  const tree = renderer.create(<CreateProgram checkDatabase={() => {}} />).toJSON();
+  const tree = renderer.create(<CreateProgram darkMode=true />).toJSON();
   expect(tree).toMatchSnapshot();
 });
 
@@ -164,16 +161,16 @@ test('Renders Feed Page Correctly', () => {
 
 test('Training Programs in Feed Working Correctly', async () => {
   const response  = await apiInstance().get('api/training-programs');
-  expect(response).not.toBeNull();
+  expect(response.data).not.toBeNull();
 });
 
 test('Random Posts in Feed Working Correctly', async () => {
   const response  = await apiInstance().get('api/posts/random');
-  expect(response).not.toBeNull();
+  expect(response.data).not.toBeNull();
 });
 
 // Joined Exercise
-const JoinedExercise = require('../components/JoinedExerxise');
+const JoinedExercise = require('../components/JoinedExercise');
 
 test('Renders Joined Exercise Page Correctly', () => {
   const tree = renderer.create(<JoinedExercise />).toJSON();
@@ -184,9 +181,10 @@ test('Progress Submission in Joined Exercise Correctly', async () => {
   const programId = jest.fn();
   const exerciseId = jest.fn();
   const newInputs = jest.fn();
+  const mockToken = jest.fn();
   // TODO: This creates mock data, maybe we should change to real values
 
-  const response  = await apiInstance().post(`/api/training-programs/${programId}/workout-exercises/${exerciseId}/complete`, newInputs);
+  const response  = await apiInstance(mockToken).post(`/api/training-programs/${programId}/workout-exercises/${exerciseId}/complete`, newInputs);
   expect(response).toBe(200);
 });
 
@@ -206,12 +204,13 @@ test('Renders Feedback Detail Page Correctly', () => {
   expect(tree).toMatchSnapshot();
 });
 
-test('Feedback Detail Works Correctly', async () => {
+test('User Following Data Works Correctly', async () => {
   const ownUsername = jest.fn();
+  const mockToken = jest.fn();
   // TODO: This creates mock data, maybe we should change to a real ownUsername
 
-  const response  = await apiInstance().get(`api/user/${ownUsername}/following`);
-  expect(response).not.toBeNull();
+  const response  = await apiInstance(mockToken).get(`api/user/${ownUsername}/following`);
+  expect(response.data).not.toBeNull();
 });
 
 // Profile Page
@@ -230,12 +229,12 @@ test('Renders Program Card Page Correctly', () => {
   expect(tree).toMatchSnapshot();
 });
 
-test('Program Card Works Correctly', async () => {
+test('Joined Training Programs Correctly', async () => {
   const username = jest.fn();
   // TODO: This creates mock data, maybe we should change to a real username
 
   const response  = await apiInstance().get(`api/training-programs/joined/${username}`);
-  expect(response).not.toBeNull();
+  expect(response.data).not.toBeNull();
 });
 
 // Program Detail
@@ -246,13 +245,24 @@ test('Renders Program Detail Page Correctly', () => {
   expect(tree).toMatchSnapshot();
 });
 
-test('Program Detail Works Correctly', async () => {
+test('Join Program Correctly', async () => {
   const programId = jest.fn();
+  const mockToken = jest.fn();
   // TODO: This creates mock data, maybe we should change to a real progam_ID
 
-  const response  = await apiInstance().get(`api/training-programs/${programId}/join`);
-  expect(response).not.toBeNull();
+  const response  = await apiInstance(mockToken).post(`api/training-programs/${programId}/join`);
+  expect(response).toBe(200);
 });
+
+test('Leave Program Correctly', async () => {
+  const programId = jest.fn();
+  const mockToken = jest.fn();
+  // TODO: This creates mock data, maybe we should change to a real progam_ID
+
+  const response  = await apiInstance(mockToken).delete(`api/training-programs/${programId}/leave`);
+  expect(response).toBe(200);
+});
+
 
 // User Profile
 const UserProfile = require('../components/UserProfile');
