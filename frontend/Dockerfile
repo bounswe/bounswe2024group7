@@ -1,24 +1,25 @@
-# Use node to build
-FROM node:20 AS builder
+# Using node:20 for the vite to work correct.
+FROM node:20
 
-# Set the working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy the files
+# Copy the current directory contents into the container at /app. But remove the node_modules folder
 COPY . .
 
-# Install dependencies and build the production app
+# Remove the node_modules folder
+RUN rm -rf node_modules
+
+# Install any needed packages specified in package.json
 RUN npm install
-RUN npm run build
 
-# Use a lightweight web server
-FROM nginx:alpine
+# Make port 3000 available for the vite app
+EXPOSE 3000
 
-# Copy the build output to NGINX's HTML directory
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Define environment variable
+#ENV NODE_ENV=development
+ENV REACT_APP_API_BASE_URL=http://localhost:30002
+ENV VITE_API_URL=http://165.227.166.132:30002
 
-# Expose port 80 for the NGINX server
-EXPOSE 80
-
-# Start NGINX
-CMD ["nginx", "-g", "daemon off;"]
+# Run the app when the container launches
+CMD ["npm", "run", "dev"]
