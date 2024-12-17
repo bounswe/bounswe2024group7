@@ -113,7 +113,7 @@ const TrainingCard = () => {
     const [weekNumber, setWeekNumber] = useState(null);
     const [workoutNumber, setWorkoutNumber] = useState(null);
     const [selectedExerciseId, setSelectedExerciseId] = useState(null);
-    const [progressValue, setprogressValue] = useState(trainingProgram ? parseInt(trainingProgram.completionPercentage) : 0);
+    const [progressValue, setprogressValue] = useState(0);
 
     // Join to a program Mutation
     const { mutate: joinProgram } = useMutation({
@@ -132,9 +132,28 @@ const TrainingCard = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['training-programs'] })
             queryClient.invalidateQueries({ queryKey: ['user'] })
+            queryClient.invalidateQueries(
+                {
+                    queryKey: ['explore-programs']
+                }
+            )
+            queryClient.invalidateQueries(
+                {
+                    queryKey: ['recommended-programs']
+                }
+            )
             setIsUserJoined(true)
         },
         onError: (error) => {
+            // If status 400, show the error message
+            if (error.response && error.response.status === 400) {
+                toast({
+                    title: error.response.data.message,
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
+            }
             console.log(error)
             toast({
                 title: 'An error occurred.',
@@ -162,6 +181,16 @@ const TrainingCard = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['training-programs'] })
             queryClient.invalidateQueries({ queryKey: ['user'] })
+            queryClient.invalidateQueries(
+                {
+                    queryKey: ['explore-programs']
+                }
+            )
+            queryClient.invalidateQueries(
+                {
+                    queryKey: ['recommended-programs']
+                }
+            )
             setIsUserJoined(false)
         },
         onError: (error) => {
@@ -176,10 +205,10 @@ const TrainingCard = () => {
     })
 
     useEffect(() => {
-        if (trainingProgram) {
+        if (trainingProgram && isUserJoined) {
             setprogressValue(parseInt(trainingProgram.completionPercentage));
         }
-    }, [trainingProgram]);
+    }, [trainingProgram, isUserJoined])
 
     useEffect(() => {
         const fetchTrainingProgram = async () => {
