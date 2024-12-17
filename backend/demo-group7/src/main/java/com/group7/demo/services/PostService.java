@@ -270,4 +270,9 @@ public class PostService {
         return response;
     }
 
+    public Post getPostById(Long postId) {
+        return postRepository.findById(postId)
+            .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
+    }
+
 }
