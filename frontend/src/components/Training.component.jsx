@@ -206,20 +206,28 @@ const TrainingCard = () => {
                 }
 
                 if (user) {
+                    try {
                     const joinedProgramsResponse = await apiInstance(sessionToken).get(
                         `/api/training-programs/ongoing/${programID}`
                     );
                     const joinedProgram = joinedProgramsResponse.data;
 
-                    setIsUserJoined(joinedProgram ? true : false);
-                    setError(null);
-                    setTrainingProgram(joinedProgram);
-                    setprogressValue(parseInt(joinedProgram.completionPercentage));
-                    return;
-                }
+                    const userJoinedBool = joinedProgram && joinedProgram.status === 'ONGOING';
 
-                setTrainingProgram(data);
-                setError(null);
+                    setIsUserJoined(userJoinedBool);
+
+                    if (userJoinedBool) {
+                        setError(null);
+                        setTrainingProgram(joinedProgram);
+                        setprogressValue(parseInt(joinedProgram.completionPercentage));
+                        return;
+                    }
+                } catch (error) {
+                    setTrainingProgram(data);
+                    setprogressValue(0);
+                    setError(null);
+                }
+            }
             } catch (error) {
                 console.error('Error fetching training program:', error);
                 toast({

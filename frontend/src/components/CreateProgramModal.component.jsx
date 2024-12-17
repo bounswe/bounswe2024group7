@@ -272,6 +272,16 @@ function CreateProgramModal({ isOpen, onClose }) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries(['training-programs']);
+            queryClient.invalidateQueries(
+                {
+                    queryKey: ['explore-programs']
+                }
+            )
+            queryClient.invalidateQueries(
+                {
+                    queryKey: ['recommended-programs']
+                }
+            )
             resetAllFields();
             onClose();
         },

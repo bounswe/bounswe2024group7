@@ -34,7 +34,6 @@ import { useDisclosure } from '@chakra-ui/react';
 function ProgramFeedCard({
     program
 }) {
-    console.log('program', program)
     const { isOpen, onOpen, onClose } = useDisclosure();
     const {
         isOpen: isFeedbackOpen,
@@ -58,15 +57,23 @@ function ProgramFeedCard({
         user && following && following.includes(program.trainer)
     )
     const [isUserJoined, setIsUserJoined] = useState(
-        user && user.joinedPrograms && user.joinedPrograms
+        user && joinedPrograms
             .filter(
-                (joinedProgram) => joinedProgram.status !== 'LEFT'
+                (joinedProgram) => joinedProgram.status !== 'LEFT' || joinedProgram.status !== 'COMPLETED'
             )
             .map((joinedProgram) => joinedProgram.id).includes(program.id)
     )
 
     useEffect(() => {
         if (user && joinedPrograms) {
+            console.log('setIsProgramCompleted', joinedPrograms
+            .filter(
+                (joinedProgram) => joinedProgram.status === 'COMPLETED'
+            )
+            .map((joinedProgram) => joinedProgram.id)
+            .includes(program.id), program.title
+            )
+
             setIsProgramCompleted(
                 joinedPrograms
                     .filter(
@@ -85,17 +92,25 @@ function ProgramFeedCard({
     }, [user, following])
 
     useEffect(() => {
-        if (user && user.joinedPrograms) {
+        if (user && joinedPrograms) {
+            console.log('setIsUserJoined', joinedPrograms
+            .filter(
+                (joinedProgram) => joinedProgram.status == "ONGOING"
+            )
+            .map((joinedProgram) => joinedProgram.id)
+            .includes(program.id), program.title
+            )
+
             setIsUserJoined(
-                user.joinedPrograms
+                joinedPrograms
                     .filter(
-                        (joinedProgram) => joinedProgram.status !== 'LEFT'
+                        (joinedProgram) => joinedProgram.status == "ONGOING"
                     )
                     .map((joinedProgram) => joinedProgram.id)
                     .includes(program.id)
             )
         }
-    }, [user])
+    }, [user, joinedPrograms])
 
     // Follow a user Mutation
     const { mutate: followUser } = useMutation(
@@ -204,6 +219,16 @@ function ProgramFeedCard({
                 queryClient.invalidateQueries({
                     queryKey: ['joinedPrograms']
                 })
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['explore-programs']
+                    }
+                )
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['recommended-programs']
+                    }
+                )
             },
             onError: (error) => {
                 console.log(error)
@@ -253,6 +278,16 @@ function ProgramFeedCard({
                 queryClient.invalidateQueries({
                     queryKey: ['joinedPrograms']
                 })
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['explore-programs']
+                    }
+                )
+                queryClient.invalidateQueries(
+                    {
+                        queryKey: ['recommended-programs']
+                    }
+                )
             },
             onError: (error) => {
                 console.log(error)
