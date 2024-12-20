@@ -89,6 +89,7 @@
     "prettier-plugin-style-order": "^0.2.2",
     "prettier-plugin-tailwindcss": "^0.1.13",
     "react-test-renderer": "^18.2.0",
+    "redux-mock-store": "^1.5.5",
     "stylelint": "^14.11.0",
     "stylelint-config-idiomatic-order": "^8.1.0",
     "stylelint-config-prettier-scss": "^0.0.1",
