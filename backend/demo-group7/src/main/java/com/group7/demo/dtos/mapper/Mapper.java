@@ -1,6 +1,7 @@
 package com.group7.demo.dtos.mapper;
 
 import com.group7.demo.dtos.*;
+import com.group7.demo.dtos.jsonld.PostJsonLd;
 import com.group7.demo.models.*;
 import com.group7.demo.models.enums.TrainingProgramWithTrackingStatus;
 import com.group7.demo.services.AuthenticationService;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -222,6 +224,50 @@ public class Mapper {
                 .build();
     }
 
+    public PostJsonLd mapToPostJsonLd(Post post) {
+        // Create array of interaction statistics for both likes and bookmarks
+        Map<String, Object>[] interactionStats = new Map[2];
+        
+        // Like statistics
+        interactionStats[0] = Map.of(
+            "@type", "InteractionCounter",
+            "interactionType", "https://schema.org/LikeAction",
+            "userInteractionCount", post.getLikedByUsers() != null ? post.getLikedByUsers().size() : 0
+        );
+        
+        // Bookmark statistics
+        interactionStats[1] = Map.of(
+            "@type", "InteractionCounter",
+            "interactionType", "https://schema.org/BookmarkAction",
+            "userInteractionCount", post.getBookmarkedByUsers() != null ? post.getBookmarkedByUsers().size() : 0
+        );
 
+        return PostJsonLd.builder()
+            .context("https://schema.org")
+            .type("SocialMediaPosting")
+            .identifier(post.getId().toString())
+            .text(post.getContent())
+            .datePublished(post.getCreatedAt().toString())
+            .author(Map.of(
+                "@type", "Person",
+                "identifier", post.getUser().getId().toString(),
+                "name", post.getUser().getUsername()
+            ))
+            .image(post.getImageUrl() != null ? post.getImageUrl() : "")
+            .interactionStatistics(interactionStats)
+            .keywords(post.getTags() != null ? 
+                post.getTags().stream()
+                    .map(Tag::getName)
+                    .toArray(String[]::new) 
+                : new String[0])
+            .trainingProgram(post.getTrainingProgram() != null ? Map.of(
+                "@type", "ExercisePlan",
+                "identifier", post.getTrainingProgram().getId().toString(),
+                "name", post.getTrainingProgram().getTitle(),
+                "description", post.getTrainingProgram().getDescription(),
+                "instructor", post.getTrainingProgram().getTrainer().getUsername()
+            ) : null)
+            .build();
+    }
 
 }
